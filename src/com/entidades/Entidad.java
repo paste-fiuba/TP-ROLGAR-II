@@ -6,7 +6,7 @@ package com.entidades;
  */
 public abstract class Entidad {
 
-    // ==== Atributos comunes ====
+    // Atributos comunes 
     protected String nombre;
     protected int vida;
     protected int posX;
