@@ -1,41 +1,89 @@
-package com.logica;
+package com.logica; // O el paquete donde tengas tu Main
 
-import com.entidades.Personaje;
-import com.items.*;
-// MAIN DE PRUEBA----------------------- asi testeaba las cartas por las dudas
+// Importaciones de la Interfaz Gráfica (Vista)
+import com.ui.PanelJuego;
+import com.ui.VentanaJuego;
+
+// Importaciones del Tablero (Modelo)
+import com.tablero.Tablero;
+import com.tablero.TipoCasillero;
+
+/**
+ * Clase principal para iniciar y probar el juego Rolgar II.
+ * Configura el modelo (Tablero) y la vista (VentanaJuego).
+ */
 public class Main {
 
+    // --- Constantes para un tablero GRANDE ---
+    private static final int ANCHO_TABLERO = 30; // <-- Aumentado
+    private static final int ALTO_TABLERO = 22;  // <-- Aumentado
+    private static final int NIVELES_TABLERO = 2;
+    private static final int NIVEL_INICIAL = 0; // Empezamos en el piso 0
+
     public static void main(String[] args) {
-        // Crear dos personajes para la prueba
-        Personaje jugador = new Personaje("Link", 100, 1, 1, 1, 15, 3, 10);
-        Personaje enemigo = new Personaje("Orco", 80, 2, 1, 1, 12, 2, 5);
+        
+        System.out.println("[Main] Iniciando Rolgar II...");
 
-        // Agregar cartas a ambos
-        jugador.agregarCarta(new CartaCuracionTotal());
-        jugador.agregarCarta(new CartaEscudo(50)); // ✅ escudo de 50%
+        // --- 1. CREAR EL MODELO ---
+        System.out.println("[Main] Creando modelo del tablero (" + 
+                           ANCHO_TABLERO + "x" + ALTO_TABLERO + "x" + NIVELES_TABLERO + ")...");
+        Tablero miTablero = new Tablero(ANCHO_TABLERO, ALTO_TABLERO, NIVELES_TABLERO);
+        
+        crearMundoDePrueba(miTablero);
 
-        jugador.agregarCarta(new CartaEsquivarDanio(0.7));
+        // --- 2. CREAR LA VISTA (UI) ---
+        System.out.println("[Main] Iniciando interfaz grafica...");
+        
+        PanelJuego miPanel = new PanelJuego(miTablero, NIVEL_INICIAL);
+        new VentanaJuego(miPanel); 
 
-        enemigo.agregarCarta(new CartaAumentoVida(20));
-        enemigo.agregarCarta(new CartaRoboDeCarta());
-        enemigo.agregarCarta(new CartaTeletransportacion(3, 2, 0));
+        System.out.println("[Main] ¡Juego iniciado! Mostrando nivel " + NIVEL_INICIAL);
+    }
 
-        // Mostrar inventarios iniciales
-        System.out.println("=== Inventarios iniciales ===");
-        System.out.println("Jugador:\n" + jugador.getInventario());
-        System.out.println("Enemigo:\n" + enemigo.getInventario());
+    /**
+     * Método de ayuda para llenar el tablero con terreno de prueba.
+     *
+     * @param tablero El tablero a modificar.
+     */
+    private static void crearMundoDePrueba(Tablero tablero) {
+        
+        System.out.println("[Mundo] Rellenando pisos con 'VACIO'...");
+        for (int z = 0; z < NIVELES_TABLERO; z++) {
+            for (int y = 0; y < ALTO_TABLERO; y++) {
+                for (int x = 0; x < ANCHO_TABLERO; x++) {
+                    tablero.getCasillero(x, y, z).setTipo(TipoCasillero.VACIO);
+                }
+            }
+        }
 
-        // Probar uso de cartas
-        System.out.println("\n=== Pruebas de efectos ===");
+        System.out.println("[Mundo] Creando estructuras en Nivel 0...");
+        // --- Nivel 0 ---
+        
+        // Un "lago" de AGUA cerca de la esquina superior izquierda
+        for(int y = 2; y <= 5; y++) {
+            for(int x = 2; x <= 6; x++) {
+                tablero.getCasillero(x, y, 0).setTipo(TipoCasillero.AGUA);
+            }
+        }
 
-        jugador.usarCarta(0, jugador); // Curación total
-        jugador.usarCarta(1, jugador); // Escudo
-        jugador.usarCarta(2, enemigo); // Evasión
-        enemigo.usarCarta(1, jugador); // Robo de carta
+        // Una "pared" de ROCA más central
+        for(int y = 10; y <= 20; y++) {
+            tablero.getCasillero(15, y, 0).setTipo(TipoCasillero.ROCA);
+        }
+        for(int x = 10; x <= 15; x++) {
+            tablero.getCasillero(x, 10, 0).setTipo(TipoCasillero.ROCA);
+        }
 
-        // Mostrar inventarios después de usar cartas
-        System.out.println("\n=== Inventarios finales ===");
-        System.out.println("Jugador:\n" + jugador.getInventario());
-        System.out.println("Enemigo:\n" + enemigo.getInventario());
+        // La "RAMPA" (o ascensor) para subir, en la esquina opuesta
+        tablero.getCasillero(ANCHO_TABLERO - 2, ALTO_TABLERO - 2, 0).setTipo(TipoCasillero.RAMPA);
+
+        // --- Nivel 1 ---
+        System.out.println("[Mundo] Creando estructuras en Nivel 1...");
+        
+        // La "RAMPA" que conecta desde arriba
+        tablero.getCasillero(ANCHO_TABLERO - 2, ALTO_TABLERO - 2, 1).setTipo(TipoCasillero.RAMPA);
+        
+        // Un obstáculo de ROCA en el piso de arriba
+        tablero.getCasillero(5, 5, 1).setTipo(TipoCasillero.ROCA);
     }
 }
