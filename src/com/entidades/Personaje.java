@@ -1,78 +1,172 @@
 package com.entidades;
 
 import com.items.Carta;
-import java.util.ArrayList;
+import com.items.Inventario;
 
 /**
- * Clase que representa a un jugador dentro del tablero.
- * Hereda de Entidad e incorpora un inventario de cartas de poder.
+ * Representa a un jugador dentro del tablero.
+ * Hereda de Entidad e incorpora un inventario de cartas y efectos especiales.
  */
 public class Personaje extends Entidad {
 
-    private ArrayList<Carta> poderes;
+    private Inventario inventario;
+
+    // Estados especiales
+    private boolean escudoActivo;
+    private int reduccionEscudo;
+    private boolean invisible;
+    private boolean evasionActiva;
+    private int movimientosExtra;
 
     /**
-     * pre: los parámetros nombre no es null, vida > 0, fuerza >= 0,
-     *      vision >= 0, salud >= 0, y las coordenadas son válidas en el tablero.
-     * post: crea un personaje con los valores iniciales dados y una lista vacía de cartas.
+     * pre: nombre no es null, vida > 0, fuerza >= 0, vision >= 0, salud >= 0.
+     * post: crea un personaje con los atributos indicados,
+     *       un inventario vacío y sin efectos activos.
      */
     public Personaje(String nombre, int vida, int posX, int posY, int posZ,
                      int fuerza, int vision, double salud) {
         super(nombre, vida, posX, posY, posZ, fuerza, vision, salud);
-        this.poderes = new ArrayList<>();
+        this.inventario = new Inventario();
+        this.escudoActivo = false;
+        this.invisible = false;
+        this.evasionActiva = false;
+        this.movimientosExtra = 0;
     }
+
+    /* ===============================
+       INVENTARIO (delegación)
+       =============================== */
 
     /**
      * pre: carta no es null.
-     * post: agrega la carta al inventario si el personaje tiene menos de 10 cartas.
-     *       si ya tiene 10 cartas, no se agrega y se informa por consola.
+     * post: agrega la carta al inventario del personaje.
      */
     public void agregarCarta(Carta carta) {
-        if (carta == null) return;
-
-        if (poderes.size() < 10) {
-            poderes.add(carta);
-            System.out.println(nombre + " obtuvo la carta: " + carta.getNombre());
-        } else {
-            System.out.println(nombre + " no puede tener más de 10 cartas.");
-        }
+        inventario.agregarCarta(carta);
     }
 
     /**
-     * pre: el personaje tiene al menos una carta en su inventario.
-     * post: devuelve la lista actual de cartas del personaje (puede estar vacía si no posee cartas).
-     */
-    public ArrayList<Carta> getPoderes() {
-        return poderes;
-    }
-
-    /**
-     * pre: el índice está entre 0 y poderes.size() - 1.
-     * post: elimina la carta de la posición indicada.
+     * pre: índice válido (0 ≤ indice < cantidadDeCartas()).
+     * post: elimina la carta de esa posición.
      */
     public void eliminarCarta(int indice) {
-        if (indice >= 0 && indice < poderes.size()) {
-            Carta eliminada = poderes.remove(indice);
-            System.out.println(nombre + " descartó la carta: " + eliminada.getNombre());
-        }
+        inventario.eliminarCarta(indice);
     }
 
     /**
-     * pre: el personaje tiene al menos una carta y el índice es válido.
-     * post: usa la carta seleccionada contra un objetivo.
+     * pre: índice válido y usuario no null.
+     * post: aplica el efecto de la carta sobre el objetivo.
      */
     public void usarCarta(int indice, Personaje objetivo) {
-        if (indice >= 0 && indice < poderes.size()) {
-            Carta carta = poderes.get(indice);
-            carta.aplicarEfecto(this, objetivo);
-        }
+        inventario.usarCarta(indice, this, objetivo);
     }
 
     /**
-     * post: devuelve una representación textual del personaje con su nombre y estado actual.
+     * post: devuelve el inventario completo del personaje.
+     */
+    public Inventario getInventario() {
+        return inventario;
+    }
+
+    /* ===============================
+       EFECTOS ESPECIALES
+       =============================== */
+
+    /**
+     * pre: porcentaje entre 0 y 100.
+     * post: activa un escudo que reduce el daño recibido según el porcentaje.
+     */
+    public void setEscudoActivo(boolean estado, int porcentaje) {
+        this.escudoActivo = estado;
+        this.reduccionEscudo = porcentaje;
+    }
+
+    /**
+     * pre: estado puede ser true o false.
+     * post: actualiza el estado de invisibilidad del personaje.
+     */
+    public void setInvisible(boolean estado) {
+        this.invisible = estado;
+    }
+
+    /**
+     * pre: estado puede ser true o false.
+     * post: activa o desactiva la evasión para el próximo ataque.
+     */
+    public void setEvasionActiva(boolean estado) {
+        this.evasionActiva = estado;
+    }
+
+    /**
+     * pre: cantidad >= 0.
+     * post: establece cuántos movimientos extra tendrá el personaje.
+     */
+    public void setMovimientosExtra(int cantidad) {
+        this.movimientosExtra = cantidad;
+    }
+
+    /**
+     * post: devuelve cuántos movimientos extra tiene el personaje actualmente.
+     */
+    public int getMovimientosExtra() {
+        return movimientosExtra;
+    }
+
+    /* ===============================
+       COMBATE Y DAÑO
+       =============================== */
+
+    /**
+     * pre: danio >= 0.
+     * post: aplica las condiciones activas (invisibilidad, evasión, escudo)
+     *       antes de restar la vida. Si invisibilidad o evasión están activas,
+     *       el daño puede anularse completamente.
+     */
+    @Override
+    public void recibirDanio(int danio) {
+        // Invisibilidad
+        if (invisible) {
+            System.out.println(nombre + " era invisible y evitó el ataque!");
+            invisible = false;
+            return;
+        }
+
+        // Evasión
+        if (evasionActiva) {
+            System.out.println(nombre + " esquivó el ataque gracias a su evasión!");
+            evasionActiva = false;
+            return;
+        }
+
+        // Escudo
+        if (escudoActivo) {
+            int danioReducido = danio - (danio * reduccionEscudo / 100);
+            super.recibirDanio(danioReducido);
+            System.out.println(nombre + " recibió " + danioReducido +
+                               " de daño (escudo activo: -" + reduccionEscudo + "%).");
+            escudoActivo = false;
+        } else {
+            super.recibirDanio(danio);
+            System.out.println(nombre + " recibió " + danio + " de daño.");
+        }
+    }
+
+    /* ===============================
+       REPRESENTACIÓN TEXTUAL
+       =============================== */
+
+    /**
+     * post: devuelve una cadena con el estado completo del personaje.
      */
     @Override
     public String toString() {
-        return "Jugador " + super.toString() + " | Cartas: " + poderes.size();
+        return "Jugador " + nombre +
+               " [vida=" + vida +
+               ", pos=(" + posX + "," + posY + "," + posZ + ")" +
+               ", escudo=" + (escudoActivo ? reduccionEscudo + "%" : "no") +
+               ", invisible=" + invisible +
+               ", evasion=" + evasionActiva +
+               ", movimientosExtra=" + movimientosExtra +
+               ", cartas=" + inventario.cantidadDeCartas() + "]";
     }
 }
