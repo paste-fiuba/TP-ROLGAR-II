@@ -1,5 +1,5 @@
 package com.logica;
 
-public class Juego {
+public class Turno {
 
 }

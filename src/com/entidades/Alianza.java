@@ -1,6 +1,5 @@
-package com.logica;
+package com.entidades;
 
-import com.entidades.Personaje;
 import java.util.ArrayList;
 
 /**
