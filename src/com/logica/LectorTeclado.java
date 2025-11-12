@@ -1,4 +1,4 @@
-package com.util;
+package com.logica;
 
 public class LectorTeclado {
 
