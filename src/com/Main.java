@@ -9,11 +9,15 @@ import com.entidades.Enemigo;
 import java.util.List;
 import java.util.ArrayList;
 import com.logica.ControladorJuego; 
+import com.logica.AdministradorDeJuego;
 import com.items.Carta;
 import com.items.CartaAtaqueDoble;
 import com.items.CartaEscudo;
 import com.items.CartaCuracionAliado;
 
+/**
+ * Clase principal: Crea y conecta el Modelo, la Vista y el Controlador.
+ */
 public class Main {
 
     private static final int ANCHO_TABLERO = 25;
@@ -23,17 +27,22 @@ public class Main {
 
     public static void main(String[] args) {
         
+        // 1. Crear el Modelo
         Tablero miTablero = new Tablero(ANCHO_TABLERO, ALTO_TABLERO, NIVELES_TABLERO);
         crearMundoCoherente(miTablero);
-        
         Personaje miPersonaje = crearPersonaje();
         List<Enemigo> listaEnemigos = crearEnemigos();
 
+        // 2. Crear la Vista
         PanelJuego miPanel = new PanelJuego(miTablero, miPersonaje, listaEnemigos, NIVEL_INICIAL);
         
-        // Creamos el controlador, pasándole el modelo (tablero, jugador, enemigos) y la vista (panel)
-        ControladorJuego miControlador = new ControladorJuego(miTablero, miPersonaje, listaEnemigos, miPanel);
+        // 3. Crear el Motor de Lógica
+        AdministradorDeJuego miAdmin = new AdministradorDeJuego(miTablero, miPersonaje, listaEnemigos, miPanel);
 
+        // 4. Crear el Controlador de Input
+        ControladorJuego miControlador = new ControladorJuego(miAdmin, miPanel);
+
+        // 5. Conectar todo
         miPanel.setControlador(miControlador);
         new VentanaJuego(miPanel); 
         miPanel.iniciarOyenteTeclado();
@@ -46,26 +55,22 @@ public class Main {
         Personaje personaje = new Personaje("Héroe Rolgar", 100, 
                                           centroX, centroY, NIVEL_INICIAL, 
                                           10, 1, 5.0);
-        
         try {
             personaje.agregarCarta(new CartaAtaqueDoble());
-            personaje.agregarCarta(new CartaEscudo(20));
+            personaje.agregarCarta(new CartaEscudo(2));
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return personaje;
     }
     
     private static List<Enemigo> crearEnemigos() {
         List<Enemigo> enemigos = new ArrayList<>();
-        
         enemigos.add(new Enemigo("Orco", "Guerrero", 50, 14, 4, 0, 5, 1, 0));
         enemigos.add(new Enemigo("Esqueleto", "Arquero", 30, 4, 9, 0, 3, 1, 0));
-        enemigos.add(new Enemigo("Murciélago", "Volador", 10, 4, 11, 1, 1, 1, 0));
+        enemigos.add(new Enemigo("Murciélago", "Volador", 10, 4, 10, 1, 1, 1, 0));
         enemigos.add(new Enemigo("Golem", "Tanque", 100, 12, 4, 2, 8, 1, 0));
-        enemigos.add(new Enemigo("Mago Oscuro", "Jefe", 80, 12, 12, 3, 15, 1, 0));
-        
+        enemigos.add(new Enemigo("Mago Oscuro", "Jefe", 80, 12, 10, 3, 15, 1, 0));
         return enemigos;
     }
     
@@ -108,9 +113,8 @@ public class Main {
         tallarHabitacion(tablero, 10, 8, 15, 12, 3);
         tablero.getCasillero(12, 10, 3).setTipo(TipoCasillero.RAMPA);
         
-        // Colocar Cartas
         try {
-            tablero.getCasillero(11, 11, 0).setCarta(new CartaCuracionAliado(30));
+            tablero.getCasillero(11, 11, 0).setCarta(new CartaCuracionAliado(2));
             tablero.getCasillero(14, 10, 2).setCarta(new CartaAtaqueDoble());
         } catch (Exception e) {
             e.printStackTrace();
