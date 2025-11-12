@@ -8,14 +8,18 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
+// Imports para Input
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 // Imports del Modelo
+import java.util.List; // Para la lista de enemigos
 import com.tablero.Tablero;
 import com.tablero.Casillero;
 import com.tablero.TipoCasillero;
 import com.entidades.Personaje;
+import com.entidades.Enemigo;
 
 // Import del Controlador
 import com.logica.ControladorJuego; 
@@ -28,27 +32,30 @@ public class PanelJuego extends JPanel implements KeyListener {
 
     public static final int TAMAÑO_TILE = 32;
 
-    // Referencias al Modelo
+    // --- Referencias al Modelo ---
     private Tablero tablero;
     private int nivelZActual; 
     private Personaje jugador; 
+    private List<Enemigo> enemigos; // Lista de enemigos
     
-    // Referencia al Controlador
+    // --- Referencia al Controlador ---
     private ControladorJuego controlador;
 
-    // Sprites
+    // --- Sprites ---
     private BufferedImage spriteRoca;
     private BufferedImage spriteVacio;  
     private BufferedImage spriteRampa; 
     private BufferedImage spriteAgua;   
     private BufferedImage spritePersonaje;
+    private BufferedImage spriteEnemigo; // Sprite para enemigos
 
     /**
      * Constructor. Recibe los datos del Modelo.
      */
-    public PanelJuego(Tablero tablero, Personaje jugador, int zInicial) {
+    public PanelJuego(Tablero tablero, Personaje jugador, List<Enemigo> enemigos, int zInicial) {
         this.tablero = tablero;
         this.jugador = jugador;
+        this.enemigos = enemigos;
         this.nivelZActual = zInicial;
         
         int anchoPanel = tablero.getDimensionX() * TAMAÑO_TILE;
@@ -85,6 +92,7 @@ public class PanelJuego extends JPanel implements KeyListener {
             this.spriteRampa = ImageIO.read(new File("src/sprites/rampa.png")); 
             this.spriteAgua = ImageIO.read(new File("src/sprites/agua.png"));
             this.spritePersonaje = ImageIO.read(new File("src/sprites/personaje.png"));
+            this.spriteEnemigo = ImageIO.read(new File("src/sprites/enemigo.png")); // Carga el sprite de enemigo
         } catch (IOException e) {
             System.err.println("Error al cargar uno o más sprites.");
             e.printStackTrace();
@@ -118,7 +126,19 @@ public class PanelJuego extends JPanel implements KeyListener {
             }
         }
         
-        // 2. Dibujar Personaje (encima del terreno)
+        // 2. Dibujar Enemigos
+        if (this.spriteEnemigo != null) {
+            for (Enemigo enemigo : enemigos) {
+                // Dibujar solo si está vivo Y en el nivel actual
+                if (enemigo.estaVivo() && enemigo.getPosZ() == this.nivelZActual) {
+                    int pixelX = enemigo.getPosX() * TAMAÑO_TILE;
+                    int pixelY = enemigo.getPosY() * TAMAÑO_TILE;
+                    g.drawImage(this.spriteEnemigo, pixelX, pixelY, this);
+                }
+            }
+        }
+        
+        // 3. Dibujar Personaje (al final para que esté por encima)
         if (jugador.getPosZ() == this.nivelZActual) {
             int pixelX = jugador.getPosX() * TAMAÑO_TILE;
             int pixelY = jugador.getPosY() * TAMAÑO_TILE;
