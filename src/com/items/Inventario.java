@@ -1,5 +1,6 @@
 package com.items;
 
+import com.entidades.Entidad;
 import com.entidades.Personaje;
 import java.util.ArrayList;
 
@@ -51,7 +52,7 @@ public class Inventario {
      * pre: índice válido y usuario no null.
      * post: aplica el efecto de la carta seleccionada sobre el objetivo (puede ser null).
      */
-    public void usarCarta(int indice, Personaje usuario, Personaje objetivo) {
+    public void usarCarta(int indice, Personaje usuario, Entidad objetivo) {
         if (indice >= 0 && indice < cartas.size() && usuario != null) {
             Carta carta = cartas.get(indice);
             carta.aplicarEfecto(usuario, objetivo);

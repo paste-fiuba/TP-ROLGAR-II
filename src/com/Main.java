@@ -9,11 +9,10 @@ import com.entidades.Enemigo;
 import java.util.List;
 import java.util.ArrayList;
 import com.logica.ControladorJuego; 
-
 import com.items.Carta;
 import com.items.CartaAtaqueDoble;
 import com.items.CartaEscudo;
-import com.items.CartaCuracionAliado; // (Ejemplo)
+import com.items.CartaCuracionAliado;
 
 public class Main {
 
@@ -32,7 +31,8 @@ public class Main {
 
         PanelJuego miPanel = new PanelJuego(miTablero, miPersonaje, listaEnemigos, NIVEL_INICIAL);
         
-        ControladorJuego miControlador = new ControladorJuego(miTablero, miPersonaje, miPanel);
+        // Creamos el controlador, pasándole el modelo (tablero, jugador, enemigos) y la vista (panel)
+        ControladorJuego miControlador = new ControladorJuego(miTablero, miPersonaje, listaEnemigos, miPanel);
 
         miPanel.setControlador(miControlador);
         new VentanaJuego(miPanel); 
@@ -47,10 +47,9 @@ public class Main {
                                           centroX, centroY, NIVEL_INICIAL, 
                                           10, 1, 5.0);
         
-        // Damos 2 cartas iniciales (para la hotbar)
         try {
             personaje.agregarCarta(new CartaAtaqueDoble());
-            personaje.agregarCarta(new CartaEscudo(10));
+            personaje.agregarCarta(new CartaEscudo(20));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -60,11 +59,13 @@ public class Main {
     
     private static List<Enemigo> crearEnemigos() {
         List<Enemigo> enemigos = new ArrayList<>();
+        
         enemigos.add(new Enemigo("Orco", "Guerrero", 50, 14, 4, 0, 5, 1, 0));
         enemigos.add(new Enemigo("Esqueleto", "Arquero", 30, 4, 9, 0, 3, 1, 0));
         enemigos.add(new Enemigo("Murciélago", "Volador", 10, 4, 10, 1, 1, 1, 0));
         enemigos.add(new Enemigo("Golem", "Tanque", 100, 12, 4, 2, 8, 1, 0));
         enemigos.add(new Enemigo("Mago Oscuro", "Jefe", 80, 12, 10, 3, 15, 1, 0));
+        
         return enemigos;
     }
     
@@ -78,17 +79,17 @@ public class Main {
             }
         }
 
-        // --- Nivel 0 ---
-        tallarHabitacion(tablero, 10, 8, 15, 12, 0); // Sala 1
-        tallarHabitacion(tablero, 10, 2, 15, 5, 0);  // Sala 2
-        tallarHabitacion(tablero, 2, 8, 7, 12, 0);  // Sala 3
+        // Nivel 0
+        tallarHabitacion(tablero, 10, 8, 15, 12, 0);
+        tallarHabitacion(tablero, 10, 2, 15, 5, 0); 
+        tallarHabitacion(tablero, 2, 8, 7, 12, 0); 
         tallarPasilloVertical(tablero, 12, 5, 8, 0);
         tallarPasilloHorizontal(tablero, 7, 10, 10, 0);
         tablero.getCasillero(12, 3, 0).setTipo(TipoCasillero.AGUA);
         tablero.getCasillero(13, 3, 0).setTipo(TipoCasillero.AGUA);
         tablero.getCasillero(4, 10, 0).setTipo(TipoCasillero.RAMPA);
 
-        // --- Nivel 1 ---
+        // Nivel 1
         tallarHabitacion(tablero, 3, 9, 5, 11, 1); 
         tablero.getCasillero(4, 10, 1).setTipo(TipoCasillero.RAMPA);
         tallarHabitacion(tablero, 10, 2, 15, 5, 1); 
@@ -96,22 +97,20 @@ public class Main {
         tallarPasilloVertical(tablero, 12, 5, 9, 1);
         tallarPasilloHorizontal(tablero, 5, 12, 9, 1);
 
-        // --- Nivel 2 ---
+        // Nivel 2
         tallarHabitacion(tablero, 10, 2, 15, 5, 2); 
         tablero.getCasillero(12, 3, 2).setTipo(TipoCasillero.RAMPA);
         tallarHabitacion(tablero, 10, 8, 15, 12, 2);
         tablero.getCasillero(12, 10, 2).setTipo(TipoCasillero.RAMPA);
         tallarPasilloVertical(tablero, 12, 5, 8, 2);
 
-        // --- Nivel 3 ---
+        // Nivel 3
         tallarHabitacion(tablero, 10, 8, 15, 12, 3);
         tablero.getCasillero(12, 10, 3).setTipo(TipoCasillero.RAMPA);
         
-        // --- COLOCAR CARTAS EN EL MUNDO ---
+        // Colocar Cartas
         try {
-            // Ponemos una carta de curación en la sala inicial (Nivel 0)
-            tablero.getCasillero(11, 11, 0).setCarta(new CartaCuracionAliado(10));
-            // Ponemos una carta de Ataque Doble en el Nivel 2
+            tablero.getCasillero(11, 11, 0).setCarta(new CartaCuracionAliado(30));
             tablero.getCasillero(14, 10, 2).setCarta(new CartaAtaqueDoble());
         } catch (Exception e) {
             e.printStackTrace();

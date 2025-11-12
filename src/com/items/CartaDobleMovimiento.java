@@ -1,5 +1,6 @@
 package com.items;
 
+import com.entidades.Entidad;
 import com.entidades.Personaje;
 
 /**
@@ -12,7 +13,7 @@ public class CartaDobleMovimiento extends Carta {
     }
 
     @Override
-    public void aplicarEfecto(Personaje usuario, Personaje objetivo) {
+    public void aplicarEfecto(Personaje usuario, Entidad objetivo) {
         usuario.setMovimientosExtra(1);
         System.out.println(usuario.getNombre() + " podrá moverse dos veces en el próximo turno.");
     }

@@ -1,5 +1,6 @@
 package com.items;
 
+import com.entidades.Entidad;
 import com.entidades.Personaje;
 
 /**
@@ -15,7 +16,7 @@ public class CartaCuracionAliado extends Carta {
     }
 
     @Override
-    public void aplicarEfecto(Personaje usuario, Personaje objetivo) {
+    public void aplicarEfecto(Personaje usuario, Entidad objetivo) {
         if (objetivo != null) {
             objetivo.setVida(objetivo.getVida() + cantidad);
             System.out.println(usuario.getNombre() + " curó a " + objetivo.getNombre() + " en " + cantidad + " puntos.");

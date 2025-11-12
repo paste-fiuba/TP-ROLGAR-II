@@ -1,5 +1,6 @@
 package com.items;
 
+import com.entidades.Entidad;
 import com.entidades.Personaje;
 
 /**
@@ -12,7 +13,7 @@ public class CartaCuracionTotal extends Carta {
     }
 
     @Override
-    public void aplicarEfecto(Personaje usuario, Personaje objetivo) {
+    public void aplicarEfecto(Personaje usuario, Entidad objetivo) {
         usuario.setVida(100);
         System.out.println(usuario.getNombre() + " usó " + nombre + " y recuperó toda su vida!");
     }

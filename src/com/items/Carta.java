@@ -1,5 +1,6 @@
 package com.items;
 
+import com.entidades.Entidad;
 import com.entidades.Personaje;
 
 /**
@@ -36,7 +37,7 @@ public abstract class Carta {
      * post: aplica el efecto específico de la carta sobre el personaje usuario
      *       y/o su objetivo.
      */
-    public abstract void aplicarEfecto(Personaje usuario, Personaje objetivo);
+    public abstract void aplicarEfecto(Personaje usuario, Entidad objetivo);
 
     @Override
     public String toString() {
