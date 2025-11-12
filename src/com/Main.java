@@ -62,9 +62,9 @@ public class Main {
         
         enemigos.add(new Enemigo("Orco", "Guerrero", 50, 14, 4, 0, 5, 1, 0));
         enemigos.add(new Enemigo("Esqueleto", "Arquero", 30, 4, 9, 0, 3, 1, 0));
-        enemigos.add(new Enemigo("Murciélago", "Volador", 10, 4, 10, 1, 1, 1, 0));
+        enemigos.add(new Enemigo("Murciélago", "Volador", 10, 4, 11, 1, 1, 1, 0));
         enemigos.add(new Enemigo("Golem", "Tanque", 100, 12, 4, 2, 8, 1, 0));
-        enemigos.add(new Enemigo("Mago Oscuro", "Jefe", 80, 12, 10, 3, 15, 1, 0));
+        enemigos.add(new Enemigo("Mago Oscuro", "Jefe", 80, 12, 12, 3, 15, 1, 0));
         
         return enemigos;
     }
