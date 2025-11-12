@@ -8,50 +8,32 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
-// Imports para Input
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.List;
 
-// Imports del Modelo
-import java.util.List; // Para la lista de enemigos
 import com.tablero.Tablero;
 import com.tablero.Casillero;
 import com.tablero.TipoCasillero;
 import com.entidades.Personaje;
 import com.entidades.Enemigo;
-
-// Import del Controlador
+import com.items.Inventario; 
 import com.logica.ControladorJuego; 
 
-/**
- * La "Vista" (Panel). Dibuja el estado del juego y captura el input.
- * Implementa KeyListener para capturar las pulsaciones de teclas.
- */
 public class PanelJuego extends JPanel implements KeyListener {
 
     public static final int TAMAÑO_TILE = 32;
+    public static final int ALTURA_HOTBAR = 64;
 
-    // --- Referencias al Modelo ---
     private Tablero tablero;
     private int nivelZActual; 
     private Personaje jugador; 
-    private List<Enemigo> enemigos; // Lista de enemigos
-    
-    // --- Referencia al Controlador ---
+    private List<Enemigo> enemigos;
     private ControladorJuego controlador;
 
-    // --- Sprites ---
-    private BufferedImage spriteRoca;
-    private BufferedImage spriteVacio;  
-    private BufferedImage spriteRampa; 
-    private BufferedImage spriteAgua;   
-    private BufferedImage spritePersonaje;
-    private BufferedImage spriteEnemigo; // Sprite para enemigos
+    private BufferedImage spriteRoca, spriteVacio, spriteRampa, spriteAgua;
+    private BufferedImage spritePersonaje, spriteEnemigo, spriteSlot, spriteCarta; 
 
-    /**
-     * Constructor. Recibe los datos del Modelo.
-     */
     public PanelJuego(Tablero tablero, Personaje jugador, List<Enemigo> enemigos, int zInicial) {
         this.tablero = tablero;
         this.jugador = jugador;
@@ -59,32 +41,23 @@ public class PanelJuego extends JPanel implements KeyListener {
         this.nivelZActual = zInicial;
         
         int anchoPanel = tablero.getDimensionX() * TAMAÑO_TILE;
-        int altoPanel = tablero.getDimensionY() * TAMAÑO_TILE;
+        int altoPanel = (tablero.getDimensionY() * TAMAÑO_TILE) + ALTURA_HOTBAR; 
         this.setPreferredSize(new Dimension(anchoPanel, altoPanel));
         
         this.setBackground(Color.BLACK); 
         cargarImagenes();
     }
     
-    /**
-     * Permite al Main "inyectar" el controlador.
-     */
     public void setControlador(ControladorJuego controlador) {
         this.controlador = controlador;
     }
     
-    /**
-     * Activa el oyente de teclado.
-     */
     public void iniciarOyenteTeclado() {
         this.addKeyListener(this);
         this.setFocusable(true);
         this.requestFocusInWindow();
     }
 
-    /**
-     * Carga todos los archivos de imagen (sprites).
-     */
     private void cargarImagenes() {
         try {
             this.spriteRoca = ImageIO.read(new File("src/sprites/roca.png"));
@@ -92,21 +65,19 @@ public class PanelJuego extends JPanel implements KeyListener {
             this.spriteRampa = ImageIO.read(new File("src/sprites/rampa.png")); 
             this.spriteAgua = ImageIO.read(new File("src/sprites/agua.png"));
             this.spritePersonaje = ImageIO.read(new File("src/sprites/personaje.png"));
-            this.spriteEnemigo = ImageIO.read(new File("src/sprites/enemigo.png")); // Carga el sprite de enemigo
+            this.spriteEnemigo = ImageIO.read(new File("src/sprites/enemigo.png"));
+            this.spriteSlot = ImageIO.read(new File("src/sprites/slot.png"));
+            this.spriteCarta = ImageIO.read(new File("src/sprites/carta.png"));
         } catch (IOException e) {
-            System.err.println("Error al cargar uno o más sprites.");
             e.printStackTrace();
         }
     }
 
-    /**
-     * Lógica de dibujo. Se llama automáticamente (ej. con repaint()).
-     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // 1. Dibujar Terreno
+        // 1. Dibujar Terreno (y cartas en el suelo)
         for (int y = 0; y < tablero.getDimensionY(); y++) {
             for (int x = 0; x < tablero.getDimensionX(); x++) {
                 
@@ -114,6 +85,7 @@ public class PanelJuego extends JPanel implements KeyListener {
                 int pixelX = x * TAMAÑO_TILE;
                 int pixelY = y * TAMAÑO_TILE;
                 
+                // Dibuja el tipo de terreno (piso, roca, etc.)
                 if (casillero.getTipo() == TipoCasillero.ROCA) {
                     g.drawImage(this.spriteRoca, pixelX, pixelY, this);
                 } else if (casillero.getTipo() == TipoCasillero.AGUA) { 
@@ -123,34 +95,66 @@ public class PanelJuego extends JPanel implements KeyListener {
                 } else if (casillero.getTipo() == TipoCasillero.VACIO) { 
                     g.drawImage(this.spriteVacio, pixelX, pixelY, this);
                 }
+                
+                // Dibuja la CARTA encima del terreno (si hay una)
+                if (casillero.getCarta() != null && this.spriteCarta != null) {
+                    int tamañoCarta = 24; // Más pequeña que el tile
+                    int padding = (TAMAÑO_TILE - tamañoCarta) / 2;
+                    g.drawImage(this.spriteCarta, pixelX + padding, pixelY + padding, tamañoCarta, tamañoCarta, this);
+                }
             }
         }
         
         // 2. Dibujar Enemigos
         if (this.spriteEnemigo != null) {
             for (Enemigo enemigo : enemigos) {
-                // Dibujar solo si está vivo Y en el nivel actual
                 if (enemigo.estaVivo() && enemigo.getPosZ() == this.nivelZActual) {
-                    int pixelX = enemigo.getPosX() * TAMAÑO_TILE;
-                    int pixelY = enemigo.getPosY() * TAMAÑO_TILE;
-                    g.drawImage(this.spriteEnemigo, pixelX, pixelY, this);
+                    g.drawImage(this.spriteEnemigo, enemigo.getPosX() * TAMAÑO_TILE, enemigo.getPosY() * TAMAÑO_TILE, this);
                 }
             }
         }
         
-        // 3. Dibujar Personaje (al final para que esté por encima)
-        if (jugador.getPosZ() == this.nivelZActual) {
-            int pixelX = jugador.getPosX() * TAMAÑO_TILE;
-            int pixelY = jugador.getPosY() * TAMAÑO_TILE;
-            if (this.spritePersonaje != null) {
-                g.drawImage(this.spritePersonaje, pixelX, pixelY, this);
+        // 3. Dibujar Personaje
+        if (jugador.getPosZ() == this.nivelZActual && this.spritePersonaje != null) {
+            g.drawImage(this.spritePersonaje, jugador.getPosX() * TAMAÑO_TILE, jugador.getPosY() * TAMAÑO_TILE, this);
+        }
+        
+        // 4. Dibujar la UI (Hotbar)
+        dibujarHotbar(g);
+    }
+
+    private void dibujarHotbar(Graphics g) {
+        
+        int anchoMundoPx = tablero.getDimensionX() * TAMAÑO_TILE;
+        int altoMundoPx = tablero.getDimensionY() * TAMAÑO_TILE;
+
+        g.setColor(new Color(0, 0, 0, 150));
+        g.fillRect(0, altoMundoPx, anchoMundoPx, ALTURA_HOTBAR);
+
+        if (this.spriteSlot == null) return;
+        
+        int numSlots = 10;
+        int tamañoSlot = 48;
+        int padding = (ALTURA_HOTBAR - tamañoSlot) / 2;
+        int anchoTotalSlots = (numSlots * tamañoSlot) + ((numSlots - 1) * 5);
+        int startX = (anchoMundoPx - anchoTotalSlots) / 2;
+        
+        Inventario inventario = jugador.getInventario();
+        
+        for (int i = 0; i < numSlots; i++) {
+            int x = startX + (i * (tamañoSlot + 5));
+            int y = altoMundoPx + padding;
+            
+            g.drawImage(this.spriteSlot, x, y, tamañoSlot, tamañoSlot, this);
+            
+            if (i < inventario.cantidadDeCartas() && this.spriteCarta != null) {
+                int tamañoCarta = 40;
+                int paddingCarta = (tamañoSlot - tamañoCarta) / 2;
+                g.drawImage(this.spriteCarta, x + paddingCarta, y + paddingCarta, tamañoCarta, tamañoCarta, this);
             }
         }
     }
 
-    /**
-     * Cambia el piso que se está viendo y fuerza el redibujado.
-     */
     public void setNivelZActual(int nuevoNivelZ) {
         this.nivelZActual = nuevoNivelZ;
         
@@ -164,12 +168,6 @@ public class PanelJuego extends JPanel implements KeyListener {
         this.repaint();
     } 
 
-    // --- MÉTODOS DE KEYLISTENER ---
-
-    /**
-     * Se llama cuando se presiona una tecla.
-     * Delega la lógica al Controlador.
-     */
     @Override
     public void keyPressed(KeyEvent e) {
         if (controlador != null) {
@@ -179,7 +177,6 @@ public class PanelJuego extends JPanel implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {}
-
     @Override
     public void keyReleased(KeyEvent e) {}
 }
