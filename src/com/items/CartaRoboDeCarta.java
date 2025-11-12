@@ -1,5 +1,6 @@
 package com.items;
 
+import com.entidades.Entidad;
 import com.entidades.Personaje;
 import java.util.Random;
 
@@ -10,37 +11,45 @@ public class CartaRoboDeCarta extends Carta {
 
     private Random random = new Random();
 
-    /**
-     * post: crea una carta que roba una carta aleatoria del inventario del objetivo.
-     */
     public CartaRoboDeCarta() {
         super("Robo de Carta", "Roba una carta aleatoria del inventario de otro jugador.");
     }
 
     /**
      * pre: usuario y objetivo no son null.
-     * post: si el objetivo tiene cartas, una de ellas es removida al azar
-     *       y agregada al inventario del usuario. Si no tiene cartas, no ocurre nada.
+     * post: si el objetivo es un Personaje y tiene cartas, una de ellas es removida
+     * y agregada al inventario del usuario.
      */
     @Override
-    public void aplicarEfecto(Personaje usuario, Personaje objetivo) {
+    public void aplicarEfecto(Personaje usuario, Entidad objetivo) {
         if (usuario == null || objetivo == null) return;
 
-        int cantidad = objetivo.getInventario().cantidadDeCartas();
-        if (cantidad > 0) {
-            int indice = random.nextInt(cantidad); // elige una carta aleatoria
-            Carta robada = objetivo.getInventario().getCarta(indice);
+        // 1. Verificar si el objetivo es un Personaje
+        if (objetivo instanceof Personaje) {
+            
+            // 2. "Castear" la Entidad a Personaje para acceder al inventario
+            Personaje objetivoJugador = (Personaje) objetivo;
 
-            // Agregar al inventario del usuario
-            usuario.getInventario().agregarCarta(robada);
+            int cantidad = objetivoJugador.getInventario().cantidadDeCartas();
+            
+            if (cantidad > 0) {
+                int indice = random.nextInt(cantidad); 
+                Carta robada = objetivoJugador.getInventario().getCarta(indice);
 
-            // Eliminar del inventario del objetivo
-            objetivo.getInventario().eliminarCarta(indice);
+                // Agregar al inventario del usuario
+                usuario.getInventario().agregarCarta(robada);
 
-            System.out.println(usuario.getNombre() + " robó la carta '" +
-                               robada.getNombre() + "' de " + objetivo.getNombre());
+                // Eliminar del inventario del objetivo
+                objetivoJugador.getInventario().eliminarCarta(indice);
+
+                System.out.println(usuario.getNombre() + " robó la carta '" +
+                                   robada.getNombre() + "' de " + objetivoJugador.getNombre());
+            } else {
+                System.out.println(objetivoJugador.getNombre() + " no tiene cartas para robar.");
+            }
         } else {
-            System.out.println(objetivo.getNombre() + " no tiene cartas para robar.");
+            // Si el objetivo es un Enemigo
+            System.out.println("No puedes robarle cartas a un " + objetivo.getNombre());
         }
     }
 }

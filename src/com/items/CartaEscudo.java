@@ -1,5 +1,6 @@
 package com.items;
 
+import com.entidades.Entidad;
 import com.entidades.Personaje;
 
 /**
@@ -19,7 +20,7 @@ public class CartaEscudo extends Carta {
     }
 
     @Override
-    public void aplicarEfecto(Personaje usuario, Personaje objetivo) {
+    public void aplicarEfecto(Personaje usuario, Entidad objetivo) {
         usuario.setEscudoActivo(true, reduccion);
         System.out.println(usuario.getNombre() + " activó un escudo de " + reduccion + "% de reducción de daño.");
     }

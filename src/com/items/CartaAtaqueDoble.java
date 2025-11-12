@@ -1,5 +1,6 @@
 package com.items;
 
+import com.entidades.Entidad;
 import com.entidades.Personaje;
 
 /**
@@ -12,7 +13,7 @@ public class CartaAtaqueDoble extends Carta {
     }
 
     @Override
-    public void aplicarEfecto(Personaje usuario, Personaje objetivo) {
+    public void aplicarEfecto(Personaje usuario, Entidad objetivo) {
         if (usuario != null && objetivo != null) {
             usuario.atacar(objetivo);
             usuario.atacar(objetivo);

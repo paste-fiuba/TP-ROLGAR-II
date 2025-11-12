@@ -1,5 +1,6 @@
 package com.items;
 
+import com.entidades.Entidad;
 import com.entidades.Personaje;
 import java.util.Random;
 
@@ -22,7 +23,7 @@ public class CartaEsquivarDanio extends Carta {
     }
 
     @Override
-    public void aplicarEfecto(Personaje usuario, Personaje objetivo) {
+    public void aplicarEfecto(Personaje usuario, Entidad objetivo) {
         boolean exito = random.nextDouble() < probabilidad;
         usuario.setEvasionActiva(exito);
         if (exito)

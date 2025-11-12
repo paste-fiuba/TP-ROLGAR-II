@@ -57,7 +57,7 @@ public class Personaje extends Entidad {
      * pre: índice válido y usuario no null.
      * post: aplica el efecto de la carta sobre el objetivo.
      */
-    public void usarCarta(int indice, Personaje objetivo) {
+    public void usarCarta(int indice, Entidad objetivo) {
         inventario.usarCarta(indice, this, objetivo);
     }
 
