@@ -24,6 +24,9 @@ public class AdministradorDeJuego {
     // Alianzas y propuestas (target -> proposer)
     private List<com.entidades.Alianza> alianzas;
     private Map<Personaje, Personaje> propuestas;
+    // Probabilidad de ruptura de cada alianza por turno (15% por defecto)
+    private static final double PROB_RUPTURA_ALIANZA = 0.15;
+    private List<String> jugadoresEliminados;
 
     public AdministradorDeJuego(Tablero tablero, List<Personaje> jugadores, List<Enemigo> enemigos, PanelJuego panel) {
         this.tablero = tablero;
@@ -33,6 +36,7 @@ public class AdministradorDeJuego {
         this.random = new Random();
         this.alianzas = new ArrayList<>();
         this.propuestas = new HashMap<>();
+        this.jugadoresEliminados = new ArrayList<>();
     }
     
     public boolean isJugadorMuerto() {
@@ -188,6 +192,8 @@ public class AdministradorDeJuego {
         if (!e.estaVivo()) {
             logBatalla("¡Has derrotado a " + e.getNombre() + "!");
         }
+        // Remover jugadores muertos para que desaparezcan completamente
+        eliminarJugadoresMuertos();
     }
 
     // Comprueba si dos personajes están adyacentes (misma Z y distancia Manhattan == 1)
@@ -258,12 +264,41 @@ public class AdministradorDeJuego {
     }
 
     /**
+     * Permite que un jugador ataque a otro jugador adyacente.
+     * Ambos reciben daño (ataque y contraataque) similar al combate jugador-enemigo.
+     */
+    public void atacarJugador(Personaje atacante, Personaje objetivo) {
+        if (atacante == null || objetivo == null) return;
+        if (!sonAdyacentes(atacante, objetivo)) {
+            logBatalla("No estás lo suficientemente cerca para atacar a " + objetivo.getNombre());
+            return;
+        }
+
+        int dmgAtacante = (atacante.getFuerza() / 2) + random.nextInt(Math.max(1, atacante.getFuerza()));
+        int dmgObjetivo = (objetivo.getFuerza() / 2) + random.nextInt(Math.max(1, objetivo.getFuerza()));
+
+        objetivo.recibirDanio(dmgAtacante);
+        atacante.recibirDanio(dmgObjetivo);
+
+        logBatalla(atacante.getNombre() + " ataca a " + objetivo.getNombre() + " por " + dmgAtacante + "!");
+        logBatalla(objetivo.getNombre() + " contraataca a " + atacante.getNombre() + " por " + dmgObjetivo + "!");
+
+        if (atacante.getVida() <= 0) logBatalla(atacante.getNombre() + " ha muerto en el combate contra " + objetivo.getNombre());
+        if (objetivo.getVida() <= 0) logBatalla(objetivo.getNombre() + " ha muerto en el combate contra " + atacante.getNombre());
+        // Remover jugadores muertos tras combate PvP
+        eliminarJugadoresMuertos();
+    }
+
+    /**
      * Finaliza el turno del jugador actual: procesa los efectos de los enemigos
      * (Opción A: enemigos actúan tras cada turno de jugador) y avanza al siguiente jugador vivo.
      */
     public void finalizarTurno() {
         // Procesar acciones simples de enemigos
         procesarTurnoEnemigos();
+
+        // Procesar rupturas aleatorias de alianzas cada vez que finaliza un turno
+        procesarRupturaAlianzas();
 
         // Avanzar al siguiente jugador vivo
         int size = jugadores.size();
@@ -302,6 +337,8 @@ public class AdministradorDeJuego {
                 }
             }
         }
+        // Remover jugadores muertos tras acciones de enemigos
+        eliminarJugadoresMuertos();
     }
 
     private Personaje encontrarJugadorMasCercanoA(Enemigo enemigo) {
@@ -316,6 +353,40 @@ public class AdministradorDeJuego {
             }
         }
         return masCercano;
+    }
+
+    // Elimina de la lista los jugadores con vida <= 0 y ajusta el índice del jugador actual
+    private void eliminarJugadoresMuertos() {
+        if (jugadores == null || jugadores.isEmpty()) return;
+        boolean removed = false;
+        java.util.Iterator<Personaje> it = jugadores.iterator();
+        int idx = 0;
+        int newIndex = indiceJugadorActual;
+        while (it.hasNext()) {
+            Personaje p = it.next();
+            if (p.getVida() <= 0) {
+                it.remove();
+                logBatalla(p.getNombre() + " fue eliminado de la partida por muerte.");
+                // Guardar nombre para mostrar en UI
+                jugadoresEliminados.add(p.getNombre());
+                removed = true;
+                if (idx < indiceJugadorActual) {
+                    newIndex = Math.max(0, newIndex - 1);
+                }
+            } else {
+                idx++;
+            }
+        }
+        if (removed) {
+            indiceJugadorActual = (jugadores.isEmpty()) ? 0 : Math.min(newIndex, jugadores.size() - 1);
+        }
+    }
+
+    /**
+     * Devuelve una copia de los nombres de jugadores eliminados (para mostrar en UI).
+     */
+    public List<String> getJugadoresEliminados() {
+        return new ArrayList<>(this.jugadoresEliminados);
     }
     
     private void logBatalla(String mensaje) {
@@ -361,5 +432,45 @@ public class AdministradorDeJuego {
             }
         }
         return masCercano;
+    }
+
+    /**
+     * Procesa rupturas aleatorias de alianzas. Cada alianza tiene una probabilidad
+     * de romperse parcialmente (se elimina un miembro aleatorio) en cada turno.
+     * Si tras la eliminación la alianza queda con 0 o 1 miembros, la alianza se
+     * disuelve completamente.
+     */
+    private void procesarRupturaAlianzas() {
+        if (alianzas == null || alianzas.isEmpty()) return;
+
+        // Usar copia para evitar ConcurrentModification
+        java.util.List<com.entidades.Alianza> copia = new java.util.ArrayList<>(alianzas);
+        for (com.entidades.Alianza al : copia) {
+            if (al == null) continue;
+            if (random.nextDouble() < PROB_RUPTURA_ALIANZA) {
+                java.util.List<com.entidades.Personaje> miembros = al.getMiembros();
+                if (miembros == null || miembros.isEmpty()) {
+                    alianzas.remove(al);
+                    continue;
+                }
+                // Elegir miembro al azar para expulsar de la alianza
+                int idx = random.nextInt(miembros.size());
+                com.entidades.Personaje expulsado = miembros.get(idx);
+                if (expulsado != null) {
+                    al.eliminarMiembro(expulsado);
+                    logBatalla("La alianza '" + al.toString() + "' se rompió: " + expulsado.getNombre() + " fue expulsado.");
+                }
+                // Si la alianza quedó con 0 o 1 miembros, disolverla
+                java.util.List<com.entidades.Personaje> despues = al.getMiembros();
+                if (despues.size() <= 1) {
+                    // Eliminar cualquier referencia restante
+                    for (com.entidades.Personaje p : despues) {
+                        if (p != null) p.setAlianza(null);
+                    }
+                    alianzas.remove(al);
+                    logBatalla("La alianza se disolvió por falta de miembros.");
+                }
+            }
+        }
     }
 }

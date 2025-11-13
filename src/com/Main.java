@@ -10,7 +10,7 @@ import com.logica.ControladorJuego;
 import com.tablero.Tablero;
 import com.tablero.TipoCasillero;
 import com.ui.PanelJuego;
-import com.ui.VentanaJuego;
+import com.ui.VentanaJuego; 		
 import java.util.ArrayList;
 import java.util.List;
 // El menú ahora se muestra dentro de la ventana del juego (ControladorJuego MENU)

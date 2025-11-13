@@ -214,6 +214,22 @@ public class RenderizadorUI {
             logY += 20;
         }
 
+        // Mostrar jugadores eliminados al costado (multijugador)
+        if (admin != null) {
+            java.util.List<String> eliminados = admin.getJugadoresEliminados();
+            if (eliminados != null && !eliminados.isEmpty()) {
+                g.setColor(Color.RED);
+                int x = g.getClipBounds().width - 200;
+                int y = 60;
+                g.drawString("Eliminados:", x, y);
+                y += 20;
+                for (String name : eliminados) {
+                    g.drawString("- " + name, x, y);
+                    y += 18;
+                }
+            }
+        }
+
         // Mostrar opciones de alianza
         if (admin != null) {
             Personaje proponente = admin.getPropuestaPara(p);
@@ -234,6 +250,19 @@ public class RenderizadorUI {
                             break;
                         }
                     }
+                }
+            }
+        }
+        // Mostrar opción de atacar a otro jugador adyacente
+        if (jugadores != null) {
+            for (Personaje otro : jugadores) {
+                if (otro == null || otro == p) continue;
+                if (otro.getVida() <= 0) continue;
+                if (p != null && admin != null && admin.sonAdyacentes(p, otro)) {
+                    g.setColor(Color.RED);
+                    String txt = "[F] Atacar a " + otro.getNombre();
+                    g.drawString(txt, 20, logY + 80);
+                    break;
                 }
             }
         }

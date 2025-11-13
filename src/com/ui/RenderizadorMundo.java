@@ -98,7 +98,7 @@ public class RenderizadorMundo {
         if (jugadores != null) {
             for (Personaje jugador : jugadores) {
                 if (jugador == null) continue;
-                if (jugador.getPosZ() == zActual) {
+                if (jugador.getPosZ() == zActual && jugador.getVida() > 0) {
                     int pxTile = jugador.getPosX() * TAMAÑO_TILE;
                     int pyTile = jugador.getPosY() * TAMAÑO_TILE;
                     if (this.spritePersonaje != null) {
