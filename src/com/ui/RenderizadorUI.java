@@ -168,9 +168,24 @@ public class RenderizadorUI {
         int w2 = g.getFontMetrics().stringWidth(linea2);
         g.drawString(linea1, (anchoVentana - w1) / 2, altoVentana / 2 - 20);
         g.drawString(linea2, (anchoVentana - w2) / 2, altoVentana / 2 + 10);
+
+        // Explicación adicional: alianzas, transferencia y objetivo
+        int infoY = altoVentana / 2 + 50;
+        g.setFont(new Font("Arial", Font.PLAIN, 14));
+        String a1 = "Alianzas: Acercate a otro jugador y presioná 'L' para proponer alianza.";
+        String a2 = "Si te proponen, presioná 'Y' para aceptar o 'N' para rechazar en tu turno.";
+        String t1 = "Transferencia de cartas: en tu turno presioná 'T' y luego 1..0 para elegir el slot a transferir a un aliado adyacente.";
+        String obj = "Objetivo: Colaborar (o no) para eliminar a los enemigos del mapa.";
+        int aw = g.getFontMetrics().stringWidth(a1);
+        g.setColor(Color.LIGHT_GRAY);
+        g.drawString(a1, (anchoVentana - aw) / 2, infoY);
+        g.drawString(a2, (anchoVentana - g.getFontMetrics().stringWidth(a2)) / 2, infoY + 20);
+        g.drawString(t1, (anchoVentana - g.getFontMetrics().stringWidth(t1)) / 2, infoY + 40);
+        g.setColor(Color.YELLOW);
+        g.drawString(obj, (anchoVentana - g.getFontMetrics().stringWidth(obj)) / 2, infoY + 70);
     }
 
-    public void dibujarInfoJuego(Graphics g, Personaje p, List<Enemigo> e) {
+    public void dibujarInfoJuego(Graphics g, Personaje p, List<Enemigo> e, java.util.List<Personaje> jugadores, com.logica.AdministradorDeJuego admin, int pendingTransfer) {
 
         g.setFont(fontInfo);
 
@@ -197,6 +212,36 @@ public class RenderizadorUI {
         for (String mensaje : battleLog) {
             g.drawString(mensaje, 20, logY);
             logY += 20;
+        }
+
+        // Mostrar opciones de alianza
+        if (admin != null) {
+            Personaje proponente = admin.getPropuestaPara(p);
+            if (proponente != null) {
+                g.setColor(Color.YELLOW);
+                String texto = "Propuesta de alianza de " + proponente.getNombre() + " - [Y] Aceptar  [N] Rechazar";
+                g.drawString(texto, 20, logY + 20);
+            } else {
+                // Buscar un jugador adyacente no aliado
+                if (jugadores != null) {
+                    for (Personaje otro : jugadores) {
+                        if (otro == null || otro == p) continue;
+                        if (otro.getVida() <= 0) continue;
+                        if (!p.estaAliadoCon(otro) && admin.sonAdyacentes(p, otro)) {
+                            g.setColor(Color.CYAN);
+                            String texto = "[L] Proponer alianza con " + otro.getNombre();
+                            g.drawString(texto, 20, logY + 20);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        // Prompt para transferencia de cartas
+        if (pendingTransfer == -2) {
+            g.setColor(Color.MAGENTA);
+            String txt = "TRANSFERIR: presioná 1..0 para elegir el slot a transferir a un aliado adyacente.";
+            g.drawString(txt, 20, logY + 50);
         }
     }
 

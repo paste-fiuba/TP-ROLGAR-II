@@ -28,6 +28,7 @@ public class Alianza {
         if (p == null) return;
         if (!miembros.contains(p)) {
             miembros.add(p);
+            p.setAlianza(this);
             System.out.println(p.getNombre() + " se unió a la alianza " + nombre);
         } else {
             System.out.println(p.getNombre() + " ya pertenece a la alianza " + nombre);
@@ -41,6 +42,7 @@ public class Alianza {
     public void eliminarMiembro(Personaje p) {
         if (p != null && miembros.contains(p)) {
             miembros.remove(p);
+            p.setAlianza(null);
             System.out.println(p.getNombre() + " salió de la alianza " + nombre);
         } else {
             System.out.println("El personaje no pertenece a la alianza.");
@@ -59,6 +61,13 @@ public class Alianza {
      */
     public int cantidadMiembros() {
         return miembros.size();
+    }
+
+    /**
+     * post: devuelve la lista de miembros (lectura).
+     */
+    public ArrayList<Personaje> getMiembros() {
+        return new ArrayList<>(miembros);
     }
 
     /**

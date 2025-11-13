@@ -3,7 +3,6 @@ package com.entidades;
 
 import com.items.Carta;
 import com.items.Inventario;
-import com.entidades.Entidad;
 
 public class Personaje extends Entidad {
 
@@ -17,6 +16,8 @@ public class Personaje extends Entidad {
     private boolean evasionActiva;
     private int movimientosExtra;
     private boolean ataqueDobleActivo; 
+    // Alianza actual (si pertenece a una)
+    private Alianza alianza;
 
     public Personaje(String nombre, int vida, int posX, int posY, int posZ,
                      int fuerza, int vision, double salud) {
@@ -27,6 +28,7 @@ public class Personaje extends Entidad {
         this.evasionActiva = false;
         this.movimientosExtra = 0;
         this.ataqueDobleActivo = false;
+        this.alianza = null;
     }
 
     public void agregarCarta(Carta carta) { inventario.agregarCarta(carta); }
@@ -59,6 +61,14 @@ public class Personaje extends Entidad {
     public int getMovimientosExtra() { return movimientosExtra; }
     public void setAtaqueDobleActivo(boolean estado) { this.ataqueDobleActivo = estado; }
     public boolean isAtaqueDobleActivo() { return this.ataqueDobleActivo; }
+
+    public Alianza getAlianza() { return this.alianza; }
+    public void setAlianza(Alianza a) { this.alianza = a; }
+
+    public boolean estaAliadoCon(Personaje otro) {
+        if (this.alianza == null || otro == null) return false;
+        return this.alianza.pertenece(otro);
+    }
 
     /**
      * El daño ahora golpea primero al escudo.

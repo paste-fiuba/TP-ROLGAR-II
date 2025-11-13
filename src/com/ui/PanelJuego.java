@@ -109,7 +109,8 @@ public class PanelJuego extends JPanel implements KeyListener {
 
         if (estado == GameState.RUNNING) {
             com.entidades.Personaje jugadorActual = (this.administrador != null) ? this.administrador.getJugadorActual() : (this.jugadores != null && !this.jugadores.isEmpty() ? this.jugadores.get(0) : null);
-            renderUI.dibujarInfoJuego(g, jugadorActual, enemigos);
+            int pending = (this.controlador != null) ? this.controlador.getPendingTransferSlot() : -1;
+            renderUI.dibujarInfoJuego(g, jugadorActual, enemigos, (this.administrador != null ? this.administrador.getJugadores() : this.jugadores), this.administrador, pending);
         }
         else if (estado == GameState.PAUSED) {
             renderUI.dibujarMenuPausa(g, getWidth(), getHeight()); 
