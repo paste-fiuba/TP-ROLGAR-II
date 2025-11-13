@@ -1,5 +1,9 @@
 package com.ui;
 
+import com.entidades.Enemigo;
+import com.entidades.Personaje;
+import com.items.Carta;
+import com.items.Inventario;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -10,11 +14,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
-
-import com.items.Carta;
-import com.items.Inventario;
-import com.entidades.Enemigo;
-import com.entidades.Personaje;
 
 public class RenderizadorUI {
 
@@ -150,6 +149,25 @@ public class RenderizadorUI {
         String opcion = "[Q] Cerrar Juego";
         int anchoOpcion = g.getFontMetrics().stringWidth(opcion);
         g.drawString(opcion, (anchoVentana - anchoOpcion) / 2, altoVentana / 2 + 60);
+    }
+
+    public void dibujarMenuInicio(Graphics g, int anchoVentana, int altoVentana) {
+        g.setColor(new Color(0, 0, 0, 200));
+        g.fillRect(0, 0, anchoVentana, altoVentana);
+
+        g.setColor(Color.WHITE);
+        g.setFont(fontMenuTitulo);
+        String titulo = "ROLGAR II - MENÚ";
+        int anchoTitulo = g.getFontMetrics().stringWidth(titulo);
+        g.drawString(titulo, (anchoVentana - anchoTitulo) / 2, altoVentana / 2 - 80);
+
+        g.setFont(fontMenuOpcion);
+        String linea1 = "Presioná 1,2,3 o 4 para seleccionar cantidad de jugadores.";
+        String linea2 = "Controles: W/A/S/D mover, 1-0 usar carta, ENTER terminar turno.";
+        int w1 = g.getFontMetrics().stringWidth(linea1);
+        int w2 = g.getFontMetrics().stringWidth(linea2);
+        g.drawString(linea1, (anchoVentana - w1) / 2, altoVentana / 2 - 20);
+        g.drawString(linea2, (anchoVentana - w2) / 2, altoVentana / 2 + 10);
     }
 
     public void dibujarInfoJuego(Graphics g, Personaje p, List<Enemigo> e) {
