@@ -1,18 +1,19 @@
 package com.ui;
 
+import com.entidades.Enemigo;
+import com.entidades.Personaje;
+import com.items.Carta;
+import com.tablero.Casillero;
+import com.tablero.Tablero;
+import com.tablero.TipoCasillero;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import javax.imageio.ImageIO;
-
-import com.tablero.Tablero;
-import com.tablero.Casillero;
-import com.tablero.TipoCasillero;
-import com.entidades.Personaje;
-import com.entidades.Enemigo;
-import com.items.Carta;   //
+import javax.imageio.ImageIO;   //
 
 public class RenderizadorMundo {
 
@@ -40,7 +41,7 @@ public class RenderizadorMundo {
     /**
      * Dibuja todos los elementos del juego (terreno, items, entidades).
      */
-    public void dibujar(Graphics2D g, Tablero tablero, Personaje jugador, List<Enemigo> enemigos, int zActual) {
+    public void dibujar(Graphics2D g, Tablero tablero, List<Personaje> jugadores, List<Enemigo> enemigos, int zActual, Personaje jugadorActivo) {
         
         int TAMAÑO_TILE = PanelJuego.TAMAÑO_TILE;
 
@@ -93,14 +94,47 @@ public class RenderizadorMundo {
             }
         }
         
-        // 3. Dibujar Personaje
-        if (jugador.getPosZ() == zActual && this.spritePersonaje != null) {
-            g.drawImage(
-                this.spritePersonaje,
-                jugador.getPosX() * TAMAÑO_TILE,
-                jugador.getPosY() * TAMAÑO_TILE,
-                null
-            );
+        // 3. Dibujar todos los jugadores vivos y sus nombres
+        if (jugadores != null) {
+            for (Personaje jugador : jugadores) {
+                if (jugador == null) continue;
+                if (jugador.getPosZ() == zActual) {
+                    int pxTile = jugador.getPosX() * TAMAÑO_TILE;
+                    int pyTile = jugador.getPosY() * TAMAÑO_TILE;
+                    if (this.spritePersonaje != null) {
+                        g.drawImage(this.spritePersonaje, pxTile, pyTile, null);
+                    } else {
+                        // marcador visual de respaldo cuando falta el sprite
+                        g.setColor(new Color(0, 200, 0));
+                        g.fillOval(pxTile + 4, pyTile + 4, TAMAÑO_TILE - 8, TAMAÑO_TILE - 8);
+                    }
+                    // Dibujar nombre del jugador centrado debajo del sprite
+                    try {
+                        String nombre = jugador.getNombre();
+                        if (nombre != null && !nombre.isEmpty()) {
+                            Font oldFont = g.getFont();
+                            Font nameFont = new Font("Arial", Font.BOLD, 12);
+                            g.setFont(nameFont);
+                            int textWidth = g.getFontMetrics().stringWidth(nombre);
+                            int textX = pxTile + (TAMAÑO_TILE - textWidth) / 2;
+                            int textY = pyTile + TAMAÑO_TILE + 12; // debajo del tile
+                            // Sombra para mejor legibilidad
+                            g.setColor(Color.BLACK);
+                            g.drawString(nombre, textX + 1, textY + 1);
+                            // Color distinto si es el jugador activo
+                            if (jugadorActivo != null && jugador == jugadorActivo) {
+                                g.setColor(Color.YELLOW);
+                            } else {
+                                g.setColor(Color.WHITE);
+                            }
+                            g.drawString(nombre, textX, textY);
+                            g.setFont(oldFont);
+                        }
+                    } catch (Exception ex) {
+                        // No interrumpir el render si ocurre algún error al dibujar el nombre
+                    }
+                }
+            }
         }
     }
 }

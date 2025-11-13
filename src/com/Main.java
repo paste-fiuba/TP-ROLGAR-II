@@ -1,21 +1,19 @@
 package com; 
 
-import com.ui.PanelJuego;
-import com.ui.VentanaJuego;
+import com.entidades.Enemigo;
+import com.entidades.Personaje;
+import com.items.CartaAtaqueDoble;
+import com.items.CartaCuracionAliado;
+import com.items.CartaEscudo;
+import com.items.CartaInvisibilidad;
+import com.logica.ControladorJuego;
 import com.tablero.Tablero;
 import com.tablero.TipoCasillero;
-import com.entidades.Personaje;
-import com.entidades.Enemigo;
-import java.util.List;
+import com.ui.PanelJuego;
+import com.ui.VentanaJuego;
 import java.util.ArrayList;
-import com.logica.ControladorJuego; 
-import com.logica.AdministradorDeJuego;
-import com.items.Carta;
-import com.items.CartaAtaqueDoble;
-import com.items.CartaEscudo;
-import com.items.CartaCuracionAliado;
-import com.items.CartaTeletransportacion;
-import com.items.CartaInvisibilidad; 
+import java.util.List;
+// El menú ahora se muestra dentro de la ventana del juego (ControladorJuego MENU)
 
 public class Main {
 
@@ -26,19 +24,22 @@ public class Main {
     private static final int NIVEL_INICIAL = 0;
 
     public static void main(String[] args) {
-        
+        // El número de jugadores se selecciona desde el menú dentro de la ventana.
+
         Tablero miTablero = new Tablero(ANCHO_TABLERO, ALTO_TABLERO, NIVELES_TABLERO);
         crearMundoCoherente(miTablero);
-        
-        Personaje miPersonaje = crearPersonaje();
+
         List<Enemigo> listaEnemigos = crearEnemigos();
 
-        PanelJuego miPanel = new PanelJuego(miTablero, miPersonaje, listaEnemigos, NIVEL_INICIAL);
-        AdministradorDeJuego miAdmin = new AdministradorDeJuego(miTablero, miPersonaje, listaEnemigos, miPanel);
-        ControladorJuego miControlador = new ControladorJuego(miAdmin, miPanel);
+        // Panel con lista vacía de jugadores; la partida se inicializa desde el menú
+        List<Personaje> jugadores = new ArrayList<>();
+        PanelJuego miPanel = new PanelJuego(miTablero, jugadores, listaEnemigos, NIVEL_INICIAL);
 
+        // Controlador en modo MENU que conoce el tablero y los enemigos
+        ControladorJuego miControlador = new ControladorJuego(miTablero, listaEnemigos, miPanel);
         miPanel.setControlador(miControlador);
-        new VentanaJuego(miPanel); 
+
+        new VentanaJuego(miPanel);
         miPanel.iniciarOyenteTeclado();
     }
 
