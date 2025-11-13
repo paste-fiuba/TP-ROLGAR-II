@@ -67,6 +67,22 @@ public class ControladorJuego {
                 adminJuego.procesarMovimiento(-1, 0);
             } else if (keyCode == KeyEvent.VK_D) {
                 adminJuego.procesarMovimiento(1, 0);
+            } else if (keyCode == KeyEvent.VK_F) {
+                // Atacar a un jugador adyacente (PvP)
+                com.entidades.Personaje atacante = adminJuego.getJugadorActual();
+                if (atacante != null) {
+                    com.entidades.Personaje objetivo = null;
+                    for (com.entidades.Personaje p : adminJuego.getJugadores()) {
+                        if (p == null || p == atacante) continue;
+                        if (p.getVida() <= 0) continue;
+                        if (adminJuego.sonAdyacentes(atacante, p)) { objetivo = p; break; }
+                    }
+                    if (objetivo != null) {
+                        adminJuego.atacarJugador(atacante, objetivo);
+                    } else {
+                        if (panelJuego != null && panelJuego.getRenderUI() != null) panelJuego.getRenderUI().agregarMensajeLog("No hay jugadores adyacentes para atacar.");
+                    }
+                }
             } else if (keyCode == KeyEvent.VK_T) {
                 // Iniciar modo transferencia: esperar la tecla de slot (1..0)
                 pendingTransferSlot = -2;
