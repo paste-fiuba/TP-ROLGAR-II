@@ -10,6 +10,7 @@ public class CartaInvisibilidad extends Carta {
 
     public CartaInvisibilidad() {
         super("Invisibilidad", "Hace invisible al jugador por un turno, evitando ataques.");
+        this.imagen = cargarImagen("src/sprites/ceguera.png");
     }
 
     @Override

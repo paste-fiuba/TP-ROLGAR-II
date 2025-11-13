@@ -19,6 +19,7 @@ public class CartaTeletransportacion extends Carta {
         this.nuevaX = x;
         this.nuevaY = y;
         this.nuevaZ = z;
+        this.imagen = cargarImagen("src/sprites/teletransportarse.png");
     }
 
     @Override

@@ -10,6 +10,7 @@ public class CartaDobleMovimiento extends Carta {
 
     public CartaDobleMovimiento() {
         super("Doble Movimiento", "Permite moverse dos veces en el siguiente turno.");
+        this.imagen = cargarImagen("src/sprites/doble-movimiento.png");
     }
 
     @Override

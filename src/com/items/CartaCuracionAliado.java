@@ -13,6 +13,7 @@ public class CartaCuracionAliado extends Carta {
     public CartaCuracionAliado(int cantidad) {
         super("Curación de Aliado", "Cura " + cantidad + " puntos de vida a un aliado.");
         this.cantidad = cantidad;
+        this.imagen = cargarImagen("src/sprites/curar-aliado.png");
     }
 
     @Override

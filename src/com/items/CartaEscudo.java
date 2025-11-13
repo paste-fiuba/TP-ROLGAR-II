@@ -5,13 +5,14 @@ import com.entidades.Personaje;
 
 public class CartaEscudo extends Carta {
 
-    private static final int VALOR_ESCUDO = 30; // El valor de 30 que pediste
+    private static final int VALOR_ESCUDO = 30; 
 
     /**
      * Constructor.
      */
     public CartaEscudo() {
         super("Escudo", "Otorga " + VALOR_ESCUDO + " de vida temporal.");
+        this.imagen = cargarImagen("src/sprites/escudo.png");
     }
 
     /**
