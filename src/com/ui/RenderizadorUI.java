@@ -17,7 +17,7 @@ import javax.imageio.ImageIO;
 
 public class RenderizadorUI {
 
-    private BufferedImage spriteSlot;   // 🔥 solo esto queda
+    private BufferedImage spriteSlot;   // 
     private Font fontMenuTitulo, fontMenuOpcion, fontInfo;
     private Font fontGameOver;
     private List<String> battleLog;
@@ -50,7 +50,7 @@ public class RenderizadorUI {
         this.battleLog.clear();
     }
 
-    // 🔥🔥🔥 HOTBAR FINAL QUE USA IMAGEN DE CADA CARTA 🔥🔥🔥
+    // 
     public void dibujarHotbar(Graphics2D g, Inventario inventario, int anchoLogico, int altoJuegoLogico) {
 
         int ALTURA_HOTBAR = PanelJuego.ALTURA_HOTBAR;
@@ -163,7 +163,7 @@ public class RenderizadorUI {
 
         g.setFont(fontMenuOpcion);
         String linea1 = "Presioná 1,2,3 o 4 para seleccionar cantidad de jugadores.";
-        String linea2 = "Controles: W/A/S/D mover, 1-0 usar carta, ENTER terminar turno.";
+            String linea2 = "Controles: W/A/S/D mover, Q/E/Z/C diagonales, 1-0 usar carta, ENTER terminar turno.";
         int w1 = g.getFontMetrics().stringWidth(linea1);
         int w2 = g.getFontMetrics().stringWidth(linea2);
         g.drawString(linea1, (anchoVentana - w1) / 2, altoVentana / 2 - 20);
@@ -175,14 +175,19 @@ public class RenderizadorUI {
         String a1 = "Alianzas: Acercate a otro jugador y presioná 'L' para proponer alianza.";
         String a2 = "Si te proponen, presioná 'Y' para aceptar o 'N' para rechazar en tu turno.";
         String t1 = "Transferencia de cartas: en tu turno presioná 'T' y luego 1..0 para elegir el slot a transferir a un aliado adyacente.";
-        String obj = "Objetivo: Colaborar (o no) para eliminar a los enemigos del mapa.";
         int aw = g.getFontMetrics().stringWidth(a1);
         g.setColor(Color.LIGHT_GRAY);
         g.drawString(a1, (anchoVentana - aw) / 2, infoY);
         g.drawString(a2, (anchoVentana - g.getFontMetrics().stringWidth(a2)) / 2, infoY + 20);
         g.drawString(t1, (anchoVentana - g.getFontMetrics().stringWidth(t1)) / 2, infoY + 40);
-        g.setColor(Color.YELLOW);
-        g.drawString(obj, (anchoVentana - g.getFontMetrics().stringWidth(obj)) / 2, infoY + 70);
+            // Mostrar ayuda sobre diagonales
+            String diag = "Diagonales: Q=adelante-izq, E=adelante-der, Z=atrás-izq, C=atrás-der";
+            g.setColor(Color.LIGHT_GRAY);
+            g.drawString(diag, (anchoVentana - g.getFontMetrics().stringWidth(diag)) / 2, infoY + 60);
+            // Objetivo: mostrar la línea solicitada exactamente
+            String objetivoTexto = "Objetivo: Eliminar a los demás personajes del tablero";
+            g.setColor(Color.YELLOW);
+            g.drawString(objetivoTexto, (anchoVentana - g.getFontMetrics().stringWidth(objetivoTexto)) / 2, infoY + 100);
     }
 
     public void dibujarInfoJuego(Graphics g, Personaje p, List<Enemigo> e, java.util.List<Personaje> jugadores, com.logica.AdministradorDeJuego admin, int pendingTransfer) {
