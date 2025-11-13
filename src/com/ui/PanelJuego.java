@@ -8,38 +8,28 @@ import java.awt.event.KeyListener;
 import java.util.List;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-
 import com.tablero.Tablero;
 import com.entidades.Personaje;
 import com.entidades.Enemigo;
 import com.logica.ControladorJuego;
 import com.logica.ControladorJuego.GameState; 
 
-/**
- * El "Lienzo" principal. Delega el dibujo a los Renderizadores.
- * Maneja el escalado y el input (KeyListener).
- */
 public class PanelJuego extends JPanel implements KeyListener {
 
     public static final int TAMAÑO_TILE = 32;
     public static final int ALTURA_HOTBAR = 64;
 
-    // Referencias al Modelo
     private Tablero tablero;
     private int nivelZActual; 
     private Personaje jugador; 
     private List<Enemigo> enemigos;
-    
-    // Referencia al Controlador
     private ControladorJuego controlador;
-
-    // TDA de Vista
     private RenderizadorMundo renderMundo;
     private RenderizadorUI renderUI;
 
     private final int ANCHO_LOGICO;
     private final int ALTO_LOGICO;
-    private final int ALTO_JUEGO_LOGICO; // Alto sin la hotbar
+    private final int ALTO_JUEGO_LOGICO;
 
     public PanelJuego(Tablero tablero, Personaje jugador, List<Enemigo> enemigos, int zInicial) {
         this.tablero = tablero;
@@ -52,7 +42,6 @@ public class PanelJuego extends JPanel implements KeyListener {
         this.ALTO_LOGICO = ALTO_JUEGO_LOGICO + ALTURA_HOTBAR; 
         
         this.setBackground(Color.BLACK); 
-        
         this.renderMundo = new RenderizadorMundo();
         this.renderUI = new RenderizadorUI();
     }
@@ -66,11 +55,14 @@ public class PanelJuego extends JPanel implements KeyListener {
         this.setFocusable(true);
         this.requestFocusInWindow();
     }
+    
+    public RenderizadorUI getRenderUI() {
+        return this.renderUI;
+    }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
         Graphics2D gJuego = (Graphics2D) g.create();
         
         try {
@@ -79,19 +71,29 @@ public class PanelJuego extends JPanel implements KeyListener {
             gJuego.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
             gJuego.scale(scaleX, scaleY);
             
-            // 1. Dibujar el Mundo (delegado)
             renderMundo.dibujar(gJuego, tablero, jugador, enemigos, nivelZActual);
-            
-            // 2. Dibujar la Hotbar (delegado)
             renderUI.dibujarHotbar(gJuego, jugador.getInventario(), ANCHO_LOGICO, ALTO_JUEGO_LOGICO);
 
         } finally {
             gJuego.dispose();
         }
         
-        // 3. Dibujar Menú de Pausa (delegado, sin escalar)
-        if (controlador != null && controlador.getEstadoJuego() == GameState.PAUSED) {
+        if (controlador == null) return;
+        
+        GameState estado = controlador.getEstadoJuego();
+
+        if (estado == GameState.RUNNING) {
+            renderUI.dibujarInfoJuego(g, jugador, enemigos);
+        }
+        else if (estado == GameState.PAUSED) {
             renderUI.dibujarMenuPausa(g, getWidth(), getHeight()); 
+        }
+        else if (estado == GameState.GAME_OVER) {
+            renderUI.dibujarPantallaGameOver(g, getWidth(), getHeight());
+        }
+        // 1. Añadimos el chequeo para el estado de Victoria
+        else if (estado == GameState.VICTORY) {
+            renderUI.dibujarPantallaVictoria(g, getWidth(), getHeight());
         }
     }
 
