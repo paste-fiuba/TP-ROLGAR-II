@@ -74,16 +74,21 @@ public class Inventario {
     }
 
     /**
-     * pre: índice válido.
-     * post: devuelve la carta en la posición indicada.
+     * Devuelve la carta en una posición específica del inventario.
+     * (¡Necesario para que el Administrador lea el nombre de la carta!)
+     *
+     * @param indice El slot del inventario (0 a 9).
+     * @return La Carta en ese slot, o null si está vacío.
      */
     public Carta getCarta(int indice) {
-        if (indice >= 0 && indice < cartas.size()) {
+        if (indice >= 0 && indice < cartas.size()) { // Asumiendo que tu lista se llama 'cartas'
             return cartas.get(indice);
         }
         return null;
     }
 
+    
+    
     /**
      * post: devuelve una representación textual del inventario.
      */

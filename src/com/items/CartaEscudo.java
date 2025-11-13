@@ -1,27 +1,26 @@
-package com.items;
+package com.items; 
 
 import com.entidades.Entidad;
 import com.entidades.Personaje;
 
-/**
- * Reduce el daño recibido durante el siguiente ataque.
- */
 public class CartaEscudo extends Carta {
 
-    private int reduccion; // porcentaje
+    private static final int VALOR_ESCUDO = 30; // El valor de 30 que pediste
 
     /**
-     * pre: reduccion entre 0 y 100
-     * post: crea una carta que reduce el daño recibido por el usuario.
+     * Constructor.
      */
-    public CartaEscudo(int reduccion) {
-        super("Escudo", "Reduce el daño recibido en un " + reduccion + "% durante el próximo ataque.");
-        this.reduccion = reduccion;
+    public CartaEscudo() {
+        super("Escudo", "Otorga " + VALOR_ESCUDO + " de vida temporal.");
     }
 
+    /**
+     * Aplica el buff "Escudo" (HP temporal) al usuario.
+     */
     @Override
     public void aplicarEfecto(Personaje usuario, Entidad objetivo) {
-        usuario.setEscudoActivo(true, reduccion);
-        System.out.println(usuario.getNombre() + " activó un escudo de " + reduccion + "% de reducción de daño.");
+        if (usuario != null) {
+            usuario.agregarVidaEscudo(VALOR_ESCUDO);
+        }
     }
 }
