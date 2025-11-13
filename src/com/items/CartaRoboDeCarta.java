@@ -13,6 +13,7 @@ public class CartaRoboDeCarta extends Carta {
 
     public CartaRoboDeCarta() {
         super("Robo de Carta", "Roba una carta aleatoria del inventario de otro jugador.");
+        this.imagen = cargarImagen("src/sprites/robo-carta.png");
     }
 
     /**

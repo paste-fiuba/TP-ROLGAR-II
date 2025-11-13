@@ -17,6 +17,7 @@ public class CartaAumentoVida extends Carta {
     public CartaAumentoVida(int incremento) {
         super("Aumento de Vida", "Aumenta la vida del personaje en " + incremento + " puntos.");
         this.incremento = incremento;
+        this.imagen = cargarImagen("src/sprites/curacion-parcial.png");
     }
 
     @Override

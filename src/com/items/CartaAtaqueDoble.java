@@ -7,6 +7,7 @@ public class CartaAtaqueDoble extends Carta {
 
     public CartaAtaqueDoble() {
         super("Ataque Doble", "Duplica el daño del próximo ataque.");
+        this.imagen = cargarImagen("src/sprites/dobleAtaque.png");
     }
 
     @Override
@@ -15,4 +16,5 @@ public class CartaAtaqueDoble extends Carta {
             usuario.setAtaqueDobleActivo(true);
         }
     }
+    
 }
