@@ -7,7 +7,10 @@ import com.tablero.Casillero;
 import com.tablero.Tablero;
 import com.tablero.TipoCasillero;
 import com.ui.PanelJuego;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class AdministradorDeJuego {
@@ -18,6 +21,9 @@ public class AdministradorDeJuego {
     private List<Enemigo> enemigos;
     private PanelJuego panelJuego;
     private Random random;
+    // Alianzas y propuestas (target -> proposer)
+    private List<com.entidades.Alianza> alianzas;
+    private Map<Personaje, Personaje> propuestas;
 
     public AdministradorDeJuego(Tablero tablero, List<Personaje> jugadores, List<Enemigo> enemigos, PanelJuego panel) {
         this.tablero = tablero;
@@ -25,6 +31,8 @@ public class AdministradorDeJuego {
         this.enemigos = enemigos;
         this.panelJuego = panel;
         this.random = new Random();
+        this.alianzas = new ArrayList<>();
+        this.propuestas = new HashMap<>();
     }
     
     public boolean isJugadorMuerto() {
@@ -151,6 +159,21 @@ public class AdministradorDeJuego {
             dmgJugador = (p.getFuerza() / 2) + random.nextInt(p.getFuerza());
         }
 
+        // Aliados cercanos que ayudan en combate (si pertenecen a la misma alianza)
+        if (p.getAlianza() != null) {
+            for (com.entidades.Personaje aliado : p.getAlianza().getMiembros()) {
+                if (aliado == p) continue;
+                if (aliado.getVida() <= 0) continue;
+                if (aliado.getPosZ() != e.getPosZ()) continue;
+                int dist = Math.abs(aliado.getPosX() - e.getPosX()) + Math.abs(aliado.getPosY() - e.getPosY());
+                if (dist <= 1) {
+                    int ayuda = (aliado.getFuerza() / 3) + random.nextInt(Math.max(1, aliado.getFuerza() / 2));
+                    dmgJugador += ayuda;
+                    logBatalla(aliado.getNombre() + " ayuda a " + p.getNombre() + " por " + ayuda + " de daño.");
+                }
+            }
+        }
+
         int dmgEnemigo = (e.getFuerza() / 2) + random.nextInt(e.getFuerza());
 
         e.recibirDanio(dmgJugador);
@@ -165,6 +188,73 @@ public class AdministradorDeJuego {
         if (!e.estaVivo()) {
             logBatalla("¡Has derrotado a " + e.getNombre() + "!");
         }
+    }
+
+    // Comprueba si dos personajes están adyacentes (misma Z y distancia Manhattan == 1)
+    public boolean sonAdyacentes(Personaje a, Personaje b) {
+        if (a == null || b == null) return false;
+        if (a.getPosZ() != b.getPosZ()) return false;
+        int dist = Math.abs(a.getPosX() - b.getPosX()) + Math.abs(a.getPosY() - b.getPosY());
+        return dist == 1;
+    }
+
+    // Proponer una alianza desde 'proponente' hacia 'objetivo' si están adyacentes y no ya aliados
+    public void proponerAlianza(Personaje proponente, Personaje objetivo) {
+        if (proponente == null || objetivo == null) return;
+        if (!sonAdyacentes(proponente, objetivo)) {
+            logBatalla("No estás lo suficientemente cerca para proponer alianza.");
+            return;
+        }
+        if (proponente.getAlianza() != null && proponente.estaAliadoCon(objetivo)) {
+            logBatalla("Ya estás aliado con " + objetivo.getNombre());
+            return;
+        }
+        propuestas.put(objetivo, proponente);
+        logBatalla(proponente.getNombre() + " propone alianza a " + objetivo.getNombre());
+    }
+
+    // Devuelve el proponente de una propuesta dirigida a 'target', o null
+    public Personaje getPropuestaPara(Personaje target) {
+        return propuestas.get(target);
+    }
+
+    // Aceptar una propuesta dirigida al jugador actual
+    public void aceptarPropuesta(Personaje target) {
+        if (target == null) return;
+        Personaje proponente = propuestas.remove(target);
+        if (proponente == null) {
+            logBatalla("No hay propuestas para aceptar.");
+            return;
+        }
+        com.entidades.Alianza nueva = new com.entidades.Alianza("Alianza " + proponente.getNombre() + "-" + target.getNombre());
+        nueva.agregarMiembro(proponente);
+        nueva.agregarMiembro(target);
+        alianzas.add(nueva);
+        logBatalla(target.getNombre() + " aceptó la alianza con " + proponente.getNombre());
+    }
+
+    public void rechazarPropuesta(Personaje target) {
+        if (target == null) return;
+        Personaje proponente = propuestas.remove(target);
+        if (proponente != null) {
+            logBatalla(target.getNombre() + " rechazó la alianza de " + proponente.getNombre());
+        } else {
+            logBatalla("No hay propuestas para rechazar.");
+        }
+    }
+
+    // Transferir carta entre jugadores aliados y adyacentes
+    public boolean transferirCarta(Personaje from, Personaje to, int slotIndex) {
+        if (from == null || to == null) return false;
+        if (!sonAdyacentes(from, to)) return false;
+        if (from.getAlianza() == null || !from.estaAliadoCon(to)) return false;
+        com.items.Carta carta = from.getInventario().getCarta(slotIndex);
+        if (carta == null) return false;
+        if (to.getInventario().cantidadDeCartas() >= 10) return false;
+        to.agregarCarta(carta);
+        from.eliminarCarta(slotIndex);
+        logBatalla(from.getNombre() + " transfirió " + carta.getNombre() + " a " + to.getNombre());
+        return true;
     }
 
     /**

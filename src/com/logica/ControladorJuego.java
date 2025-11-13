@@ -16,6 +16,8 @@ public class ControladorJuego {
 
     private AdministradorDeJuego adminJuego;
     private PanelJuego panelJuego;
+    // Estado transitorio para transferencia de cartas: -1 = none, -2 = esperando slot
+    private int pendingTransferSlot = -1;
 
     // Recursos para crear la partida desde el menú
     private Tablero tablero;
@@ -30,7 +32,6 @@ public class ControladorJuego {
     }
 
     public void manejarInput(int keyCode) {
-
         if (estadoJuego == GameState.MENU) {
             // En el menú, permitir elegir 1-4 jugadores con teclas 1..4
             if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_4) {
@@ -53,10 +54,11 @@ public class ControladorJuego {
             } else if (estadoJuego == GameState.PAUSED) {
                 estadoJuego = GameState.RUNNING;
             }
-        } 
-        
+        }
+
         else if (estadoJuego == GameState.RUNNING) {
             if (adminJuego == null) return;
+            // Movimiento
             if (keyCode == KeyEvent.VK_W) {
                 adminJuego.procesarMovimiento(0, -1);
             } else if (keyCode == KeyEvent.VK_S) {
@@ -65,16 +67,72 @@ public class ControladorJuego {
                 adminJuego.procesarMovimiento(-1, 0);
             } else if (keyCode == KeyEvent.VK_D) {
                 adminJuego.procesarMovimiento(1, 0);
+            } else if (keyCode == KeyEvent.VK_T) {
+                // Iniciar modo transferencia: esperar la tecla de slot (1..0)
+                pendingTransferSlot = -2;
+                if (panelJuego != null && panelJuego.getRenderUI() != null) {
+                    panelJuego.getRenderUI().agregarMensajeLog("Transferencia: presioná 1..0 para elegir el slot a transferir.");
+                }
             } else if (keyCode == KeyEvent.VK_ENTER) {
                 // Finalizar el turno del jugador actual
                 adminJuego.finalizarTurno();
-            } 
+            } else if (keyCode == KeyEvent.VK_L) {
+                // Proponer alianza con un jugador adyacente no aliado (si existe)
+                com.entidades.Personaje actual = adminJuego.getJugadorActual();
+                if (actual != null) {
+                    com.entidades.Personaje objetivo = null;
+                    for (com.entidades.Personaje p : adminJuego.getJugadores()) {
+                        if (p == null || p == actual) continue;
+                        if (p.getVida() <= 0) continue;
+                        if (!actual.estaAliadoCon(p) && adminJuego.sonAdyacentes(actual, p)) {
+                            objetivo = p;
+                            break;
+                        }
+                    }
+                    if (objetivo != null) {
+                        adminJuego.proponerAlianza(actual, objetivo);
+                    }
+                }
+            } else if (keyCode == KeyEvent.VK_Y) {
+                // Aceptar propuesta en tu turno
+                com.entidades.Personaje actual = adminJuego.getJugadorActual();
+                if (actual != null) adminJuego.aceptarPropuesta(actual);
+            } else if (keyCode == KeyEvent.VK_N) {
+                com.entidades.Personaje actual = adminJuego.getJugadorActual();
+                if (actual != null) adminJuego.rechazarPropuesta(actual);
+            }
             else if (keyCode >= KeyEvent.VK_0 && keyCode <= KeyEvent.VK_9) {
                 int slotIndex = (keyCode == KeyEvent.VK_0) ? 9 : keyCode - KeyEvent.VK_1;
-                adminJuego.activarCarta(slotIndex);
+                // Si estamos en modo transferencia, tratar de transferir ese slot
+                if (pendingTransferSlot != -1) {
+                    com.entidades.Personaje from = adminJuego.getJugadorActual();
+                    if (from == null) {
+                        pendingTransferSlot = -1;
+                    } else {
+                        // buscar primer aliado adyacente
+                        com.entidades.Personaje objetivo = null;
+                        for (com.entidades.Personaje p : adminJuego.getJugadores()) {
+                            if (p == null || p == from) continue;
+                            if (p.getVida() <= 0) continue;
+                            if (from.getAlianza() != null && from.estaAliadoCon(p) && adminJuego.sonAdyacentes(from, p)) {
+                                objetivo = p;
+                                break;
+                            }
+                        }
+                        if (objetivo == null) {
+                            if (panelJuego != null && panelJuego.getRenderUI() != null) panelJuego.getRenderUI().agregarMensajeLog("No hay aliado adyacente para transferir.");
+                        } else {
+                            boolean ok = adminJuego.transferirCarta(from, objetivo, slotIndex);
+                            if (!ok && panelJuego != null && panelJuego.getRenderUI() != null) panelJuego.getRenderUI().agregarMensajeLog("Transferencia fallida.");
+                        }
+                        pendingTransferSlot = -1;
+                    }
+                } else {
+                    adminJuego.activarCarta(slotIndex);
+                }
             }
-        } 
-        
+        }
+
         else if (estadoJuego == GameState.PAUSED) {
             if (keyCode == KeyEvent.VK_R) {
                 estadoJuego = GameState.RUNNING;
@@ -82,8 +140,7 @@ public class ControladorJuego {
                 System.exit(0);
             }
         }
-        
-        // Game over / victory handling
+
         else if (estadoJuego == GameState.GAME_OVER || estadoJuego == GameState.VICTORY) {
             if (keyCode == KeyEvent.VK_Q) {
                 System.exit(0);
@@ -104,6 +161,10 @@ public class ControladorJuego {
 
     public GameState getEstadoJuego() {
         return this.estadoJuego;
+    }
+
+    public int getPendingTransferSlot() {
+        return this.pendingTransferSlot;
     }
 
     /**
