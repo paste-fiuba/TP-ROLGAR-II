@@ -2,17 +2,17 @@ package com;
 
 import com.entidades.Enemigo;
 import com.entidades.Personaje;
-import com.items.CartaAtaqueDoble;
-import com.items.CartaCuracionAliado;
-import com.items.CartaEscudo;
-import com.items.CartaInvisibilidad;
+import com.items.*;
 import com.logica.ControladorJuego;
+import com.tablero.Casillero;
 import com.tablero.Tablero;
 import com.tablero.TipoCasillero;
 import com.ui.PanelJuego;
 import com.ui.VentanaJuego; 		
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 // El menú ahora se muestra dentro de la ventana del juego (ControladorJuego MENU)
 
 public class Main {
@@ -195,6 +195,56 @@ public class Main {
         tallarPasilloVertical(tablero, 20, 10, 15, 9);
         tablero.getCasillero(12, 21, 9).setCarta(new CartaCuracionAliado(10));
         tablero.getCasillero(28, 21, 9).setCarta(new CartaCuracionAliado(10));
+
+        // --- Distribuir al menos una de cada tipo de carta en niveles aleatorios (niveles distintos)
+        java.util.List<Carta> cartas = new java.util.ArrayList<>();
+        cartas.add(new CartaAtaqueDoble());
+        cartas.add(new CartaAumentoVida(20));
+        cartas.add(new CartaCuracionAliado(30));
+        cartas.add(new CartaCuracionTotal());
+        cartas.add(new CartaDobleMovimiento());
+        cartas.add(new CartaEscudo());
+        cartas.add(new CartaEsquivarDanio(0.6));
+        cartas.add(new CartaInvisibilidad());
+        cartas.add(new CartaRoboDeCarta());
+        // Teletransportación apunta al centro del tablero por defecto
+        cartas.add(new CartaTeletransportacion(ANCHO_TABLERO/2, ALTO_TABLERO/2, 0));
+
+        Random rnd = new Random();
+        java.util.List<Integer> niveles = new java.util.ArrayList<>();
+        for (int z = 0; z < NIVELES_TABLERO; z++) niveles.add(z);
+        Collections.shuffle(niveles, rnd);
+
+        for (int i = 0; i < cartas.size() && i < niveles.size(); i++) {
+            int z = niveles.get(i);
+            boolean placed = false;
+            // Intentos aleatorios
+            for (int attempt = 0; attempt < 500 && !placed; attempt++) {
+                int x = rnd.nextInt(ANCHO_TABLERO);
+                int y = rnd.nextInt(ALTO_TABLERO);
+                if (!tablero.esCoordenadaValida(x, y, z)) continue;
+                Casillero c = tablero.getCasillero(x, y, z);
+                if (c.getTipo() == TipoCasillero.ROCA) continue;
+                if (c.getCarta() != null) continue;
+                c.setCarta(cartas.get(i));
+                placed = true;
+            }
+            // Fallback: buscar la primera celda disponible en el nivel
+            if (!placed) {
+                outer:
+                for (int yy = 0; yy < ALTO_TABLERO; yy++) {
+                    for (int xx = 0; xx < ANCHO_TABLERO; xx++) {
+                        if (!tablero.esCoordenadaValida(xx, yy, z)) continue;
+                        Casillero c2 = tablero.getCasillero(xx, yy, z);
+                        if (c2.getTipo() != TipoCasillero.ROCA && c2.getCarta() == null) {
+                            c2.setCarta(cartas.get(i));
+                            placed = true;
+                            break outer;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // --- Métodos de ayuda para tallar el mundo ---
