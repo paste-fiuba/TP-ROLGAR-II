@@ -67,6 +67,18 @@ public class ControladorJuego {
                 adminJuego.procesarMovimiento(-1, 0);
             } else if (keyCode == KeyEvent.VK_D) {
                 adminJuego.procesarMovimiento(1, 0);
+            } else if (keyCode == KeyEvent.VK_Q) {
+                // Diagonal adelante-izquierda (W + A)
+                adminJuego.procesarMovimiento(-1, -1);
+            } else if (keyCode == KeyEvent.VK_E) {
+                // Diagonal adelante-derecha (W + D)
+                adminJuego.procesarMovimiento(1, -1);
+            } else if (keyCode == KeyEvent.VK_Z) {
+                // Diagonal atras-izquierda (S + A)
+                adminJuego.procesarMovimiento(-1, 1);
+            } else if (keyCode == KeyEvent.VK_C) {
+                // Diagonal atras-derecha (S + D)
+                adminJuego.procesarMovimiento(1, 1);
             } else if (keyCode == KeyEvent.VK_F) {
                 // Atacar a un jugador adyacente (PvP)
                 com.entidades.Personaje atacante = adminJuego.getJugadorActual();
