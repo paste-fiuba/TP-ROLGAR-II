@@ -18,16 +18,15 @@ public class Main {
         PartidaDeRolgar partida = new PartidaDeRolgar();
 
         // 2. Crear el PanelJuego (la vista)
-        // Se inicializa sin un tablero o jugadores, se cargarán desde el menú.
         PanelJuego miPanel = new PanelJuego();
 
         // 3. Crear el ControladorJuego (que maneja los estados)
-        // Le pasamos la instancia de partida (para cargarla) y el panel (para dibujarlo)
         ControladorJuego miControlador = new ControladorJuego(partida, miPanel);
         
         miPanel.setControlador(miControlador);
 
         // 4. Crear la Ventana y arrancar
         new VentanaJuego(miPanel);
+        // La ventana se encarga de iniciar el oyente
     }
 }

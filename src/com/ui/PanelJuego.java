@@ -29,6 +29,7 @@ public class PanelJuego extends JPanel implements KeyListener {
     private RenderizadorMundo renderMundo;
     private RenderizadorUI renderUI;
 
+    // Dimensiones lógicas por defecto (se actualizarán al cargar la partida)
     private int ANCHO_LOGICO = 800;
     private int ALTO_LOGICO = 600;
     private int ALTO_JUEGO_LOGICO = 536;
@@ -38,23 +39,29 @@ public class PanelJuego extends JPanel implements KeyListener {
         this.renderMundo = new RenderizadorMundo();
         this.renderUI = new RenderizadorUI();
         
+        // Dimensiones temporales para el menú
         this.setPreferredSize(new Dimension(ANCHO_LOGICO, ALTO_LOGICO));
     }
     
+    /**
+     * Configura el panel con los datos de una partida recién cargada.
+     */
     public void setDatosDePartida(Tablero tablero, List<Personaje> jugadores, List<Enemigo> enemigos) {
         this.tablero = tablero;
         this.jugadores = jugadores;
         this.enemigos = enemigos;
-        this.nivelZActual = 0; 
+        this.nivelZActual = 0; // Asumir nivel inicial 0
         
+        // Actualizar las dimensiones lógicas basadas en el tablero cargado
         this.ANCHO_LOGICO = tablero.getDimensionX() * TAMAÑO_TILE;
         this.ALTO_JUEGO_LOGICO = tablero.getDimensionY() * TAMAÑO_TILE;
         this.ALTO_LOGICO = ALTO_JUEGO_LOGICO + ALTURA_HOTBAR; 
         
+        // Actualizar el tamaño preferido del panel para que la ventana se ajuste
         this.setPreferredSize(new Dimension(ANCHO_LOGICO, ALTO_LOGICO));
         
         if (this.getTopLevelAncestor() instanceof javax.swing.JFrame) {
-            ((javax.swing.JFrame) this.getTopLevelAncestor()).pack();
+            // No re-empacar, solo centrar si ya es visible
             ((javax.swing.JFrame) this.getTopLevelAncestor()).setLocationRelativeTo(null); 
         }
     }
@@ -88,23 +95,34 @@ public class PanelJuego extends JPanel implements KeyListener {
         if (estado == GameState.MENU_PRINCIPAL || 
             estado == GameState.MENU_DIFICULTAD || 
             estado == GameState.MENU_JUGADORES ||
-            estado == GameState.MENU_INSTRUCCIONES) { // <-- AÑADIDO
+            estado == GameState.MENU_INSTRUCCIONES) { 
             
             renderUI.dibujarMenu(g, estado, getWidth(), getHeight());
             return;
         }
 
+        // Si estamos EN COMBATE, dibujar solo la pantalla de combate
+        if (estado == GameState.EN_COMBATE) {
+            renderUI.dibujarPantallaCombate(g, controlador.getAdminCombate(), getWidth(), getHeight());
+            return;
+        }
+
+        // Si el juego está corriendo (RUNNING, PAUSED, GAME_OVER, VICTORY)
+        // dibujamos el mundo de fondo.
 
         Graphics2D gJuego = (Graphics2D) g.create();
         try {
-            double scaleX = (double) getWidth() / ANCHO_LOGICO;
-            double scaleY = (double) getHeight() / ALTO_LOGICO;
+            int ventanaAncho = getWidth();
+            int ventanaAlto = getHeight();
+
+            double scaleX = (double) ventanaAncho / ANCHO_LOGICO;
+            double scaleY = (double) ventanaAlto / ALTO_LOGICO;
             double scale = Math.min(scaleX, scaleY); 
 
             int scaledWidth = (int) (ANCHO_LOGICO * scale);
             int scaledHeight = (int) (ALTO_LOGICO * scale);
-            int offsetX = (getWidth() - scaledWidth) / 2;
-            int offsetY = (getHeight() - scaledHeight) / 2;
+            int offsetX = (ventanaAncho - scaledWidth) / 2;
+            int offsetY = (ventanaAlto - scaledHeight) / 2;
 
             gJuego.translate(offsetX, offsetY);
             gJuego.scale(scale, scale);
@@ -129,6 +147,7 @@ public class PanelJuego extends JPanel implements KeyListener {
             gJuego.dispose();
         }
         
+        // Dibujar UI superpuesta (Info, Pausa, GameOver, Victoria)
         if (estado == GameState.RUNNING) {
             Personaje jugadorActual = (this.administrador != null) ? this.administrador.getJugadorActual() : null;
             int pending = (this.controlador != null) ? this.controlador.getPendingTransferSlot() : -1;

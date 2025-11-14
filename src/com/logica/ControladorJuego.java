@@ -1,6 +1,7 @@
 package com.logica;
 
 import com.entidades.Enemigo;
+import com.entidades.Entidad; 
 import com.entidades.Personaje;
 import com.tablero.Tablero;
 import com.ui.PanelJuego;
@@ -15,8 +16,9 @@ public class ControladorJuego {
         MENU_PRINCIPAL,
         MENU_DIFICULTAD,
         MENU_JUGADORES,
-        MENU_INSTRUCCIONES, // <-- NUEVO ESTADO
+        MENU_INSTRUCCIONES,
         RUNNING, 
+        EN_COMBATE, 
         PAUSED, 
         GAME_OVER, 
         VICTORY 
@@ -25,6 +27,7 @@ public class ControladorJuego {
     private GameState estadoJuego;
 
     private AdministradorDeJuego adminJuego;
+    private AdministradorDeCombate adminCombate; 
     private PanelJuego panelJuego;
     
     private PartidaDeRolgar partida; 
@@ -55,12 +58,15 @@ public class ControladorJuego {
                 manejarMenuJugadores(keyCode);
                 this.panelJuego.repaint();
                 return;
-            case MENU_INSTRUCCIONES: // <-- NUEVO MANEJO
+            case MENU_INSTRUCCIONES:
                 manejarMenuInstrucciones(keyCode);
                 this.panelJuego.repaint();
                 return;
+            case EN_COMBATE: 
+                manejarInputCombate(keyCode);
+                this.panelJuego.repaint();
+                return;
             default:
-                // Si no es un estado de menú, sigue al manejo del juego
                 break;
         }
 
@@ -75,7 +81,9 @@ public class ControladorJuego {
                 estadoJuego = GameState.PAUSED;
             } else if (estadoJuego == GameState.PAUSED) {
                 estadoJuego = GameState.RUNNING;
-            } else if (estadoJuego == GameState.MENU_DIFICULTAD || estadoJuego == GameState.MENU_JUGADORES) {
+            } else if (estadoJuego == GameState.MENU_DIFICULTAD || 
+                       estadoJuego == GameState.MENU_JUGADORES ||
+                       estadoJuego == GameState.MENU_INSTRUCCIONES) {
                 estadoJuego = GameState.MENU_PRINCIPAL; 
             }
         }
@@ -119,7 +127,7 @@ public class ControladorJuego {
                         }
                     }
                     if (objetivo != null) {
-                        adminJuego.atacarJugador(atacante, objetivo);
+                        iniciarCombate(atacante, objetivo);
                     } else {
                         if (panelJuego != null && panelJuego.getRenderUI() != null) panelJuego.getRenderUI().agregarMensajeLog("No hay jugadores adyacentes para atacar.");
                     }
@@ -177,6 +185,7 @@ public class ControladorJuego {
                         pendingTransferSlot = -1;
                     }
                 } else {
+                    // Usar carta (esto gasta el turno)
                     adminJuego.activarCarta(slotIndex);
                     adminJuego.finalizarTurno(); 
                 }
@@ -197,6 +206,7 @@ public class ControladorJuego {
             }
         }
 
+        // Revisar estado después de cada acción
         if (estadoJuego == GameState.RUNNING && adminJuego != null) {
             if (adminJuego.isJugadorMuerto()) {
                 estadoJuego = GameState.GAME_OVER;
@@ -215,7 +225,7 @@ public class ControladorJuego {
             this.estadoJuego = GameState.MENU_DIFICULTAD;
         }
         if (keyCode == KeyEvent.VK_2) { // 2. Instrucciones
-            this.estadoJuego = GameState.MENU_INSTRUCCIONES; // <-- CAMBIADO
+            this.estadoJuego = GameState.MENU_INSTRUCCIONES;
         }
         if (keyCode == KeyEvent.VK_3 || keyCode == KeyEvent.VK_ESCAPE) { // 3. Salir
             System.exit(0);
@@ -235,6 +245,9 @@ public class ControladorJuego {
             this.dificultadSeleccionada = PartidaDeRolgar.Dificultad.DIFICIL;
             this.estadoJuego = GameState.MENU_JUGADORES;
         }
+        if (keyCode == KeyEvent.VK_ESCAPE) {
+            this.estadoJuego = GameState.MENU_PRINCIPAL;
+        }
     }
     
     private void manejarMenuJugadores(int keyCode) {
@@ -242,20 +255,31 @@ public class ControladorJuego {
             this.jugadoresSeleccionados = keyCode - KeyEvent.VK_0; // '1' -> 1
             iniciarPartida();
         }
+        if (keyCode == KeyEvent.VK_ESCAPE) {
+            this.estadoJuego = GameState.MENU_DIFICULTAD;
+        }
     }
-    
-    /**
-     * pre: keyCode es el código de la tecla presionada.
-     * post: Cambia el estado a MENU_PRINCIPAL si se presiona ESC.
-     */
+
     private void manejarMenuInstrucciones(int keyCode) {
         if (keyCode == KeyEvent.VK_ESCAPE) { // Salir con ESC
             this.estadoJuego = GameState.MENU_PRINCIPAL;
         }
     }
 
+    private void manejarInputCombate(int keyCode) {
+        if (adminCombate == null) return;
+        // Simplemente pasamos la tecla al TDA de combate
+        adminCombate.manejarInput(keyCode);
+    }
+    
+    // --- Métodos de Control de Partida ---
+
     public GameState getEstadoJuego() {
         return this.estadoJuego;
+    }
+    
+    public AdministradorDeCombate getAdminCombate() {
+        return this.adminCombate;
     }
 
     public int getPendingTransferSlot() {
@@ -271,7 +295,7 @@ public class ControladorJuego {
 
         panelJuego.setDatosDePartida(tablero, jugadores, enemigos);
 
-        this.adminJuego = new AdministradorDeJuego(tablero, jugadores, enemigos, panelJuego);
+        this.adminJuego = new AdministradorDeJuego(this, tablero, jugadores, enemigos, panelJuego);
         panelJuego.setAdministrador(adminJuego);
         
         Personaje primer = this.adminJuego.getJugadorActual();
@@ -279,5 +303,22 @@ public class ControladorJuego {
         
         this.estadoJuego = GameState.RUNNING;
         panelJuego.repaint();
+    }
+    
+    public void iniciarCombate(Personaje jugador, Entidad oponente) {
+        this.adminCombate = new AdministradorDeCombate(this, this.adminJuego, jugador, oponente);
+        this.estadoJuego = GameState.EN_COMBATE;
+    }
+    
+    public void finalizarCombate() {
+        this.adminCombate = null;
+        this.estadoJuego = GameState.RUNNING;
+        
+        // Chequear estado general post-combate
+        if (adminJuego.isJugadorMuerto()) {
+            estadoJuego = GameState.GAME_OVER;
+        } else if (adminJuego.isVictoria()) {
+            estadoJuego = GameState.VICTORY;
+        }
     }
 }
