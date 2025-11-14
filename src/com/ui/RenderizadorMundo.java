@@ -48,6 +48,17 @@ public class RenderizadorMundo {
             e.printStackTrace();
         }
     }
+    
+    private boolean personajeCercano(List<Personaje> jugadores, int x, int y, int z) {
+    	boolean respuesta = false;
+    	for(Personaje jugador : jugadores) {
+    		if(((jugador.getPosX()==x && (jugador.getPosY()==y || jugador.getPosY()==y-1 || jugador.getPosY()==y+1)) || (jugador.getPosX()==x-1 && (jugador.getPosY()==y || jugador.getPosY()==y-1 || jugador.getPosY()==y+1)) || (jugador.getPosX()==x+1 && (jugador.getPosY()==y || jugador.getPosY()==y-1 || jugador.getPosY()==y+1))) && jugador.getPosZ()==z) {
+    			respuesta=true;
+    		}
+    	}
+    	
+    	return respuesta;
+    }
 
     private void loadEnemySprite(String key, String path) {
         try {
@@ -74,21 +85,22 @@ public class RenderizadorMundo {
                 Casillero casillero = tablero.getCasillero(x, y, zActual);
                 int pixelX = x * TAMAÑO_TILE;
                 int pixelY = y * TAMAÑO_TILE;
+  
                 
                 // Terreno
-                if (casillero.getTipo() == TipoCasillero.ROCA) {
+                if (casillero.getTipo() == TipoCasillero.ROCA && personajeCercano(jugadores, x, y, zActual)) {
                     g.drawImage(this.spriteRoca, pixelX, pixelY, null);
-                } else if (casillero.getTipo() == TipoCasillero.AGUA) { 
+                } else if (casillero.getTipo() == TipoCasillero.AGUA && personajeCercano(jugadores, x, y, zActual)) { 
                     g.drawImage(this.spriteAgua, pixelX, pixelY, null);
-                } else if (casillero.getTipo() == TipoCasillero.RAMPA) { 
+                } else if (casillero.getTipo() == TipoCasillero.RAMPA && personajeCercano(jugadores, x, y, zActual)) { 
                     g.drawImage(this.spriteRampa, pixelX, pixelY, null);
-                } else if (casillero.getTipo() == TipoCasillero.VACIO) { 
+                } else if (casillero.getTipo() == TipoCasillero.VACIO && personajeCercano(jugadores, x, y, zActual)) { 
                     g.drawImage(this.spriteVacio, pixelX, pixelY, null);
                 }
                 
                 // Carta tirada en el casillero
                 Carta carta = casillero.getCarta();
-                if (carta != null && carta.getImagen() != null) {
+                if (carta != null && carta.getImagen() != null && personajeCercano(jugadores, x, y, zActual)) {
                     int tamañoCarta = 24;
                     int offset = 4; // para centrar dentro del tile 32x32
                     g.drawImage(
