@@ -144,7 +144,6 @@ public class ControladorJuego {
                     }
                 }
             } else if (keyCode == KeyEvent.VK_F) {
-            } else if (keyCode == KeyEvent.VK_F) {
                 // Atacar a un jugador adyacente (PvP)
                 com.entidades.Personaje atacante = adminJuego.getJugadorActual();
                 if (atacante != null) {
