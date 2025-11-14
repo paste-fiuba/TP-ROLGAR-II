@@ -14,6 +14,7 @@ public class Personaje extends Entidad {
     // (Variables de otros buffs)
     private boolean invisible;
     private boolean evasionActiva;
+    private double probabilidadEsquivaProximoAtaque;
     private int movimientosExtra;
     private boolean ataqueDobleActivo; 
     // Alianza actual (si pertenece a una)
@@ -26,6 +27,7 @@ public class Personaje extends Entidad {
         this.vidaEscudo = 0; // Inicia con 0 de escudo
         this.invisible = false;
         this.evasionActiva = false;
+        this.probabilidadEsquivaProximoAtaque = 0.0;
         this.movimientosExtra = 0;
         this.ataqueDobleActivo = false;
         this.alianza = null;
@@ -56,7 +58,10 @@ public class Personaje extends Entidad {
     
     // (Otros buffs)
     public void setInvisible(boolean estado) { this.invisible = estado; }
+    public boolean isInvisible() { return this.invisible; }
     public void setEvasionActiva(boolean estado) { this.evasionActiva = estado; }
+    public void setProbabilidadEsquiva(double prob) { this.probabilidadEsquivaProximoAtaque = prob; }
+    public double getProbabilidadEsquiva() { return this.probabilidadEsquivaProximoAtaque; }
     public void setMovimientosExtra(int cantidad) { this.movimientosExtra = cantidad; }
     public int getMovimientosExtra() { return movimientosExtra; }
     public void setAtaqueDobleActivo(boolean estado) { this.ataqueDobleActivo = estado; }
@@ -76,11 +81,24 @@ public class Personaje extends Entidad {
     @Override
     public void recibirDanio(int danio) {
         if (invisible) {
-            invisible = false; 
+            // Invisibilidad evita el daño garantizado y se consume
+            invisible = false;
             return;
         }
+
+        // Si hay una probabilidad de esquivar el próximo ataque, evaluar y consumirla
+        if (probabilidadEsquivaProximoAtaque > 0.0) {
+            double roll = Math.random();
+            boolean esquivo = roll < probabilidadEsquivaProximoAtaque;
+            // consumir la probabilidad en cualquier caso
+            probabilidadEsquivaProximoAtaque = 0.0;
+            if (esquivo) {
+                return;
+            }
+            // si falla la esquiva, continuar al cálculo de daño
+        }
         if (evasionActiva) {
-            evasionActiva = false; 
+            evasionActiva = false;
             return;
         }
         

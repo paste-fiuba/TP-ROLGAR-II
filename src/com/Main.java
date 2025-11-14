@@ -245,6 +245,95 @@ public class Main {
                 }
             }
         }
+
+        // --- Asegurar al menos 4 cartas por nivel (aleatorias) ---
+        final int MIN_CARTAS_POR_NIVEL = 4;
+        for (int z = 0; z < NIVELES_TABLERO; z++) {
+            // Contar cartas ya presentes en este nivel
+            int existentes = 0;
+            for (int yy = 0; yy < ALTO_TABLERO; yy++) {
+                for (int xx = 0; xx < ANCHO_TABLERO; xx++) {
+                    if (!tablero.esCoordenadaValida(xx, yy, z)) continue;
+                    Casillero cc = tablero.getCasillero(xx, yy, z);
+                    if (cc.getCarta() != null) existentes++;
+                }
+            }
+
+            int attempts = 0;
+            while (existentes < MIN_CARTAS_POR_NIVEL && attempts < 5000) {
+                attempts++;
+                int x = rnd.nextInt(ANCHO_TABLERO);
+                int y = rnd.nextInt(ALTO_TABLERO);
+                if (!tablero.esCoordenadaValida(x, y, z)) continue;
+                Casillero c = tablero.getCasillero(x, y, z);
+                if (c.getTipo() == TipoCasillero.ROCA) continue;
+                if (c.getCarta() != null) continue;
+
+                // Elegir una carta aleatoria y crear una nueva instancia
+                int choice = rnd.nextInt(10);
+                Carta nueva;
+                switch (choice) {
+                    case 0: nueva = new CartaAtaqueDoble(); break;
+                    case 1: nueva = new CartaAumentoVida(20); break;
+                    case 2: nueva = new CartaCuracionAliado(30); break;
+                    case 3: nueva = new CartaCuracionTotal(); break;
+                    case 4: nueva = new CartaDobleMovimiento(); break;
+                    case 5: nueva = new CartaEscudo(); break;
+                    case 6: nueva = new CartaEsquivarDanio(0.6); break;
+                    case 7: nueva = new CartaInvisibilidad(); break;
+                    case 8: nueva = new CartaRoboDeCarta(); break;
+                    default: nueva = new CartaTeletransportacion(ANCHO_TABLERO/2, ALTO_TABLERO/2, z); break;
+                }
+
+                c.setCarta(nueva);
+                existentes++;
+            }
+
+            // Si no se colocaron suficientes por azar, buscar secuencialmente
+            if (existentes < MIN_CARTAS_POR_NIVEL) {
+                outer2:
+                for (int yy = 0; yy < ALTO_TABLERO; yy++) {
+                    for (int xx = 0; xx < ANCHO_TABLERO; xx++) {
+                        if (!tablero.esCoordenadaValida(xx, yy, z)) continue;
+                        Casillero c2 = tablero.getCasillero(xx, yy, z);
+                        if (c2.getTipo() != TipoCasillero.ROCA && c2.getCarta() == null) {
+                            // Añadir cartas hasta alcanzar el mínimo
+                            int falta = MIN_CARTAS_POR_NIVEL - existentes;
+                            for (int k = 0; k < falta; k++) {
+                                // Buscar la siguiente celda libre secuencialmente
+                                boolean placed = false;
+                                for (int y2 = yy; y2 < ALTO_TABLERO && !placed; y2++) {
+                                    for (int x2 = (y2 == yy ? xx : 0); x2 < ANCHO_TABLERO; x2++) {
+                                        if (!tablero.esCoordenadaValida(x2, y2, z)) continue;
+                                        Casillero c3 = tablero.getCasillero(x2, y2, z);
+                                        if (c3.getTipo() != TipoCasillero.ROCA && c3.getCarta() == null) {
+                                            int choice2 = rnd.nextInt(10);
+                                            Carta nueva2;
+                                            switch (choice2) {
+                                                case 0: nueva2 = new CartaAtaqueDoble(); break;
+                                                case 1: nueva2 = new CartaAumentoVida(20); break;
+                                                case 2: nueva2 = new CartaCuracionAliado(30); break;
+                                                case 3: nueva2 = new CartaCuracionTotal(); break;
+                                                case 4: nueva2 = new CartaDobleMovimiento(); break;
+                                                case 5: nueva2 = new CartaEscudo(); break;
+                                                case 6: nueva2 = new CartaEsquivarDanio(0.6); break;
+                                                case 7: nueva2 = new CartaInvisibilidad(); break;
+                                                case 8: nueva2 = new CartaRoboDeCarta(); break;
+                                                default: nueva2 = new CartaTeletransportacion(ANCHO_TABLERO/2, ALTO_TABLERO/2, z); break;
+                                            }
+                                            c3.setCarta(nueva2);
+                                            existentes++;
+                                            placed = true;
+                                            if (existentes >= MIN_CARTAS_POR_NIVEL) break outer2;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // --- Métodos de ayuda para tallar el mundo ---

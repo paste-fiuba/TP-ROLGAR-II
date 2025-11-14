@@ -102,7 +102,23 @@ public class AdministradorDeJuego {
         if (slotIndex < jugador.getInventario().cantidadDeCartas()) {
             Carta carta = jugador.getInventario().getCarta(slotIndex);
             logBatalla("¡Has activado '" + carta.getNombre() + "'!");
-            jugador.usarCarta(slotIndex, null);
+            // Si es una carta de robo, intentar robar a un jugador adyacente
+            if (carta instanceof com.items.CartaRoboDeCarta) {
+                com.entidades.Personaje objetivo = null;
+                for (com.entidades.Personaje p : jugadores) {
+                    if (p == null || p == jugador) continue;
+                    if (p.getVida() <= 0) continue;
+                    if (sonAdyacentes(jugador, p)) { objetivo = p; break; }
+                }
+                if (objetivo != null) {
+                    jugador.usarCarta(slotIndex, objetivo);
+                } else {
+                    logBatalla("No hay ningún jugador adyacente para robarle una carta.");
+                }
+            } else {
+                jugador.usarCarta(slotIndex, null);
+            }
+            // Eliminar la carta usada
             jugador.eliminarCarta(slotIndex);
         } else {
             logBatalla("Slot " + (slotIndex + 1) + " está vacío.");
@@ -334,6 +350,15 @@ public class AdministradorDeJuego {
                 logBatalla(enemigo.getNombre() + " ataca a " + objetivo.getNombre() + " por " + dmg + "!");
                 if (objetivo.getVida() <= 0) {
                     logBatalla(objetivo.getNombre() + " ha muerto!");
+                }
+            }
+        }
+        // Limpiar invisibilidad: la carta dura exactamente un turno de enemigos
+        if (jugadores != null) {
+            for (Personaje p : jugadores) {
+                if (p != null && p.isInvisible()) {
+                    p.setInvisible(false);
+                    logBatalla("La invisibilidad de " + p.getNombre() + " ha expirado.");
                 }
             }
         }

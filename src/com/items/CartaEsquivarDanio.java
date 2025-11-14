@@ -25,11 +25,8 @@ public class CartaEsquivarDanio extends Carta {
 
     @Override
     public void aplicarEfecto(Personaje usuario, Entidad objetivo) {
-        boolean exito = random.nextDouble() < probabilidad;
-        usuario.setEvasionActiva(exito);
-        if (exito)
-            System.out.println(usuario.getNombre() + " activó Evasión y esquivará el próximo ataque!");
-        else
-            System.out.println(usuario.getNombre() + " intentó usar Evasión, pero falló...");
+        // Establecer probabilidad de esquivar el próximo ataque (se consumirá al intentar recibir daño)
+        usuario.setProbabilidadEsquiva(probabilidad);
+        System.out.println(usuario.getNombre() + " usó " + nombre + " y tiene " + (int)(probabilidad * 100) + "% de chance de esquivar el próximo ataque.");
     }
 }
