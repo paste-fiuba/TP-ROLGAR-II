@@ -61,32 +61,89 @@ public class ControladorJuego {
             // Movimiento
             if (keyCode == KeyEvent.VK_W) {
                 boolean moved = adminJuego.procesarMovimiento(0, -1);
-                if (moved) adminJuego.finalizarTurno();
+                if (moved) {
+                    com.entidades.Personaje jugador = adminJuego.getJugadorActual();
+                    if (jugador != null && jugador.getMovimientosExtra() > 0) {
+                        jugador.setMovimientosExtra(jugador.getMovimientosExtra() - 1);
+                    } else {
+                        adminJuego.finalizarTurno();
+                    }
+                }
             } else if (keyCode == KeyEvent.VK_S) {
                 boolean moved = adminJuego.procesarMovimiento(0, 1);
-                if (moved) adminJuego.finalizarTurno();
+                if (moved) {
+                    com.entidades.Personaje jugador = adminJuego.getJugadorActual();
+                    if (jugador != null && jugador.getMovimientosExtra() > 0) {
+                        jugador.setMovimientosExtra(jugador.getMovimientosExtra() - 1);
+                    } else {
+                        adminJuego.finalizarTurno();
+                    }
+                }
             } else if (keyCode == KeyEvent.VK_A) {
                 boolean moved = adminJuego.procesarMovimiento(-1, 0);
-                if (moved) adminJuego.finalizarTurno();
+                if (moved) {
+                    com.entidades.Personaje jugador = adminJuego.getJugadorActual();
+                    if (jugador != null && jugador.getMovimientosExtra() > 0) {
+                        jugador.setMovimientosExtra(jugador.getMovimientosExtra() - 1);
+                    } else {
+                        adminJuego.finalizarTurno();
+                    }
+                }
             } else if (keyCode == KeyEvent.VK_D) {
                 boolean moved = adminJuego.procesarMovimiento(1, 0);
-                if (moved) adminJuego.finalizarTurno();
+                if (moved) {
+                    com.entidades.Personaje jugador = adminJuego.getJugadorActual();
+                    if (jugador != null && jugador.getMovimientosExtra() > 0) {
+                        jugador.setMovimientosExtra(jugador.getMovimientosExtra() - 1);
+                    } else {
+                        adminJuego.finalizarTurno();
+                    }
+                }
             } else if (keyCode == KeyEvent.VK_Q) {
                 // Diagonal adelante-izquierda (W + A)
                 boolean moved = adminJuego.procesarMovimiento(-1, -1);
-                if (moved) adminJuego.finalizarTurno();
+                if (moved) {
+                    com.entidades.Personaje jugador = adminJuego.getJugadorActual();
+                    if (jugador != null && jugador.getMovimientosExtra() > 0) {
+                        jugador.setMovimientosExtra(jugador.getMovimientosExtra() - 1);
+                    } else {
+                        adminJuego.finalizarTurno();
+                    }
+                }
             } else if (keyCode == KeyEvent.VK_E) {
                 // Diagonal adelante-derecha (W + D)
                 boolean moved = adminJuego.procesarMovimiento(1, -1);
-                if (moved) adminJuego.finalizarTurno();
+                if (moved) {
+                    com.entidades.Personaje jugador = adminJuego.getJugadorActual();
+                    if (jugador != null && jugador.getMovimientosExtra() > 0) {
+                        jugador.setMovimientosExtra(jugador.getMovimientosExtra() - 1);
+                    } else {
+                        adminJuego.finalizarTurno();
+                    }
+                }
             } else if (keyCode == KeyEvent.VK_Z) {
                 // Diagonal atras-izquierda (S + A)
                 boolean moved = adminJuego.procesarMovimiento(-1, 1);
-                if (moved) adminJuego.finalizarTurno();
+                if (moved) {
+                    com.entidades.Personaje jugador = adminJuego.getJugadorActual();
+                    if (jugador != null && jugador.getMovimientosExtra() > 0) {
+                        jugador.setMovimientosExtra(jugador.getMovimientosExtra() - 1);
+                    } else {
+                        adminJuego.finalizarTurno();
+                    }
+                }
             } else if (keyCode == KeyEvent.VK_C) {
                 // Diagonal atras-derecha (S + D)
                 boolean moved = adminJuego.procesarMovimiento(1, 1);
-                if (moved) adminJuego.finalizarTurno();
+                if (moved) {
+                    com.entidades.Personaje jugador = adminJuego.getJugadorActual();
+                    if (jugador != null && jugador.getMovimientosExtra() > 0) {
+                        jugador.setMovimientosExtra(jugador.getMovimientosExtra() - 1);
+                    } else {
+                        adminJuego.finalizarTurno();
+                    }
+                }
+            } else if (keyCode == KeyEvent.VK_F) {
             } else if (keyCode == KeyEvent.VK_F) {
                 // Atacar a un jugador adyacente (PvP)
                 com.entidades.Personaje atacante = adminJuego.getJugadorActual();
