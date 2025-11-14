@@ -60,25 +60,33 @@ public class ControladorJuego {
             if (adminJuego == null) return;
             // Movimiento
             if (keyCode == KeyEvent.VK_W) {
-                adminJuego.procesarMovimiento(0, -1);
+                boolean moved = adminJuego.procesarMovimiento(0, -1);
+                if (moved) adminJuego.finalizarTurno();
             } else if (keyCode == KeyEvent.VK_S) {
-                adminJuego.procesarMovimiento(0, 1);
+                boolean moved = adminJuego.procesarMovimiento(0, 1);
+                if (moved) adminJuego.finalizarTurno();
             } else if (keyCode == KeyEvent.VK_A) {
-                adminJuego.procesarMovimiento(-1, 0);
+                boolean moved = adminJuego.procesarMovimiento(-1, 0);
+                if (moved) adminJuego.finalizarTurno();
             } else if (keyCode == KeyEvent.VK_D) {
-                adminJuego.procesarMovimiento(1, 0);
+                boolean moved = adminJuego.procesarMovimiento(1, 0);
+                if (moved) adminJuego.finalizarTurno();
             } else if (keyCode == KeyEvent.VK_Q) {
                 // Diagonal adelante-izquierda (W + A)
-                adminJuego.procesarMovimiento(-1, -1);
+                boolean moved = adminJuego.procesarMovimiento(-1, -1);
+                if (moved) adminJuego.finalizarTurno();
             } else if (keyCode == KeyEvent.VK_E) {
                 // Diagonal adelante-derecha (W + D)
-                adminJuego.procesarMovimiento(1, -1);
+                boolean moved = adminJuego.procesarMovimiento(1, -1);
+                if (moved) adminJuego.finalizarTurno();
             } else if (keyCode == KeyEvent.VK_Z) {
                 // Diagonal atras-izquierda (S + A)
-                adminJuego.procesarMovimiento(-1, 1);
+                boolean moved = adminJuego.procesarMovimiento(-1, 1);
+                if (moved) adminJuego.finalizarTurno();
             } else if (keyCode == KeyEvent.VK_C) {
                 // Diagonal atras-derecha (S + D)
-                adminJuego.procesarMovimiento(1, 1);
+                boolean moved = adminJuego.procesarMovimiento(1, 1);
+                if (moved) adminJuego.finalizarTurno();
             } else if (keyCode == KeyEvent.VK_F) {
                 // Atacar a un jugador adyacente (PvP)
                 com.entidades.Personaje atacante = adminJuego.getJugadorActual();
@@ -101,9 +109,6 @@ public class ControladorJuego {
                 if (panelJuego != null && panelJuego.getRenderUI() != null) {
                     panelJuego.getRenderUI().agregarMensajeLog("Transferencia: presioná 1..0 para elegir el slot a transferir.");
                 }
-            } else if (keyCode == KeyEvent.VK_ENTER) {
-                // Finalizar el turno del jugador actual
-                adminJuego.finalizarTurno();
             } else if (keyCode == KeyEvent.VK_L) {
                 // Proponer alianza con un jugador adyacente no aliado (si existe)
                 com.entidades.Personaje actual = adminJuego.getJugadorActual();
