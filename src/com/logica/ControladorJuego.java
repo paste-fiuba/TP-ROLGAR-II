@@ -166,6 +166,9 @@ public class ControladorJuego {
                 if (panelJuego != null && panelJuego.getRenderUI() != null) {
                     panelJuego.getRenderUI().agregarMensajeLog("Transferencia: presioná 1..0 para elegir el slot a transferir.");
                 }
+            } else if (keyCode == KeyEvent.VK_ENTER) {
+                // Finalizar el turno del jugador actual
+                adminJuego.finalizarTurno();
             } else if (keyCode == KeyEvent.VK_L) {
                 // Proponer alianza con un jugador adyacente no aliado (si existe)
                 com.entidades.Personaje actual = adminJuego.getJugadorActual();
