@@ -12,13 +12,16 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.imageio.ImageIO;   //
 
 public class RenderizadorMundo {
 
     private BufferedImage spriteRoca, spriteVacio, spriteRampa, spriteAgua;
     private BufferedImage spritePersonaje, spriteEnemigo;
+    private Map<String, BufferedImage> spritesEnemigos;
     
     public RenderizadorMundo() {
         cargarSpritesDelMundo();
@@ -33,8 +36,28 @@ public class RenderizadorMundo {
             this.spritePersonaje  = ImageIO.read(new File("src/sprites/personaje.png"));
             this.spriteEnemigo    = ImageIO.read(new File("src/sprites/enemigo.png"));
             
+            // Sprites por tipo/nombre de enemigo
+            this.spritesEnemigos = new HashMap<>();
+            loadEnemySprite("orco", "src/sprites/ogro.png");
+            loadEnemySprite("esqueleto", "src/sprites/esqueleto.png");
+            loadEnemySprite("murcielago", "src/sprites/murcielago.png");
+            loadEnemySprite("golem", "src/sprites/golem.png");
+            loadEnemySprite("serpiente", "src/sprites/serpiente.png");
+            loadEnemySprite("mago", "src/sprites/mago.png");
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void loadEnemySprite(String key, String path) {
+        try {
+            File f = new File(path);
+            if (f.exists()) {
+                BufferedImage img = ImageIO.read(f);
+                this.spritesEnemigos.put(key, img);
+            }
+        } catch (IOException ex) {
+            // ignore missing enemy sprite
         }
     }
 
@@ -80,17 +103,26 @@ public class RenderizadorMundo {
             }
         }
         
-        // 2. Dibujar Enemigos
-        if (this.spriteEnemigo != null) {
-            for (Enemigo enemigo : enemigos) {
-                if (enemigo.estaVivo() && enemigo.getPosZ() == zActual) {
-                    g.drawImage(
-                        this.spriteEnemigo,
-                        enemigo.getPosX() * TAMAÑO_TILE,
-                        enemigo.getPosY() * TAMAÑO_TILE,
-                        null
-                    );
+        // 2. Dibujar Enemigos (usar sprite específico si existe)
+        for (Enemigo enemigo : enemigos) {
+            if (!enemigo.estaVivo() || enemigo.getPosZ() != zActual) continue;
+            BufferedImage img = null;
+            if (this.spritesEnemigos != null) {
+                String key = normalizeKey(enemigo.getNombre());
+                img = this.spritesEnemigos.get(key);
+                if (img == null) {
+                    // intentar por tipo
+                    String tipoKey = normalizeKey(enemigo.getTipo());
+                    img = this.spritesEnemigos.get(tipoKey);
                 }
+            }
+            if (img == null) img = this.spriteEnemigo;
+            if (img != null) {
+                g.drawImage(img, enemigo.getPosX() * TAMAÑO_TILE, enemigo.getPosY() * TAMAÑO_TILE, null);
+            } else {
+                // fallback visual
+                g.setColor(Color.RED);
+                g.fillRect(enemigo.getPosX() * TAMAÑO_TILE + 4, enemigo.getPosY() * TAMAÑO_TILE + 4, TAMAÑO_TILE - 8, TAMAÑO_TILE - 8);
             }
         }
         
@@ -136,5 +168,17 @@ public class RenderizadorMundo {
                 }
             }
         }
+    }
+
+    private String normalizeKey(String s) {
+        if (s == null) return "";
+        String key = s.toLowerCase();
+        key = key.replaceAll("[áàäâ]", "a");
+        key = key.replaceAll("[éèëê]", "e");
+        key = key.replaceAll("[íìïî]", "i");
+        key = key.replaceAll("[óòöô]", "o");
+        key = key.replaceAll("[úùüû]", "u");
+        key = key.replaceAll("[^a-z0-9]", "");
+        return key;
     }
 }
