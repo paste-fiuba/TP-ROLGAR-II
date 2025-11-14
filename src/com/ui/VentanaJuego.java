@@ -20,5 +20,9 @@ public class VentanaJuego extends JFrame {
         add(panel);
 
         setVisible(true);
+        
+        // --- ESTA ES LA CORRECCIÓN ---
+        // Pedimos el foco DESPUÉS de que la ventana es visible.
+        panel.iniciarOyenteTeclado();
     }
 }

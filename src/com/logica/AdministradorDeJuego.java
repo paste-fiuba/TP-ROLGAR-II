@@ -41,6 +41,7 @@ public class AdministradorDeJuego {
     
     public boolean isJugadorMuerto() {
         // Devuelve true si TODOS los jugadores están muertos
+        if (jugadores == null || jugadores.isEmpty()) return true; // Si no hay jugadores
         for (Personaje p : jugadores) {
             if (p.getVida() > 0) return false;
         }
@@ -48,9 +49,10 @@ public class AdministradorDeJuego {
     }
     
     /**
-     * Nuevo método público que revisa si todos los enemigos están muertos.
+     * post: Devuelve true si todos los enemigos están muertos, false en caso contrario.
      */
     public boolean isVictoria() {
+        if (enemigos == null || enemigos.isEmpty()) return true; // Si no hay enemigos, hay victoria
         for (Enemigo e : enemigos) {
             if (e.estaVivo()) {
                 return false; // Si encuentra uno vivo, no hay victoria
@@ -80,6 +82,19 @@ public class AdministradorDeJuego {
         }
         return null;
     }
+    
+    /**
+     * post: Si el jugador tiene movimientos extra, los gasta. Si no, finaliza el turno.
+     */
+    public void finalizarTurnoSiCorresponde() {
+        Personaje jugador = getJugadorActual();
+        if (jugador != null && jugador.getMovimientosExtra() > 0) {
+            jugador.setMovimientosExtra(jugador.getMovimientosExtra() - 1);
+            logBatalla(jugador.getNombre() + " usó un movimiento extra.");
+        } else {
+            finalizarTurno();
+        }
+    }
 
     public boolean procesarMovimiento(int dx, int dy) {
         Personaje jugador = getJugadorActual();
@@ -106,11 +121,13 @@ public class AdministradorDeJuego {
             logBatalla("¡Has activado '" + carta.getNombre() + "'!");
             // Si es una carta de robo, intentar robar a un jugador adyacente
             if (carta instanceof com.items.CartaRoboDeCarta) {
-                com.entidades.Personaje objetivo = null;
-                for (com.entidades.Personaje p : jugadores) {
-                    if (p == null || p == jugador) continue;
-                    if (p.getVida() <= 0) continue;
-                    if (sonAdyacentes(jugador, p)) { objetivo = p; break; }
+                Personaje objetivo = null;
+                for (Personaje p : jugadores) {
+                    if (p == null || p == jugador || p.getVida() <= 0) continue;
+                    if (sonAdyacentes(jugador, p)) { 
+                        objetivo = p; 
+                        break; 
+                    }
                 }
                 if (objetivo != null) {
                     jugador.usarCarta(slotIndex, objetivo);
@@ -128,7 +145,7 @@ public class AdministradorDeJuego {
     }
 
     private boolean esMovimientoValido(int targetX, int targetY, int targetZ) {
-        if (!tablero.esCoordenadaValida(targetX, targetY, targetZ)) return false;
+        if (tablero == null || !tablero.esCoordenadaValida(targetX, targetY, targetZ)) return false;
         Casillero c = tablero.getCasillero(targetX, targetY, targetZ);
         if (c.getTipo() == TipoCasillero.ROCA || c.getTipo() == TipoCasillero.AGUA) return false;
         return true; 
@@ -136,6 +153,8 @@ public class AdministradorDeJuego {
 
     private void revisarCasilleroActual(int x, int y, int z) {
         Personaje jugador = getJugadorActual();
+        if (jugador == null || tablero == null) return;
+        
         Enemigo enemigoEnCasilla = enemigoEnPosicion(x, y, z);
         if (enemigoEnCasilla != null && enemigoEnCasilla.estaVivo()) {
             ejecutarCombate(jugador, enemigoEnCasilla);
@@ -183,9 +202,8 @@ public class AdministradorDeJuego {
 
         // Aliados cercanos que ayudan en combate (si pertenecen a la misma alianza)
         if (p.getAlianza() != null) {
-            for (com.entidades.Personaje aliado : p.getAlianza().getMiembros()) {
-                if (aliado == p) continue;
-                if (aliado.getVida() <= 0) continue;
+            for (Personaje aliado : p.getAlianza().getMiembros()) {
+                if (aliado == p || aliado.getVida() <= 0) continue;
                 if (aliado.getPosZ() != e.getPosZ()) continue;
                 int dist = Math.abs(aliado.getPosX() - e.getPosX()) + Math.abs(aliado.getPosY() - e.getPosY());
                 if (dist <= 1) {
@@ -272,7 +290,7 @@ public class AdministradorDeJuego {
         if (from == null || to == null) return false;
         if (!sonAdyacentes(from, to)) return false;
         if (from.getAlianza() == null || !from.estaAliadoCon(to)) return false;
-        com.items.Carta carta = from.getInventario().getCarta(slotIndex);
+        Carta carta = from.getInventario().getCarta(slotIndex);
         if (carta == null) return false;
         if (to.getInventario().cantidadDeCartas() >= 10) return false;
         to.agregarCarta(carta);
@@ -319,7 +337,10 @@ public class AdministradorDeJuego {
         procesarRupturaAlianzas();
 
         // Avanzar al siguiente jugador vivo
+        if (jugadores == null || jugadores.isEmpty()) return;
         int size = jugadores.size();
+        if (size == 0) return; // No hay jugadores vivos
+        
         for (int i = 1; i <= size; i++) {
             int next = (indiceJugadorActual + i) % size;
             if (jugadores.get(next).getVida() > 0) {
@@ -339,6 +360,7 @@ public class AdministradorDeJuego {
      * de lo contrario no se mueven (implementación simple para empezar).
      */
     private void procesarTurnoEnemigos() {
+        if (enemigos == null) return;
         for (Enemigo enemigo : enemigos) {
             if (!enemigo.estaVivo()) continue;
             Personaje objetivo = encontrarJugadorMasCercanoA(enemigo);
@@ -369,6 +391,7 @@ public class AdministradorDeJuego {
     }
 
     private Personaje encontrarJugadorMasCercanoA(Enemigo enemigo) {
+        if (jugadores == null || jugadores.isEmpty()) return null;
         Personaje masCercano = null;
         int menor = Integer.MAX_VALUE;
         for (Personaje p : jugadores) {
@@ -429,6 +452,7 @@ public class AdministradorDeJuego {
     }
 
     private Enemigo enemigoEnPosicion(int x, int y, int z) {
+        if (enemigos == null) return null;
         for (Enemigo enemigo : enemigos) {
             if (enemigo.estaVivo() && 
                 enemigo.getPosX() == x && 
@@ -449,6 +473,7 @@ public class AdministradorDeJuego {
         int pY = jugadorRef.getPosY();
         int pZ = jugadorRef.getPosZ();
 
+        if (enemigos == null) return null;
         for (Enemigo enemigo : enemigos) {
             if (enemigo.estaVivo() && enemigo.getPosZ() == pZ) {
                 int dist = Math.abs(enemigo.getPosX() - pX) + Math.abs(enemigo.getPosY() - pY);
@@ -475,23 +500,23 @@ public class AdministradorDeJuego {
         for (com.entidades.Alianza al : copia) {
             if (al == null) continue;
             if (random.nextDouble() < PROB_RUPTURA_ALIANZA) {
-                java.util.List<com.entidades.Personaje> miembros = al.getMiembros();
+                java.util.List<Personaje> miembros = al.getMiembros();
                 if (miembros == null || miembros.isEmpty()) {
                     alianzas.remove(al);
                     continue;
                 }
                 // Elegir miembro al azar para expulsar de la alianza
                 int idx = random.nextInt(miembros.size());
-                com.entidades.Personaje expulsado = miembros.get(idx);
+                Personaje expulsado = miembros.get(idx);
                 if (expulsado != null) {
                     al.eliminarMiembro(expulsado);
                     logBatalla("La alianza '" + al.toString() + "' se rompió: " + expulsado.getNombre() + " fue expulsado.");
                 }
                 // Si la alianza quedó con 0 o 1 miembros, disolverla
-                java.util.List<com.entidades.Personaje> despues = al.getMiembros();
+                java.util.List<Personaje> despues = al.getMiembros();
                 if (despues.size() <= 1) {
                     // Eliminar cualquier referencia restante
-                    for (com.entidades.Personaje p : despues) {
+                    for (Personaje p : despues) {
                         if (p != null) p.setAlianza(null);
                     }
                     alianzas.remove(al);
