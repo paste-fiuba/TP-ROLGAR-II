@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.imageio.ImageIO;   //
+import javax.imageio.ImageIO;
 
 public class RenderizadorMundo {
 
@@ -36,7 +36,6 @@ public class RenderizadorMundo {
             this.spritePersonaje  = ImageIO.read(new File("src/sprites/personaje.png"));
             this.spriteEnemigo    = ImageIO.read(new File("src/sprites/enemigo.png"));
             
-            // Sprites por tipo/nombre de enemigo
             this.spritesEnemigos = new HashMap<>();
             loadEnemySprite("orco", "src/sprites/ogro.png");
             loadEnemySprite("esqueleto", "src/sprites/esqueleto.png");
@@ -49,15 +48,24 @@ public class RenderizadorMundo {
         }
     }
     
+    /**
+     * Revisa si una coordenada (x, y, z) es visible por algún jugador.
+     * (Versión optimizada de tu método).
+     */
     private boolean personajeCercano(List<Personaje> jugadores, int x, int y, int z) {
-    	boolean respuesta = false;
-    	for(Personaje jugador : jugadores) {
-    		if(((jugador.getPosX()==x && (jugador.getPosY()==y || jugador.getPosY()==y-1 || jugador.getPosY()==y+1)) || (jugador.getPosX()==x-1 && (jugador.getPosY()==y || jugador.getPosY()==y-1 || jugador.getPosY()==y+1)) || (jugador.getPosX()==x+1 && (jugador.getPosY()==y || jugador.getPosY()==y-1 || jugador.getPosY()==y+1))) && jugador.getPosZ()==z) {
-    			respuesta=true;
-    		}
-    	}
-    	
-    	return respuesta;
+        for(Personaje jugador : jugadores) {
+            if (jugador.getPosZ() == z) {
+                // Calcula la distancia absoluta (en tiles)
+                int distAbsX = Math.abs(jugador.getPosX() - x);
+                int distAbsY = Math.abs(jugador.getPosY() - y);
+
+                // Si está en un cuadrado de 3x3 (distancia de 1 o 0 en cada eje)
+                if (distAbsX <= 1 && distAbsY <= 1) {
+                    return true; // Un jugador puede verlo, no sigas buscando
+                }
+            }
+        }
+        return false; // Ningún jugador puede verlo
     }
 
     private void loadEnemySprite(String key, String path) {
@@ -68,77 +76,72 @@ public class RenderizadorMundo {
                 this.spritesEnemigos.put(key, img);
             }
         } catch (IOException ex) {
-            // ignore missing enemy sprite
+            // ignora si falta el sprite
         }
     }
 
-    /**
-     * Dibuja todos los elementos del juego (terreno, items, entidades).
-     */
     public void dibujar(Graphics2D g, Tablero tablero, List<Personaje> jugadores, List<Enemigo> enemigos, int zActual, Personaje jugadorActivo) {
         
         int TAMAÑO_TILE = PanelJuego.TAMAÑO_TILE;
 
-        // 1. Dibujar Terreno y Cartas en el suelo
+        // 1. Dibujar Terreno y Cartas
         for (int y = 0; y < tablero.getDimensionY(); y++) {
             for (int x = 0; x < tablero.getDimensionX(); x++) {
-                Casillero casillero = tablero.getCasillero(x, y, zActual);
-                int pixelX = x * TAMAÑO_TILE;
-                int pixelY = y * TAMAÑO_TILE;
-  
                 
-                // Terreno
-                if (casillero.getTipo() == TipoCasillero.ROCA && personajeCercano(jugadores, x, y, zActual)) {
-                    g.drawImage(this.spriteRoca, pixelX, pixelY, null);
-                } else if (casillero.getTipo() == TipoCasillero.AGUA && personajeCercano(jugadores, x, y, zActual)) { 
-                    g.drawImage(this.spriteAgua, pixelX, pixelY, null);
-                } else if (casillero.getTipo() == TipoCasillero.RAMPA && personajeCercano(jugadores, x, y, zActual)) { 
-                    g.drawImage(this.spriteRampa, pixelX, pixelY, null);
-                } else if (casillero.getTipo() == TipoCasillero.VACIO && personajeCercano(jugadores, x, y, zActual)) { 
-                    g.drawImage(this.spriteVacio, pixelX, pixelY, null);
+                // Solo dibuja el tile si es visible
+                if (personajeCercano(jugadores, x, y, zActual)) {
+                    Casillero casillero = tablero.getCasillero(x, y, zActual);
+                    int pixelX = x * TAMAÑO_TILE;
+                    int pixelY = y * TAMAÑO_TILE;
+    
+                    if (casillero.getTipo() == TipoCasillero.ROCA) {
+                        g.drawImage(this.spriteRoca, pixelX, pixelY, null);
+                    } else if (casillero.getTipo() == TipoCasillero.AGUA) { 
+                        g.drawImage(this.spriteAgua, pixelX, pixelY, null);
+                    } else if (casillero.getTipo() == TipoCasillero.RAMPA) { 
+                        g.drawImage(this.spriteRampa, pixelX, pixelY, null);
+                    } else if (casillero.getTipo() == TipoCasillero.VACIO) { 
+                        g.drawImage(this.spriteVacio, pixelX, pixelY, null);
+                    }
+                    
+                    Carta carta = casillero.getCarta();
+                    if (carta != null && carta.getImagen() != null) {
+                        g.drawImage(carta.getImagen(), pixelX + 4, pixelY + 4, 24, 24, null);
+                    }
                 }
-                
-                // Carta tirada en el casillero
-                Carta carta = casillero.getCarta();
-                if (carta != null && carta.getImagen() != null && personajeCercano(jugadores, x, y, zActual)) {
-                    int tamañoCarta = 24;
-                    int offset = 4; // para centrar dentro del tile 32x32
-                    g.drawImage(
-                        carta.getImagen(),
-                        pixelX + offset,
-                        pixelY + offset,
-                        tamañoCarta,
-                        tamañoCarta,
-                        null
-                    );
-                }
+                // (Opcional: podrías dibujar un tile de "niebla" si no es visible)
+                // else { g.setColor(Color.BLACK); g.fillRect(x * TAMAÑO_TILE, y * TAMAÑO_TILE, TAMAÑO_TILE, TAMAÑO_TILE); }
             }
         }
         
-        // 2. Dibujar Enemigos (usar sprite específico si existe)
+        // 2. Dibujar Enemigos
         for (Enemigo enemigo : enemigos) {
             if (!enemigo.estaVivo() || enemigo.getPosZ() != zActual) continue;
-            BufferedImage img = null;
-            if (this.spritesEnemigos != null) {
-                String key = normalizeKey(enemigo.getNombre());
-                img = this.spritesEnemigos.get(key);
-                if (img == null) {
-                    // intentar por tipo
-                    String tipoKey = normalizeKey(enemigo.getTipo());
-                    img = this.spritesEnemigos.get(tipoKey);
+
+            // --- ¡CORRECCIÓN AQUÍ! ---
+            // Solo dibuja el enemigo si está dentro de la visión
+            if (personajeCercano(jugadores, enemigo.getPosX(), enemigo.getPosY(), zActual)) {
+            
+                BufferedImage img = null;
+                if (this.spritesEnemigos != null) {
+                    String key = normalizeKey(enemigo.getNombre());
+                    img = this.spritesEnemigos.get(key);
+                    if (img == null) {
+                        String tipoKey = normalizeKey(enemigo.getTipo());
+                        img = this.spritesEnemigos.get(tipoKey);
+                    }
                 }
-            }
-            if (img == null) img = this.spriteEnemigo;
-            if (img != null) {
-                g.drawImage(img, enemigo.getPosX() * TAMAÑO_TILE, enemigo.getPosY() * TAMAÑO_TILE, null);
-            } else {
-                // fallback visual
-                g.setColor(Color.RED);
-                g.fillRect(enemigo.getPosX() * TAMAÑO_TILE + 4, enemigo.getPosY() * TAMAÑO_TILE + 4, TAMAÑO_TILE - 8, TAMAÑO_TILE - 8);
+                if (img == null) img = this.spriteEnemigo;
+                if (img != null) {
+                    g.drawImage(img, enemigo.getPosX() * TAMAÑO_TILE, enemigo.getPosY() * TAMAÑO_TILE, null);
+                } else {
+                    g.setColor(Color.RED);
+                    g.fillRect(enemigo.getPosX() * TAMAÑO_TILE + 4, enemigo.getPosY() * TAMAÑO_TILE + 4, TAMAÑO_TILE - 8, TAMAÑO_TILE - 8);
+                }
             }
         }
         
-        // 3. Dibujar todos los jugadores vivos y sus nombres
+        // 3. Dibujar todos los jugadores (estos siempre se ven si están en el piso)
         if (jugadores != null) {
             for (Personaje jugador : jugadores) {
                 if (jugador == null) continue;
@@ -148,11 +151,9 @@ public class RenderizadorMundo {
                     if (this.spritePersonaje != null) {
                         g.drawImage(this.spritePersonaje, pxTile, pyTile, null);
                     } else {
-                        // marcador visual de respaldo cuando falta el sprite
                         g.setColor(new Color(0, 200, 0));
                         g.fillOval(pxTile + 4, pyTile + 4, TAMAÑO_TILE - 8, TAMAÑO_TILE - 8);
                     }
-                    // Dibujar nombre del jugador centrado debajo del sprite
                     try {
                         String nombre = jugador.getNombre();
                         if (nombre != null && !nombre.isEmpty()) {
@@ -161,11 +162,9 @@ public class RenderizadorMundo {
                             g.setFont(nameFont);
                             int textWidth = g.getFontMetrics().stringWidth(nombre);
                             int textX = pxTile + (TAMAÑO_TILE - textWidth) / 2;
-                            int textY = pyTile + TAMAÑO_TILE + 12; // debajo del tile
-                            // Sombra para mejor legibilidad
+                            int textY = pyTile + TAMAÑO_TILE + 12;
                             g.setColor(Color.BLACK);
                             g.drawString(nombre, textX + 1, textY + 1);
-                            // Color distinto si es el jugador activo
                             if (jugadorActivo != null && jugador == jugadorActivo) {
                                 g.setColor(Color.YELLOW);
                             } else {
@@ -175,7 +174,7 @@ public class RenderizadorMundo {
                             g.setFont(oldFont);
                         }
                     } catch (Exception ex) {
-                        // No interrumpir el render si ocurre algún error al dibujar el nombre
+                        // No interrumpir el render
                     }
                 }
             }
