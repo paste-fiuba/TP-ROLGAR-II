@@ -81,9 +81,9 @@ public class AdministradorDeJuego {
         return null;
     }
 
-    public void procesarMovimiento(int dx, int dy) {
+    public boolean procesarMovimiento(int dx, int dy) {
         Personaje jugador = getJugadorActual();
-        if (jugador == null) return;
+        if (jugador == null) return false;
         int x = jugador.getPosX();
         int y = jugador.getPosY();
         int z = jugador.getPosZ();
@@ -93,7 +93,9 @@ public class AdministradorDeJuego {
         if (esMovimientoValido(newX, newY, z)) {
             jugador.setPosicion(newX, newY, z);
             revisarCasilleroActual(newX, newY, z);
+            return true;
         }
+        return false;
     }
 
     public void activarCarta(int slotIndex) {
