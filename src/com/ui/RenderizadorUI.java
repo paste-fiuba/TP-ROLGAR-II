@@ -163,7 +163,7 @@ public class RenderizadorUI {
 
         g.setFont(fontMenuOpcion);
         String linea1 = "Presioná 1,2,3 o 4 para seleccionar cantidad de jugadores.";
-            String linea2 = "Controles: W/A/S/D mover, Q/E/Z/C diagonales, 1-0 usar carta, ENTER terminar turno.";
+            String linea2 = "Controles: W/A/S/D mover, Q/E/Z/C diagonales, 1-0 usar carta.";
         int w1 = g.getFontMetrics().stringWidth(linea1);
         int w2 = g.getFontMetrics().stringWidth(linea2);
         g.drawString(linea1, (anchoVentana - w1) / 2, altoVentana / 2 - 20);
@@ -184,10 +184,13 @@ public class RenderizadorUI {
             String diag = "Diagonales: Q=adelante-izq, E=adelante-der, Z=atrás-izq, C=atrás-der";
             g.setColor(Color.LIGHT_GRAY);
             g.drawString(diag, (anchoVentana - g.getFontMetrics().stringWidth(diag)) / 2, infoY + 60);
+            // Explicación: cada turno consiste en un solo movimiento
+            String turnoExp = "Cada turno consiste en UN movimiento: mové una casilla y pasa al siguiente jugador.";
+            g.drawString(turnoExp, (anchoVentana - g.getFontMetrics().stringWidth(turnoExp)) / 2, infoY + 80);
             // Objetivo: mostrar la línea solicitada exactamente
             String objetivoTexto = "Objetivo: Eliminar a los demás personajes del tablero";
             g.setColor(Color.YELLOW);
-            g.drawString(objetivoTexto, (anchoVentana - g.getFontMetrics().stringWidth(objetivoTexto)) / 2, infoY + 100);
+            g.drawString(objetivoTexto, (anchoVentana - g.getFontMetrics().stringWidth(objetivoTexto)) / 2, infoY + 120);
     }
 
     public void dibujarInfoJuego(Graphics g, Personaje p, List<Enemigo> e, java.util.List<Personaje> jugadores, com.logica.AdministradorDeJuego admin, int pendingTransfer) {
