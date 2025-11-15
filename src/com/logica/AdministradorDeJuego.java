@@ -372,28 +372,6 @@ public class AdministradorDeJuego {
         return null;
     }
 
-    private Enemigo encontrarEnemigoMasCercano() {
-        Enemigo masCercano = null;
-        int menorDistancia = Integer.MAX_VALUE;
-        Personaje jugadorRef = getJugadorActual();
-        if (jugadorRef == null) return null;
-        int pX = jugadorRef.getPosX();
-        int pY = jugadorRef.getPosY();
-        int pZ = jugadorRef.getPosZ();
-
-        if (enemigos == null) return null;
-        for (Enemigo enemigo : enemigos) {
-            if (enemigo.estaVivo() && enemigo.getPosZ() == pZ) {
-                int dist = Math.abs(enemigo.getPosX() - pX) + Math.abs(enemigo.getPosY() - pY);
-                if (dist < menorDistancia) {
-                    menorDistancia = dist;
-                    masCercano = enemigo;
-                }
-            }
-        }
-        return masCercano;
-    }
-
     private void procesarRupturaAlianzas() {
         if (alianzas == null || alianzas.isEmpty()) return;
 
@@ -422,5 +400,26 @@ public class AdministradorDeJuego {
                 }
             }
         }
+    }
+    public static Enemigo encontrarEnemigoMasCercano(Personaje jugador, List<Enemigo> enemigos) {
+        Enemigo masCercano = null;
+        int menorDistancia = Integer.MAX_VALUE;
+
+        if (jugador == null || enemigos == null) return null;
+
+        int pX = jugador.getPosX();
+        int pY = jugador.getPosY();
+        int pZ = jugador.getPosZ();
+
+        for (Enemigo enemigo : enemigos) {
+            if (enemigo.estaVivo() && enemigo.getPosZ() == pZ) {
+                int dist = Math.abs(enemigo.getPosX() - pX) + Math.abs(enemigo.getPosY() - pY);
+                if (dist < menorDistancia) {
+                    menorDistancia = dist;
+                    masCercano = enemigo;
+                }
+            }
+        }
+        return masCercano;
     }
 }
