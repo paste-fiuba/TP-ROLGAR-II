@@ -22,9 +22,11 @@ public class RenderizadorMundo {
     private BufferedImage spriteRoca, spriteVacio, spriteRampa, spriteAgua;
     private BufferedImage spritePersonaje, spriteEnemigo;
     private Map<String, BufferedImage> spritesEnemigos;
+    private RenderizarMusica bgm = new RenderizarMusica();
     
     public RenderizadorMundo() {
         cargarSpritesDelMundo();
+        bgm.reproducir("src/Musica/musicaJuego.wav");
     }
 
     private void cargarSpritesDelMundo() {

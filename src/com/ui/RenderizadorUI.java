@@ -27,7 +27,6 @@ public class RenderizadorUI {
     
     private RenderizarMenu renderizadorMenu = new RenderizarMenu();
     private RenderizarData renderizadorData = new RenderizarData();
-    private RenderizarCombate renderizadorCombate = new RenderizarCombate();
 
     private Font fontMenuTitulo, fontMenuOpcion, fontInfo;
     private Font fontGameOver, fontCombate, fontCombateInfo; // Fuentes para combate
