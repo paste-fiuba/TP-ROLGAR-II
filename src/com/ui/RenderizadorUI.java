@@ -5,9 +5,8 @@ import com.entidades.Entidad;
 import com.entidades.Personaje;
 import com.items.Carta;
 import com.items.Inventario;
-import com.logica.ControladorJuego; 
-import com.logica.AdministradorDeCombate; 
-
+import com.logica.AdministradorDeCombate;
+import com.logica.ControladorJuego;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -344,12 +343,24 @@ public class RenderizadorUI {
         }
 
         Enemigo masCercano = encontrarEnemigoMasCercano(p, e);
+        // Contar enemigos vivos
+        int enemigosVivos = 0;
+        if (e != null) {
+            for (Enemigo en : e) {
+                if (en != null && en.estaVivo()) enemigosVivos++;
+            }
+        }
         if (masCercano != null) {
             g.setColor(Color.ORANGE);
             String textoEnemigo = masCercano.getNombre() + " HP: " + masCercano.getVida();
             int anchoTexto = g.getFontMetrics().stringWidth(textoEnemigo);
             g.drawString(textoEnemigo, g.getClipBounds().width - anchoTexto - 20, 30);
         }
+
+        // Mostrar número total de criaturas enemigas vivas
+        g.setColor(Color.WHITE);
+        String enemigosTxt = "Criaturas enemigas restantes: " + enemigosVivos;
+        g.drawString(enemigosTxt, 20, 60);
 
         g.setColor(Color.GREEN);
         for (String mensaje : battleLog) {
