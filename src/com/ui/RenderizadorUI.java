@@ -27,6 +27,7 @@ public class RenderizadorUI {
     
     private RenderizarMenu renderizadorMenu = new RenderizarMenu();
     private RenderizarData renderizadorData = new RenderizarData();
+    private RenderizarFinJuego renderizadorFin = new RenderizarFinJuego();
 
     private Font fontMenuTitulo, fontMenuOpcion, fontInfo;
     private Font fontGameOver, fontCombate, fontCombateInfo; // Fuentes para combate
@@ -108,37 +109,11 @@ public class RenderizadorUI {
     }
 
     public void dibujarPantallaGameOver(Graphics g, int anchoVentana, int altoVentana) {
-        g.setColor(new Color(100, 0, 0, 200));
-        g.fillRect(0, 0, anchoVentana, altoVentana);
-
-        g.setColor(Color.RED);
-        g.setFont(fontGameOver);
-        String titulo = "PERDISTE";
-        int anchoTitulo = g.getFontMetrics().stringWidth(titulo);
-        g.drawString(titulo, (anchoVentana - anchoTitulo) / 2, altoVentana / 2);
-
-        g.setColor(Color.WHITE);
-        g.setFont(fontMenuOpcion);
-        String opcion = "[Q] Cerrar Juego";
-        int anchoOpcion = g.getFontMetrics().stringWidth(opcion);
-        g.drawString(opcion, (anchoVentana - anchoOpcion) / 2, altoVentana / 2 + 60);
+    	renderizadorFin.dibujarPantallaGameOver(g, anchoVentana, altoVentana, this.fontGameOver, this.fontMenuOpcion);
     }
 
     public void dibujarPantallaVictoria(Graphics g, int anchoVentana, int altoVentana) {
-        g.setColor(new Color(0, 80, 20, 200));
-        g.fillRect(0, 0, anchoVentana, altoVentana);
-
-        g.setColor(Color.YELLOW);
-        g.setFont(fontGameOver);
-        String titulo = "¡GANASTE!";
-        int anchoTitulo = g.getFontMetrics().stringWidth(titulo);
-        g.drawString(titulo, (anchoVentana - anchoTitulo) / 2, altoVentana / 2);
-
-        g.setColor(Color.WHITE);
-        g.setFont(fontMenuOpcion);
-        String opcion = "[Q] Cerrar Juego";
-        int anchoOpcion = g.getFontMetrics().stringWidth(opcion);
-        g.drawString(opcion, (anchoVentana - anchoOpcion) / 2, altoVentana / 2 + 60);
+        renderizadorFin.dibujarPantallaVictoria(g, anchoVentana, altoVentana, this.fontGameOver, this.fontMenuOpcion);
     }
 
     /**
