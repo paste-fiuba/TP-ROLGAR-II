@@ -98,8 +98,14 @@ public class PartidaDeRolgar {
         // String[] sprites = {"personaje.png", "personaje2.png", "personaje3.png", "personaje4.png"}; 
 
         for (int i = 0; i < numJugadores; i++) {
-            int startX = 5 + (i * 3); // Posiciones iniciales separadas
-            int startY = 5;
+            int startX = 8; // Posiciones iniciales separadas
+            int startY = 8;
+            if(i%2==0) {
+            	startX = 5;
+            }
+            if(i<2) {
+            	startY = 5;
+            }
             
             Personaje p = new Personaje(nombres[i], 100, startX, startY, NIVEL_INICIAL, 10, 1, 5.0);
             try {
