@@ -31,6 +31,7 @@ public class PartidaDeRolgar {
     private List<Personaje> jugadores;
     private List<Enemigo> enemigos;
     private Random random = new Random();
+    private Dificultad dificultadActual; 
 
     /**
      * pre: -
@@ -40,6 +41,7 @@ public class PartidaDeRolgar {
         this.tablero = null;
         this.jugadores = null;
         this.enemigos = null;
+        this.dificultadActual = Dificultad.NORMAL; // Default
     }
 
     /**
@@ -48,6 +50,8 @@ public class PartidaDeRolgar {
      * Los atributos (tablero, jugadores, enemigos) quedan listos para ser obtenidos.
      */
     public void cargarPartida(Dificultad dificultad, int numJugadores) {
+        this.dificultadActual = dificultad; 
+        
         // 1. Crear Tablero basado en dificultad
         this.tablero = new Tablero(ANCHO_TABLERO, ALTO_TABLERO, NIVELES_TABLERO);
         crearMundoCoherente(this.tablero, dificultad);
@@ -61,6 +65,10 @@ public class PartidaDeRolgar {
 
     // --- Getters para el AdministradorDeJuego ---
 
+    public Dificultad getDificultad() { 
+        return this.dificultadActual;
+    }
+    
     /**
      * pre: la partida debe haber sido cargada (cargarPartida).
      * post: devuelve el tablero generado.
@@ -94,18 +102,10 @@ public class PartidaDeRolgar {
     private List<Personaje> crearJugadores(int numJugadores) {
         List<Personaje> listaJugadores = new ArrayList<>();
         String[] nombres = {"Jugador1", "Jugador2", "Jugador3", "Jugador4"};
-        // TODO: Cargar sprites diferentes para cada jugador
-        // String[] sprites = {"personaje.png", "personaje2.png", "personaje3.png", "personaje4.png"}; 
 
         for (int i = 0; i < numJugadores; i++) {
-            int startX = 8; // Posiciones iniciales separadas
-            int startY = 8;
-            if(i%2==0) {
-            	startX = 5;
-            }
-            if(i<2) {
-            	startY = 5;
-            }
+            int startX = 5 + (i * 3); // Posiciones iniciales separadas
+            int startY = 5;
             
             Personaje p = new Personaje(nombres[i], 100, startX, startY, NIVEL_INICIAL, 10, 1, 5.0);
             try {
@@ -126,19 +126,20 @@ public class PartidaDeRolgar {
      */
     private List<Enemigo> crearEnemigos(Dificultad dificultad) {
         List<Enemigo> enemigos = new ArrayList<>();
+        // --- VIDAS REDUCIDAS ---
         // Nivel 0
-        enemigos.add(new Enemigo("Orco", "Guerrero", 50, 20, 12, 0, 5, 1, 0));
-        enemigos.add(new Enemigo("Orco", "Guerrero", 50, 22, 13, 0, 5, 1, 0));
+        enemigos.add(new Enemigo("Orco", "Guerrero", 30, 20, 12, 0, 5, 1, 0)); // HP 50 -> 30
+        enemigos.add(new Enemigo("Orco", "Guerrero", 30, 22, 13, 0, 5, 1, 0)); // HP 50 -> 30
         // Nivel 1
         enemigos.add(new Enemigo("Esqueleto", "Arquero", 30, 7, 7, 1, 8, 1, 0));
         enemigos.add(new Enemigo("Esqueleto", "Arquero", 30, 20, 10, 1, 8, 1, 0));
         // Nivel 2
         enemigos.add(new Enemigo("Murciélago", "Volador", 10, 20, 5, 2, 2, 1, 0));
         enemigos.add(new Enemigo("Murciélago", "Volador", 10, 30, 12, 2, 2, 1, 0));
-        enemigos.add(new Enemigo("Golem", "Tanque", 100, 35, 19, 2, 8, 1, 0));
+        enemigos.add(new Enemigo("Golem", "Tanque", 60, 35, 19, 2, 8, 1, 0)); // HP 100 -> 60
         // Nivel 3
-        enemigos.add(new Enemigo("Orco", "Guerrero", 60, 15, 15, 3, 7, 1, 0));
-        enemigos.add(new Enemigo("Orco", "Guerrero", 60, 17, 15, 3, 7, 1, 0));
+        enemigos.add(new Enemigo("Orco", "Guerrero", 40, 15, 15, 3, 7, 1, 0)); // HP 60 -> 40
+        enemigos.add(new Enemigo("Orco", "Guerrero", 40, 17, 15, 3, 7, 1, 0)); // HP 60 -> 40
         // Nivel 4
         enemigos.add(new Enemigo("Esqueleto", "Elite", 50, 32, 20, 4, 10, 1, 0));
         enemigos.add(new Enemigo("Esqueleto", "Elite", 50, 7, 5, 4, 10, 1, 0));
@@ -146,26 +147,31 @@ public class PartidaDeRolgar {
         enemigos.add(new Enemigo("Serpiente Acuática", "Rápida", 40, 12, 10, 5, 10, 1, 0));
         enemigos.add(new Enemigo("Serpiente Acuática", "Rápida", 40, 28, 15, 5, 10, 1, 0));
         // Nivel 6
-        enemigos.add(new Enemigo("Golem", "Tanque", 120, 10, 12, 6, 10, 1, 0));
-        enemigos.add(new Enemigo("Golem", "Tanque", 120, 30, 12, 6, 10, 1, 0));
+        enemigos.add(new Enemigo("Golem", "Tanque", 80, 10, 12, 6, 10, 1, 0)); // HP 120 -> 80
+        enemigos.add(new Enemigo("Golem", "Tanque", 80, 30, 12, 6, 10, 1, 0)); // HP 120 -> 80
         // Nivel 7
         enemigos.add(new Enemigo("Murciélago", "Enjambre", 15, 7, 18, 7, 3, 1, 0));
         enemigos.add(new Enemigo("Murciélago", "Enjambre", 15, 8, 18, 7, 3, 1, 0));
         enemigos.add(new Enemigo("Murciélago", "Enjambre", 15, 9, 18, 7, 3, 1, 0));
         // Nivel 8
-        enemigos.add(new Enemigo("Golem", "Magma", 150, 20, 7, 8, 12, 1, 0));
+        enemigos.add(new Enemigo("Golem", "Magma", 100, 20, 7, 8, 12, 1, 0)); // HP 150 -> 100
         // Nivel 9 (Jefe)
         enemigos.add(new Enemigo("REY MAGO", "JEFE", 300, 20, 19, 9, 20, 1, 0));
 
         if (dificultad == Dificultad.FACIL) {
             // En fácil, quitar la mitad de los enemigos (excepto el jefe)
             enemigos.removeIf(e -> !e.getNombre().equals("REY MAGO") && random.nextBoolean());
+            
+            // --- NUEVO: Reducir la fuerza de todos los enemigos en Fácil ---
+            for (Enemigo e : enemigos) {
+                e.setFuerza(e.getFuerza() / 2); // Reduce la fuerza a la mitad
+            }
+            
         } else if (dificultad == Dificultad.DIFICIL) {
             // En difícil, duplicar la vida de todos
             for (Enemigo e : enemigos) {
                 e.setVida(e.getVida() * 2);
-                // NOTA: Para modificar la fuerza, la clase Entidad necesitaría un setFuerza()
-                // e.setFuerza(e.getFuerza() * 2); 
+                e.setFuerza(e.getFuerza() + e.getFuerza() / 2); // Aumentar fuerza 50%
             }
         }
         return enemigos;
@@ -284,7 +290,6 @@ public class PartidaDeRolgar {
      */
     private void distribuirCartas(Tablero tablero, Dificultad dificultad) {
         
-        // --- Distribuir al menos una de cada tipo de carta en niveles aleatorios (niveles distintos)
         java.util.List<Carta> cartas = new java.util.ArrayList<>();
         cartas.add(new CartaAtaqueDoble());
         cartas.add(new CartaAumentoVida(20));
@@ -295,7 +300,7 @@ public class PartidaDeRolgar {
         cartas.add(new CartaEsquivarDanio(0.6));
         cartas.add(new CartaInvisibilidad());
         cartas.add(new CartaRoboDeCarta());
-        cartas.add(new CartaTeletransportacion(ANCHO_TABLERO/2, ALTO_TABLERO/2, 0)); // TP al inicio
+        cartas.add(new CartaTeletransportacion(ANCHO_TABLERO/2, ALTO_TABLERO/2, 0)); 
 
         java.util.List<Integer> niveles = new java.util.ArrayList<>();
         for (int z = 0; z < NIVELES_TABLERO; z++) niveles.add(z);
@@ -304,7 +309,6 @@ public class PartidaDeRolgar {
         for (int i = 0; i < cartas.size() && i < niveles.size(); i++) {
             int z = niveles.get(i);
             boolean placed = false;
-            // Intentos aleatorios
             for (int attempt = 0; attempt < 500 && !placed; attempt++) {
                 int x = random.nextInt(ANCHO_TABLERO);
                 int y = random.nextInt(ALTO_TABLERO);
@@ -316,12 +320,11 @@ public class PartidaDeRolgar {
             }
         }
 
-        // --- Asegurar MÍNIMO de cartas por nivel según dificultad ---
         int minCartasPorNivel = 4;
         if (dificultad == Dificultad.FACIL) {
-            minCartasPorNivel = 6; // Más cartas en fácil
+            minCartasPorNivel = 6; 
         } else if (dificultad == Dificultad.DIFICIL) {
-            minCartasPorNivel = 2; // Menos cartas en difícil
+            minCartasPorNivel = 2; 
         }
         
         final int MIN_CARTAS_POR_NIVEL = minCartasPorNivel;
@@ -344,8 +347,8 @@ public class PartidaDeRolgar {
                 if (!tablero.esCoordenadaValida(x, y, z)) continue;
                 Casillero c = tablero.getCasillero(x, y, z);
                 if (c.getTipo() == TipoCasillero.ROCA || c.getCarta() != null) continue;
-
-                c.setCarta(crearCartaAleatoria(z));
+                
+                c.setCarta(crearCartaAleatoria(z, dificultad));
                 existentes++;
             }
         }
@@ -355,7 +358,20 @@ public class PartidaDeRolgar {
      * pre: z es un nivel válido.
      * post: Devuelve una nueva instancia de una carta aleatoria.
      */
-    private Carta crearCartaAleatoria(int z) {
+    private Carta crearCartaAleatoria(int z, Dificultad dificultad) {
+        
+        // --- NUEVA LÓGICA PARA MODO FÁCIL ---
+        // En fácil, solo spawnean cartas de combate directo
+        if (dificultad == Dificultad.FACIL) {
+            int choice = random.nextInt(2); // 50/50
+            if (choice == 0) {
+                return new CartaAtaqueDoble();
+            } else {
+                return new CartaEscudo();
+            }
+        }
+
+        // Lógica original para Normal y Difícil
         int choice = random.nextInt(10);
         switch (choice) {
             case 0: return new CartaAtaqueDoble();

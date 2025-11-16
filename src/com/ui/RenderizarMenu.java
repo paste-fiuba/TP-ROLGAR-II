@@ -111,6 +111,7 @@ public class RenderizarMenu {
         int anchoTitulo = g.getFontMetrics().stringWidth(titulo);
         g.drawString(titulo, (anchoVentana - anchoTitulo) / 2, altoVentana / 4); 
 
+        Font fontInstrucciones = null;
         g.setFont(fontInstrucciones);
         
         String[] lineas = {
