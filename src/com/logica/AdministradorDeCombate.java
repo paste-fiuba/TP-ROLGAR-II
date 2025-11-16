@@ -1,8 +1,8 @@
 package com.logica;
 
+import com.entidades.Enemigo;
 import com.entidades.Entidad;
 import com.entidades.Personaje;
-import com.entidades.Enemigo;
 import com.items.Carta;
 import com.items.CartaAtaqueDoble; 
 import com.items.CartaEscudo;     
@@ -228,7 +228,12 @@ public class AdministradorDeCombate {
             adminJuego.logBatalla("¡Has derrotado a " + oponente.getNombre() + "!");
             
             if (oponente instanceof Enemigo) {
+<<<<<<< Updated upstream
                 ((Enemigo) oponente).recibirDanio(0); 
+=======
+                // Informar al AdministradorDeJuego que el enemigo fue derrotado
+                adminJuego.marcarEnemigoDerrotado((Enemigo) oponente);
+>>>>>>> Stashed changes
             }
             
             this.estado = EstadoCombate.FINALIZADO;
