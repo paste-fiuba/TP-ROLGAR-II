@@ -26,42 +26,45 @@ public class PanelJuego extends JPanel implements KeyListener {
     private List<Enemigo> enemigos;
     private com.logica.AdministradorDeJuego administrador;
     private ControladorJuego controlador;
+    
+    // --- MÓDULOS DE UI MODIFICADOS ---
+    private GerenciadorDeSprites gerenciadorSprites; // <-- NUEVO
     private RenderizadorMundo renderMundo;
     private RenderizadorUI renderUI;
+    private RenderizarMusica musica; // <-- NUEVO
 
-    // Dimensiones lógicas por defecto (se actualizarán al cargar la partida)
+    // Dimensiones lógicas por defecto
     private int ANCHO_LOGICO = 800;
     private int ALTO_LOGICO = 600;
     private int ALTO_JUEGO_LOGICO = 536;
 
     public PanelJuego() {
         this.setBackground(Color.BLACK); 
-        this.renderMundo = new RenderizadorMundo();
-        this.renderUI = new RenderizadorUI();
         
-        // Dimensiones temporales para el menú
+        // --- INICIALIZACIÓN CENTRALIZADA ---
+        this.gerenciadorSprites = new GerenciadorDeSprites(); // <-- 1. CREA EL GERENCIADOR
+        this.renderMundo = new RenderizadorMundo(this.gerenciadorSprites); // <-- 2. INYECTA EN MUNDO
+        this.renderUI = new RenderizadorUI(this.gerenciadorSprites); // <-- 3. INYECTA EN UI
+        
+        this.musica = new RenderizarMusica();
+        this.musica.reproducir("src/Musica/musicaJuego.wav");
+        
         this.setPreferredSize(new Dimension(ANCHO_LOGICO, ALTO_LOGICO));
     }
     
-    /**
-     * Configura el panel con los datos de una partida recién cargada.
-     */
     public void setDatosDePartida(Tablero tablero, List<Personaje> jugadores, List<Enemigo> enemigos) {
         this.tablero = tablero;
         this.jugadores = jugadores;
         this.enemigos = enemigos;
-        this.nivelZActual = 0; // Asumir nivel inicial 0
+        this.nivelZActual = 0; 
         
-        // Actualizar las dimensiones lógicas basadas en el tablero cargado
         this.ANCHO_LOGICO = tablero.getDimensionX() * TAMAÑO_TILE;
         this.ALTO_JUEGO_LOGICO = tablero.getDimensionY() * TAMAÑO_TILE;
         this.ALTO_LOGICO = ALTO_JUEGO_LOGICO + ALTURA_HOTBAR; 
         
-        // Actualizar el tamaño preferido del panel para que la ventana se ajuste
         this.setPreferredSize(new Dimension(ANCHO_LOGICO, ALTO_LOGICO));
         
         if (this.getTopLevelAncestor() instanceof javax.swing.JFrame) {
-            // No re-empacar, solo centrar si ya es visible
             ((javax.swing.JFrame) this.getTopLevelAncestor()).setLocationRelativeTo(null); 
         }
     }
@@ -91,7 +94,6 @@ public class PanelJuego extends JPanel implements KeyListener {
         if (controlador == null) return;
         GameState estado = controlador.getEstadoJuego();
 
-        // Si estamos en un menú, solo dibujar el menú y salir
         if (estado == GameState.MENU_PRINCIPAL || 
             estado == GameState.MENU_DIFICULTAD || 
             estado == GameState.MENU_JUGADORES ||
@@ -101,14 +103,10 @@ public class PanelJuego extends JPanel implements KeyListener {
             return;
         }
 
-        // Si estamos EN COMBATE, dibujar solo la pantalla de combate
         if (estado == GameState.EN_COMBATE) {
             renderUI.dibujarPantallaCombate(g, controlador.getAdminCombate(), getWidth(), getHeight());
             return;
         }
-
-        // Si el juego está corriendo (RUNNING, PAUSED, GAME_OVER, VICTORY)
-        // dibujamos el mundo de fondo.
 
         Graphics2D gJuego = (Graphics2D) g.create();
         try {
@@ -147,7 +145,6 @@ public class PanelJuego extends JPanel implements KeyListener {
             gJuego.dispose();
         }
         
-        // Dibujar UI superpuesta (Info, Pausa, GameOver, Victoria)
         if (estado == GameState.RUNNING) {
             Personaje jugadorActual = (this.administrador != null) ? this.administrador.getJugadorActual() : null;
             int pending = (this.controlador != null) ? this.controlador.getPendingTransferSlot() : -1;

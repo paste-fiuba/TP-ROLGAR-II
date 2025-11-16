@@ -1,25 +1,13 @@
 package com.items;
-
 import com.entidades.Entidad;
 import com.entidades.Personaje;
-
-/**
- * Aumenta la vida actual del personaje.
- */
 public class CartaAumentoVida extends Carta {
-
     private int incremento;
-
-    /**
-     * pre: incremento > 0
-     * post: crea una carta que aumenta la vida del usuario en 'incremento' puntos.
-     */
     public CartaAumentoVida(int incremento) {
         super("Aumento de Vida", "Aumenta la vida del personaje en " + incremento + " puntos.");
         this.incremento = incremento;
-        this.imagen = cargarImagen("src/sprites/curacion-parcial.png");
+        // --- LÍNEA ELIMINADA ---
     }
-
     @Override
     public void aplicarEfecto(Personaje usuario, Entidad objetivo) {
         if (usuario != null) {
@@ -28,4 +16,3 @@ public class CartaAumentoVida extends Carta {
         }
     }
 }
-

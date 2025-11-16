@@ -1,9 +1,6 @@
 package com.items;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import javax.imageio.ImageIO;
-
+// --- Imports de imagen ELIMINADOS ---
 import com.entidades.Entidad;
 import com.entidades.Personaje;
 
@@ -12,15 +9,14 @@ public abstract class Carta {
     protected String nombre;
     protected String descripcion;
 
-    
-    protected BufferedImage imagen;
+    // --- CAMPO ELIMINADO ---
+    // protected BufferedImage imagen;
 
     public Carta(String nombre, String descripcion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
     }
 
-    
     public abstract void aplicarEfecto(Personaje usuario, Entidad objetivo);
 
     public String getNombre() {
@@ -31,18 +27,9 @@ public abstract class Carta {
         return descripcion;
     }
 
-    
-    public BufferedImage getImagen() {
-        return imagen;
-    }
+    // --- MÉTODO ELIMINADO ---
+    // public BufferedImage getImagen() { ... }
 
-    
-    protected BufferedImage cargarImagen(String ruta) {
-        try {
-            return ImageIO.read(new File(ruta));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+    // --- MÉTODO ELIMINADO ---
+    // protected BufferedImage cargarImagen(String ruta) { ... }
 }

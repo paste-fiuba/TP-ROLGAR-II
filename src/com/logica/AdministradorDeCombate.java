@@ -4,21 +4,16 @@ import com.entidades.Entidad;
 import com.entidades.Personaje;
 import com.entidades.Enemigo;
 import com.items.Carta;
-import com.items.CartaAtaqueDoble; // <-- IMPORTANTE
-import com.items.CartaEscudo;     // <-- IMPORTANTE
-import java.awt.event.KeyEvent; 
+import com.items.CartaAtaqueDoble; 
+import com.items.CartaEscudo;     
+// import java.awt.event.KeyEvent; // <-- IMPORT ELIMINADO
 import java.util.Random;
 
-/**
- * TDA para gestionar una instancia de combate por turnos.
- * Se activa cuando el estado del juego es EN_COMBATE.
- */
 public class AdministradorDeCombate {
 
-    // --- ESTADOS INTERNOS DEL COMBATE ---
     public enum EstadoCombate { 
-        ELIGE_ACCION,     // Mostrando [1] Luchar, [2] Carta, [3] Huir
-        ELIGE_CARTA,      // Mostrando el inventario
+        ELIGE_ACCION,     
+        ELIGE_CARTA,      
         TURNO_OPONENTE, 
         FINALIZADO 
     }
@@ -26,24 +21,17 @@ public class AdministradorDeCombate {
     private Personaje jugador;
     private Entidad oponente;
     private ControladorJuego controlador;
-    private AdministradorDeJuego adminJuego; // Para usar el log
+    private AdministradorDeJuego adminJuego; 
     
     private EstadoCombate estado;
     private Random random = new Random();
-    private String mensajeAccion = ""; // Mensaje para mostrar en la UI
-    // private PartidaDeRolgar.Dificultad dificultad; // <-- ELIMINADO
-
-    /**
-     * pre: controlador, adminJuego, jugador y oponente no son null.
-     * post: Crea una nueva instancia de combate. El turno siempre empieza por el jugador.
-     */
-    // --- CONSTRUCTOR MODIFICADO ---
+    private String mensajeAccion = ""; 
+    
     public AdministradorDeCombate(ControladorJuego controlador, AdministradorDeJuego adminJuego, Personaje jugador, Entidad oponente) {
         this.controlador = controlador;
         this.adminJuego = adminJuego;
         this.jugador = jugador;
         this.oponente = oponente;
-        // this.dificultad = dificultad; // <-- ELIMINADO
         this.estado = EstadoCombate.ELIGE_ACCION; 
         this.adminJuego.limpiarLogCombate(); 
         this.adminJuego.logBatalla("¡" + oponente.getNombre() + " te desafía!");
@@ -51,16 +39,16 @@ public class AdministradorDeCombate {
     }
 
     /**
-     * pre: keyCode es la tecla presionada por el usuario.
-     * post: Procesa el input según el estado actual del combate (elegir acción o elegir carta).
+     * pre: accion no es NINGUNA.
+     * post: Procesa la acción del jugador (traducida por ControladorJuego).
      */
-    public void manejarInput(int keyCode) {
+    public void procesarAccion(AccionCombate accion) {
         switch (estado) {
             case ELIGE_ACCION:
-                manejarInputAccion(keyCode);
+                procesarAccionPrincipal(accion);
                 break;
             case ELIGE_CARTA:
-                manejarInputCarta(keyCode);
+                procesarAccionCarta(accion);
                 break;
             case TURNO_OPONENTE:
             case FINALIZADO:
@@ -73,17 +61,17 @@ public class AdministradorDeCombate {
      * pre: El estado es ELIGE_ACCION.
      * post: Procesa la acción principal (Luchar, Carta, Huir).
      */
-    private void manejarInputAccion(int keyCode) {
-        if (keyCode == KeyEvent.VK_1) { // [1] LUCHAR
+    private void procesarAccionPrincipal(AccionCombate accion) {
+        if (accion == AccionCombate.ATACAR) {
             jugadorAtaca();
             if (estado == EstadoCombate.ELIGE_ACCION) { 
                 cambiarTurno();
             }
-        } else if (keyCode == KeyEvent.VK_2) { // [2] CARTA
+        } else if (accion == AccionCombate.ABRIR_MENU_CARTA) {
             this.estado = EstadoCombate.ELIGE_CARTA;
             this.mensajeAccion = "Elige una carta (1-0) o [ESC] para cancelar.";
             adminJuego.limpiarLogCombate(); 
-        } else if (keyCode == KeyEvent.VK_3) { // [3] HUIR
+        } else if (accion == AccionCombate.HUIR) {
             jugadorIntentaHuir();
             if (estado == EstadoCombate.ELIGE_ACCION) { 
                 cambiarTurno();
@@ -95,8 +83,8 @@ public class AdministradorDeCombate {
      * pre: El estado es ELIGE_CARTA.
      * post: Procesa la selección de carta o la cancelación.
      */
-    private void manejarInputCarta(int keyCode) {
-        if (keyCode == KeyEvent.VK_ESCAPE) { // Cancelar
+    private void procesarAccionCarta(AccionCombate accion) {
+        if (accion == AccionCombate.CANCELAR_CARTA) { // Cancelar
             this.estado = EstadoCombate.ELIGE_ACCION;
             this.mensajeAccion = "Elige tu acción...";
             adminJuego.limpiarLogCombate();
@@ -104,9 +92,10 @@ public class AdministradorDeCombate {
             return;
         }
         
-        if (keyCode >= KeyEvent.VK_0 && keyCode <= KeyEvent.VK_9) {
-            int slotIndex = (keyCode == KeyEvent.VK_0) ? 9 : keyCode - KeyEvent.VK_1; 
-            
+        // --- Lógica para convertir AccionCombate en slot ---
+        int slotIndex = getSlotFromAccion(accion);
+        
+        if (slotIndex != -1) { // Si fue una tecla de carta (0-9)
             boolean exito = jugadorUsaCarta(slotIndex);
             
             if (exito && estado == EstadoCombate.ELIGE_CARTA) { 
@@ -115,11 +104,36 @@ public class AdministradorDeCombate {
             }
         }
     }
-
+    
     /**
-     * pre: -
-     * post: El jugador ataca al oponente. Se aplican buffs y se loguea la acción.
+     * Convierte un enum de AccionCombate a un índice de slot (0-9).
+     * Devuelve -1 si no es una acción de carta.
      */
+    private int getSlotFromAccion(AccionCombate accion) {
+        switch(accion) {
+            case USAR_CARTA_1: return 0;
+            case USAR_CARTA_2: return 1;
+            case USAR_CARTA_3: return 2;
+            case USAR_CARTA_4: return 3;
+            case USAR_CARTA_5: return 4;
+            case USAR_CARTA_6: return 5;
+            case USAR_CARTA_7: return 6;
+            case USAR_CARTA_8: return 7;
+            case USAR_CARTA_9: return 8;
+            case USAR_CARTA_0: return 9;
+            default: return -1;
+        }
+    }
+
+
+    // --- MÉTODOS ELIMINADOS ---
+    // public void manejarInput(int keyCode) { ... }
+    // private void manejarInputAccion(int keyCode) { ... }
+    // private void manejarInputCarta(int keyCode) { ... }
+    
+
+    // --- LÓGICA DE COMBATE (SIN CAMBIOS) ---
+
     private void jugadorAtaca() {
         int dmgJugador;
         
@@ -151,39 +165,27 @@ public class AdministradorDeCombate {
         verificarFinDeCombate();
     }
     
-    /**
-     * pre: slotIndex es un índice válido en el inventario.
-     * post: El jugador usa una carta. Se aplica el efecto y se consume la carta.
-     * Devuelve true si la carta se usó, false si no.
-     */
     private boolean jugadorUsaCarta(int slotIndex) {
         if (jugador.getInventario().cantidadDeCartas() > slotIndex) {
             Carta carta = jugador.getInventario().getCarta(slotIndex);
             
-            // --- NUEVA REGLA GLOBAL ---
-            // Solo permite usar cartas de AtaqueDoble o Escudo en combate
             if (!(carta instanceof CartaAtaqueDoble) && !(carta instanceof CartaEscudo)) {
                 adminJuego.logBatalla("¡Solo puedes usar cartas de Ataque o Escudo en combate!");
-                return false; // No se usó la carta, no se gasta el turno
+                return false; 
             }
-            // --- FIN DE LA REGLA ---
 
             adminJuego.logBatalla(jugador.getNombre() + " usó '" + carta.getNombre() + "'!");
-            jugador.usarCarta(slotIndex, oponente); // Aplicar efecto
-            jugador.eliminarCarta(slotIndex); // Consumir carta
+            jugador.usarCarta(slotIndex, oponente); 
+            jugador.eliminarCarta(slotIndex); 
             
             verificarFinDeCombate();
-            return true; // Se usó la carta
+            return true; 
         } else {
             adminJuego.logBatalla("¡No hay una carta en ese slot!");
-            return false; // No se usó la carta
+            return false; 
         }
     }
 
-    /**
-     * pre: -
-     * post: El jugador intenta huir. Si tiene éxito, finaliza el combate.
-     */
     private void jugadorIntentaHuir() {
         if (random.nextDouble() < 0.30) {
             adminJuego.logBatalla("¡Lograste escapar!");
@@ -194,10 +196,6 @@ public class AdministradorDeCombate {
         }
     }
 
-    /**
-     * pre: -
-     * post: Cambia el turno al oponente y ejecuta su lógica.
-     */
     private void cambiarTurno() {
         this.estado = EstadoCombate.TURNO_OPONENTE;
         this.mensajeAccion = "Turno del oponente...";
@@ -205,10 +203,6 @@ public class AdministradorDeCombate {
         procesarTurnoOponente();
     }
 
-    /**
-     * pre: -
-     * post: El oponente realiza su acción (atacar) y se cambia el turno al jugador.
-     */
     private void procesarTurnoOponente() {
         if (estado != EstadoCombate.TURNO_OPONENTE) return;
 
@@ -224,11 +218,6 @@ public class AdministradorDeCombate {
         }
     }
 
-    /**
-     * pre: -
-     * post: Verifica si alguno de los combatientes ha sido derrotado.
-     * Si es así, finaliza el combate.
-     */
     private void verificarFinDeCombate() {
         if (jugador.getVida() <= 0) {
             adminJuego.logBatalla("¡" + jugador.getNombre() + " ha sido derrotado!");
@@ -239,7 +228,7 @@ public class AdministradorDeCombate {
             adminJuego.logBatalla("¡Has derrotado a " + oponente.getNombre() + "!");
             
             if (oponente instanceof Enemigo) {
-                ((Enemigo) oponente).recibirDanio(0); // Esto lo marcará como muerto
+                ((Enemigo) oponente).recibirDanio(0); 
             }
             
             this.estado = EstadoCombate.FINALIZADO;
