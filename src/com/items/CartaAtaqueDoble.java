@@ -4,7 +4,6 @@ import com.entidades.Personaje;
 public class CartaAtaqueDoble extends Carta {
     public CartaAtaqueDoble() {
         super("Ataque Doble", "Duplica el daño del próximo ataque.");
-        // --- LÍNEA ELIMINADA ---
     }
     @Override
     public void aplicarEfecto(Personaje usuario, Entidad objetivo) {

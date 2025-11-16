@@ -1,11 +1,11 @@
 package com.logica;
 
-import com.entidades.Enemigo;
 import com.entidades.Entidad;
 import com.entidades.Personaje;
+import com.entidades.Enemigo;
 import com.items.Carta;
-import com.items.CartaAtaqueDoble;
-import com.items.CartaEscudo;
+import com.items.CartaAtaqueDoble; 
+import com.items.CartaEscudo;     
 import java.util.Random;
 
 public class AdministradorDeCombate {
@@ -51,7 +51,6 @@ public class AdministradorDeCombate {
                 break;
             case TURNO_OPONENTE:
             case FINALIZADO:
-                // No hacer nada si no es el turno del jugador
                 break;
         }
     }
@@ -83,7 +82,7 @@ public class AdministradorDeCombate {
      * post: Procesa la selección de carta o la cancelación.
      */
     private void procesarAccionCarta(AccionCombate accion) {
-        if (accion == AccionCombate.CANCELAR_CARTA) { // Cancelar
+        if (accion == AccionCombate.CANCELAR_CARTA) { 
             this.estado = EstadoCombate.ELIGE_ACCION;
             this.mensajeAccion = "Elige tu acción...";
             adminJuego.limpiarLogCombate();
@@ -91,10 +90,9 @@ public class AdministradorDeCombate {
             return;
         }
         
-        // --- Lógica para convertir AccionCombate en slot ---
         int slotIndex = getSlotFromAccion(accion);
         
-        if (slotIndex != -1) { // Si fue una tecla de carta (0-9)
+        if (slotIndex != -1) { 
             boolean exito = jugadorUsaCarta(slotIndex);
             
             if (exito && estado == EstadoCombate.ELIGE_CARTA) { 
@@ -125,13 +123,8 @@ public class AdministradorDeCombate {
     }
 
 
-    // --- MÉTODOS ELIMINADOS ---
-    // public void manejarInput(int keyCode) { ... }
-    // private void manejarInputAccion(int keyCode) { ... }
-    // private void manejarInputCarta(int keyCode) { ... }
-    
 
-    // --- LÓGICA DE COMBATE (SIN CAMBIOS) ---
+    
 
     private void jugadorAtaca() {
         int dmgJugador;
@@ -225,18 +218,17 @@ public class AdministradorDeCombate {
             
         } else if (oponente.getVida() <= 0) {
             adminJuego.logBatalla("¡Has derrotado a " + oponente.getNombre() + "!");
-
+            
             if (oponente instanceof Enemigo) {
-                // Informar al AdministradorDeJuego que el enemigo fue derrotado
-                adminJuego.marcarEnemigoDerrotado((Enemigo) oponente);
+                ((Enemigo) oponente).recibirDanio(0); 
             }
-
+            
             this.estado = EstadoCombate.FINALIZADO;
             controlador.finalizarCombate();
         }
     }
 
-    // --- Getters para el RenderizadorUI ---
+    // --- Getters ---
     public EstadoCombate getEstado() { return this.estado; }
     public Personaje getJugador() { return jugador; }
     public Entidad getOponente() { return oponente; }

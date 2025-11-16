@@ -4,7 +4,7 @@ import com.entidades.Personaje;
 public class CartaCuracionTotal extends Carta {
     public CartaCuracionTotal() {
         super("Curación Total", "Restaura la vida del personaje al 100%.");
-        // --- LÍNEA ELIMINADA ---
+
     }
     @Override
     public void aplicarEfecto(Personaje usuario, Entidad objetivo) {

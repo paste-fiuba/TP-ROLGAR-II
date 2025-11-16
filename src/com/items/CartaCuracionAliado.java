@@ -6,8 +6,8 @@ public class CartaCuracionAliado extends Carta {
     public CartaCuracionAliado(int cantidad) {
         super("Curación de Aliado", "Cura " + cantidad + " puntos de vida a un aliado.");
         this.cantidad = cantidad;
-        // --- LÍNEA ELIMINADA ---
     }
+    
     @Override
     public void aplicarEfecto(Personaje usuario, Entidad objetivo) {
         Personaje objetivoPersonaje = null;

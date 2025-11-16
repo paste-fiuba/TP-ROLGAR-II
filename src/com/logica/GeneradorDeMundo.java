@@ -34,12 +34,11 @@ public class GeneradorDeMundo {
         String[] nombres = {"Jugador1", "Jugador2", "Jugador3", "Jugador4"};
 
         for (int i = 0; i < numJugadores; i++) {
-            int startX = 5 + (i * 3); // Posiciones iniciales separadas
+            int startX = 5 + (i * 3); 
             int startY = 5;
             
             Personaje p = new Personaje(nombres[i], 100, startX, startY, NIVEL_INICIAL, 10, 1, 5.0);
             try {
-                // Dar a cada jugador cartas iniciales
                 p.agregarCarta(new CartaAtaqueDoble());
                 p.agregarCarta(new CartaEscudo());
             } catch (Exception ex) {
@@ -57,18 +56,18 @@ public class GeneradorDeMundo {
         List<Enemigo> enemigos = new ArrayList<>();
         // --- VIDAS REDUCIDAS ---
         // Nivel 0
-        enemigos.add(new Enemigo("Orco", "Guerrero", 30, 20, 12, 0, 5, 1, 0)); // HP 50 -> 30
-        enemigos.add(new Enemigo("Orco", "Guerrero", 30, 22, 13, 0, 5, 1, 0)); // HP 50 -> 30
+        enemigos.add(new Enemigo("Orco", "Guerrero", 30, 20, 12, 0, 5, 1, 0)); 
+        enemigos.add(new Enemigo("Orco", "Guerrero", 30, 22, 13, 0, 5, 1, 0)); 
         // Nivel 1
         enemigos.add(new Enemigo("Esqueleto", "Arquero", 30, 7, 7, 1, 8, 1, 0));
         enemigos.add(new Enemigo("Esqueleto", "Arquero", 30, 20, 10, 1, 8, 1, 0));
         // Nivel 2
         enemigos.add(new Enemigo("Murciélago", "Volador", 10, 20, 5, 2, 2, 1, 0));
         enemigos.add(new Enemigo("Murciélago", "Volador", 10, 30, 12, 2, 2, 1, 0));
-        enemigos.add(new Enemigo("Golem", "Tanque", 60, 35, 19, 2, 8, 1, 0)); // HP 100 -> 60
+        enemigos.add(new Enemigo("Golem", "Tanque", 60, 35, 19, 2, 8, 1, 0)); 
         // Nivel 3
-        enemigos.add(new Enemigo("Orco", "Guerrero", 40, 15, 15, 3, 7, 1, 0)); // HP 60 -> 40
-        enemigos.add(new Enemigo("Orco", "Guerrero", 40, 17, 15, 3, 7, 1, 0)); // HP 60 -> 40
+        enemigos.add(new Enemigo("Orco", "Guerrero", 40, 15, 15, 3, 7, 1, 0)); 
+        enemigos.add(new Enemigo("Orco", "Guerrero", 40, 17, 15, 3, 7, 1, 0)); 
         // Nivel 4
         enemigos.add(new Enemigo("Esqueleto", "Elite", 50, 32, 20, 4, 10, 1, 0));
         enemigos.add(new Enemigo("Esqueleto", "Elite", 50, 7, 5, 4, 10, 1, 0));
@@ -76,30 +75,28 @@ public class GeneradorDeMundo {
         enemigos.add(new Enemigo("Serpiente Acuática", "Rápida", 40, 12, 10, 5, 10, 1, 0));
         enemigos.add(new Enemigo("Serpiente Acuática", "Rápida", 40, 28, 15, 5, 10, 1, 0));
         // Nivel 6
-        enemigos.add(new Enemigo("Golem", "Tanque", 80, 10, 12, 6, 10, 1, 0)); // HP 120 -> 80
-        enemigos.add(new Enemigo("Golem", "Tanque", 80, 30, 12, 6, 10, 1, 0)); // HP 120 -> 80
+        enemigos.add(new Enemigo("Golem", "Tanque", 80, 10, 12, 6, 10, 1, 0)); 
+        enemigos.add(new Enemigo("Golem", "Tanque", 80, 30, 12, 6, 10, 1, 0)); 
         // Nivel 7
         enemigos.add(new Enemigo("Murciélago", "Enjambre", 15, 7, 18, 7, 3, 1, 0));
         enemigos.add(new Enemigo("Murciélago", "Enjambre", 15, 8, 18, 7, 3, 1, 0));
         enemigos.add(new Enemigo("Murciélago", "Enjambre", 15, 9, 18, 7, 3, 1, 0));
         // Nivel 8
-        enemigos.add(new Enemigo("Golem", "Magma", 100, 20, 7, 8, 12, 1, 0)); // HP 150 -> 100
+        enemigos.add(new Enemigo("Golem", "Magma", 100, 20, 7, 8, 12, 1, 0)); 
         // Nivel 9 (Jefe)
         enemigos.add(new Enemigo("REY MAGO", "JEFE", 300, 20, 19, 9, 20, 1, 0));
 
         if (dificultad == PartidaDeRolgar.Dificultad.FACIL) {
-            // En fácil, quitar la mitad de los enemigos (excepto el jefe)
             enemigos.removeIf(e -> !e.getNombre().equals("REY MAGO") && random.nextBoolean());
             
             for (Enemigo e : enemigos) {
-                e.setFuerza(e.getFuerza() / 2); // Reduce la fuerza a la mitad
+                e.setFuerza(e.getFuerza() / 2);
             }
             
         } else if (dificultad == PartidaDeRolgar.Dificultad.DIFICIL) {
-            // En difícil, duplicar la vida de todos
             for (Enemigo e : enemigos) {
                 e.setVida(e.getVida() * 2);
-                e.setFuerza(e.getFuerza() + e.getFuerza() / 2); // Aumentar fuerza 50%
+                e.setFuerza(e.getFuerza() + e.getFuerza() / 2); 
             }
         }
         return enemigos;
@@ -113,10 +110,10 @@ public class GeneradorDeMundo {
     }
     
     /**
-     * Rellena un tablero existente con el mundo (rocas, pasillos, rampas).
+     * Rellena un tablero existente con el mundo .
      */
     public void poblarTablero(Tablero tablero, PartidaDeRolgar.Dificultad dificultad) {
-        crearMundoCoherente(tablero, dificultad);
+        crearMundo(tablero, dificultad);
         distribuirCartas(tablero, dificultad);
     }
 
@@ -124,7 +121,7 @@ public class GeneradorDeMundo {
      * pre: tablero no es null, dificultad no es null.
      * post: Modifica el tablero, tallando el mundo, pasillos, rampas.
      */
-    private void crearMundoCoherente(Tablero tablero, PartidaDeRolgar.Dificultad dificultad) {
+    private void crearMundo(Tablero tablero, PartidaDeRolgar.Dificultad dificultad) {
         
         // 1. Rellenar todo de roca
         for (int z = 0; z < NIVELES_TABLERO; z++) {
@@ -137,7 +134,7 @@ public class GeneradorDeMundo {
             }
         }
 
-        // --- Nivel 0: Las Cuevas (Inicio) ---
+        // --- Nivel 0 ---
         tallarHabitacion(tablero, 3, 3, 10, 10, 0); 
         tallarHabitacion(tablero, 5, 15, 10, 20, 0, TipoCasillero.AGUA);
         tallarHabitacion(tablero, 15, 10, 25, 15, 0); 
@@ -145,7 +142,7 @@ public class GeneradorDeMundo {
         tallarPasilloVertical(tablero, 15, 7, 10, 0);
         tablero.getCasillero(20, 12, 0).setTipo(TipoCasillero.RAMPA); // Rampa 0->1
         
-        // --- Nivel 1: El Cruce ---
+        // --- Nivel 1 ---
         tallarHabitacion(tablero, 18, 10, 22, 14, 1);
         tablero.getCasillero(20, 12, 1).setTipo(TipoCasillero.RAMPA); // Rampa 1->0
         tallarHabitacion(tablero, 3, 3, 10, 10, 1);
@@ -153,7 +150,7 @@ public class GeneradorDeMundo {
         tallarPasilloHorizontal(tablero, 10, 18, 10, 1);
         tallarPasilloVertical(tablero, 10, 5, 10, 1);
         
-        // --- Nivel 2: La Prisión ---
+        // --- Nivel 2 ---
         tallarHabitacion(tablero, 3, 3, 10, 10, 2);
         tablero.getCasillero(5, 5, 2).setTipo(TipoCasillero.RAMPA); // Rampa 2->1
         tallarHabitacion(tablero, 33, 18, 38, 23, 2);
@@ -162,14 +159,14 @@ public class GeneradorDeMundo {
         tallarPasilloVertical(tablero, 30, 5, 20, 2);
         tallarPasilloHorizontal(tablero, 33, 30, 20, 2);
 
-        // --- Nivel 3: El Gran Salón ---
+        // --- Nivel 3 ---
         tallarHabitacion(tablero, 33, 18, 38, 23, 3);
         tablero.getCasillero(35, 20, 3).setTipo(TipoCasillero.RAMPA); // Rampa 3->2
         tallarHabitacion(tablero, 10, 5, 30, 20, 3);
         tallarPasilloHorizontal(tablero, 30, 35, 18, 3);
         tablero.getCasillero(15, 12, 3).setTipo(TipoCasillero.RAMPA); // Rampa 3->4
         
-        // --- Nivel 4: Las Tumbas ---
+        // --- Nivel 4---
         tallarHabitacion(tablero, 10, 5, 25, 20, 4);
         tablero.getCasillero(15, 12, 4).setTipo(TipoCasillero.RAMPA); // Rampa 4->3
         tallarHabitacion(tablero, 5, 3, 8, 6, 4);
@@ -182,7 +179,7 @@ public class GeneradorDeMundo {
         tallarPasilloHorizontal(tablero, 25, 30, 20, 4);
         tablero.getCasillero(32, 20, 4).setTipo(TipoCasillero.RAMPA); // Rampa 4->5
 
-        // --- Nivel 5: Caverna de Agua ---
+        // --- Nivel 5 ---
         tallarHabitacion(tablero, 30, 18, 33, 21, 5);
         tablero.getCasillero(32, 20, 5).setTipo(TipoCasillero.RAMPA); // Rampa 5->4
         tallarHabitacion(tablero, 5, 5, 35, 20, 5);
@@ -190,14 +187,14 @@ public class GeneradorDeMundo {
         tallarPasilloHorizontal(tablero, 25, 30, 19, 5);
         tablero.getCasillero(7, 7, 5).setTipo(TipoCasillero.RAMPA); // Rampa 5->6
 
-        // --- Nivel 6: Corazón de la Montaña ---
+        // --- Nivel 6 ---
         tallarHabitacion(tablero, 5, 5, 35, 20, 6);
         tablero.getCasillero(7, 7, 6).setTipo(TipoCasillero.RAMPA); // Rampa 6->5
         tallarHabitacion(tablero, 10, 8, 30, 17, 6, TipoCasillero.ROCA); // Pilar de roca
         tallarHabitacion(tablero, 15, 11, 25, 14, 6); // Túnel a través del pilar
         tablero.getCasillero(33, 12, 6).setTipo(TipoCasillero.RAMPA); // Rampa 6->7
         
-        // --- Nivel 7: El Laberinto ---
+        // --- Nivel 7---
         tallarHabitacion(tablero, 31, 10, 35, 14, 7);
         tablero.getCasillero(33, 12, 7).setTipo(TipoCasillero.RAMPA); // Rampa 7->6
         tallarHabitacion(tablero, 5, 5, 10, 10, 7);
@@ -210,14 +207,14 @@ public class GeneradorDeMundo {
         tallarPasilloVertical(tablero, 31, 14, 22, 7);
         tablero.getCasillero(7, 18, 7).setTipo(TipoCasillero.RAMPA); // Rampa 7->8
         
-        // --- Nivel 8: El Nido ---
+        // --- Nivel 8 ---
         tallarHabitacion(tablero, 5, 15, 10, 20, 8);
         tablero.getCasillero(7, 18, 8).setTipo(TipoCasillero.RAMPA); // Rampa 8->7
         tallarHabitacion(tablero, 15, 5, 25, 20, 8);
         tallarPasilloHorizontal(tablero, 10, 15, 18, 8);
         tablero.getCasillero(20, 7, 8).setTipo(TipoCasillero.RAMPA); // Rampa 8->9
         
-        // --- Nivel 9: Trono del Jefe ---
+        // --- Nivel 9 ---
         tallarHabitacion(tablero, 15, 5, 25, 10, 9);
         tablero.getCasillero(20, 7, 9).setTipo(TipoCasillero.RAMPA); // Rampa 9->8
         tallarHabitacion(tablero, 10, 15, 30, 23, 9);
@@ -309,7 +306,6 @@ public class GeneradorDeMundo {
             }
         }
 
-        // Lógica original para Normal y Difícil
         int choice = random.nextInt(10);
         switch (choice) {
             case 0: return new CartaAtaqueDoble();

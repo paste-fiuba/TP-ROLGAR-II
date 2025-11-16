@@ -5,10 +5,7 @@ import com.entidades.Personaje;
 import com.tablero.Tablero;
 import java.util.List;
 
-/**
- * Wrapper class that delegates world, enemies and players creation
- * to the GeneradorDeMundo TDA.
- */
+
 public class PartidaDeRolgar {
 
     public enum Dificultad { FACIL, NORMAL, DIFICIL }

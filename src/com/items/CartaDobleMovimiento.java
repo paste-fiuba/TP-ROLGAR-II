@@ -4,7 +4,7 @@ import com.entidades.Personaje;
 public class CartaDobleMovimiento extends Carta {
     public CartaDobleMovimiento() {
         super("Doble Movimiento", "Permite moverse dos veces en el siguiente turno.");
-        // --- LÍNEA ELIMINADA ---
+
     }
     @Override
     public void aplicarEfecto(Personaje usuario, Entidad objetivo) {

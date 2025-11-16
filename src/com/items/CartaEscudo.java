@@ -5,7 +5,6 @@ public class CartaEscudo extends Carta {
     private static final int VALOR_ESCUDO = 30; 
     public CartaEscudo() {
         super("Escudo", "Otorga " + VALOR_ESCUDO + " de vida temporal.");
-        // --- LÍNEA ELIMINADA ---
     }
     @Override
     public void aplicarEfecto(Personaje usuario, Entidad objetivo) {

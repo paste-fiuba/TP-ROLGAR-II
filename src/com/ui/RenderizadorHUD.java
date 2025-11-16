@@ -18,8 +18,7 @@ public class RenderizadorHUD {
     // Dependencias de UI
     private Font fontInfo;
     private Color colorCajaBorde;
-    private Color colorPlataformaBatalla; // Usado para el piso del minimapa
-
+    private Color colorPlataformaBatalla;
     public RenderizadorHUD(Font fontInfo, Color colorCajaBorde, Color colorPlataforma) {
         this.fontInfo = fontInfo;
         this.colorCajaBorde = colorCajaBorde;
@@ -29,7 +28,6 @@ public class RenderizadorHUD {
     /**
      * pre: g no es null, admin no es null, nivelZ es válido.
      * post: Dibuja un mini-mapa en la esquina superior derecha.
-     * (Movido de RenderizadorUI)
      */
     public void dibujarMiniMapa(Graphics g, AdministradorDeJuego admin, int nivelZ, int anchoVentana, int altoVentana) {
         if (admin == null || admin.getTablero() == null) {
@@ -70,7 +68,7 @@ public class RenderizadorHUD {
                     // Dibuja el casillero visitado
                     switch (c.getTipo()) {
                         case VACIO:
-                            g.setColor(colorPlataformaBatalla); // Marrón piso
+                            g.setColor(colorPlataformaBatalla); 
                             break;
                         case RAMPA:
                             g.setColor(Color.YELLOW);
@@ -85,11 +83,10 @@ public class RenderizadorHUD {
                     g.fillRect(offsetX + x * dotSize, offsetY + y * dotSize, dotSize, dotSize);
                 
                 } 
-                // Si no está visitado, no se dibuja nada
             }
         }
         
-        // Dibujar al jugador (punto blanco brillante)
+        // Dibujar al jugador
         if (jugador != null && jugador.getPosZ() == nivelZ) {
             g.setColor(Color.WHITE);
             g.fillRect(offsetX + jugador.getPosX() * dotSize, offsetY + jugador.getPosY() * dotSize, dotSize, dotSize);

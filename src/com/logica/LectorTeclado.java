@@ -10,8 +10,6 @@ public class LectorTeclado {
 
     /**
      * Traduce un código de tecla de Swing a una AccionJuego.
-     * @param keyCode El KeyEvent.VK_...
-     * @return La AccionJuego correspondiente.
      */
     public AccionJuego traducirInput(int keyCode) {
         switch (keyCode) {
