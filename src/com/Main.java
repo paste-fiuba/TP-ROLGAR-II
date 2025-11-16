@@ -6,7 +6,7 @@ import com.ui.PanelJuego;
 import com.ui.VentanaJuego; 		
 
 /**
- * Punto de entrada principal del juego Rolgar II.
+ * Punto de entrada principal del juego Rolgar II.   
  * Su única responsabilidad es inicializar los componentes
  * principales de la UI y el TDA PartidaDeRolgar.
  */

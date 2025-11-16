@@ -1,18 +1,11 @@
 package com.items;
-
 import com.entidades.Entidad;
 import com.entidades.Personaje;
-
-/**
- * Cura toda la vida del jugador al 100%.
- */
 public class CartaCuracionTotal extends Carta {
-
     public CartaCuracionTotal() {
         super("Curación Total", "Restaura la vida del personaje al 100%.");
-        this.imagen = cargarImagen("src/sprites/curacion-completa.png");
+        // --- LÍNEA ELIMINADA ---
     }
-
     @Override
     public void aplicarEfecto(Personaje usuario, Entidad objetivo) {
         usuario.setVida(100);

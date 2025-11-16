@@ -8,6 +8,9 @@ public class Turno {
 	public int getIndiceJugadorActual() { return indiceJugadorActual; }
 	public int getRonda() { return ronda; }
 
+    /**
+     * Avanza al siguiente jugador. Si llega al final, vuelve a 0 y suma una ronda.
+     */
 	public void nextPlayer(int totalJugadores) {
 		indiceJugadorActual++;
 		if (indiceJugadorActual >= totalJugadores) {
@@ -16,5 +19,9 @@ public class Turno {
 		}
 	}
 
+    /**
+     * Establece forzosamente el índice del jugador.
+     * (Necesario si un jugador es eliminado)
+     */
 	public void setIndiceJugadorActual(int idx) { this.indiceJugadorActual = idx; }
 }
