@@ -1,12 +1,11 @@
 package com.logica;
 
+import com.entidades.Enemigo;
 import com.entidades.Entidad;
 import com.entidades.Personaje;
-import com.entidades.Enemigo;
 import com.items.Carta;
-import com.items.CartaAtaqueDoble; 
-import com.items.CartaEscudo;     
-// import java.awt.event.KeyEvent; // <-- IMPORT ELIMINADO
+import com.items.CartaAtaqueDoble;
+import com.items.CartaEscudo;
 import java.util.Random;
 
 public class AdministradorDeCombate {
@@ -226,11 +225,12 @@ public class AdministradorDeCombate {
             
         } else if (oponente.getVida() <= 0) {
             adminJuego.logBatalla("¡Has derrotado a " + oponente.getNombre() + "!");
-            
+
             if (oponente instanceof Enemigo) {
-                ((Enemigo) oponente).recibirDanio(0); 
+                // Informar al AdministradorDeJuego que el enemigo fue derrotado
+                adminJuego.marcarEnemigoDerrotado((Enemigo) oponente);
             }
-            
+
             this.estado = EstadoCombate.FINALIZADO;
             controlador.finalizarCombate();
         }
