@@ -18,7 +18,7 @@ public abstract class Entidad {
 
     /**
      * pre: nombre no es null, vida > 0, fuerza >= 0, vision >= 0, salud >= 0.
-     *      Las coordenadas (posX, posY, posZ) son válidas dentro del tablero.
+     * Las coordenadas (posX, posY, posZ) son válidas dentro del tablero.
      * post: crea una entidad inicializando todos los atributos con los valores indicados.
      */
     public Entidad(String nombre, int vida, int posX, int posY, int posZ,
@@ -35,7 +35,7 @@ public abstract class Entidad {
 
     /**
      * pre: dx, dy y dz representan desplazamientos válidos (por ejemplo, -1, 0 o 1)
-     *      y el movimiento resultante debe mantenerse dentro del tablero.
+     * y el movimiento resultante debe mantenerse dentro del tablero.
      * post: actualiza la posición de la entidad sumando (dx, dy, dz) a su posición actual.
      */
     public void mover(int dx, int dy, int dz) {
@@ -47,7 +47,7 @@ public abstract class Entidad {
     /**
      * pre: danio >= 0.
      * post: disminuye la vida de la entidad en "danio" unidades.
-     *       si la vida es menor a 0, se ajusta a 0.
+     * si la vida es menor a 0, se ajusta a 0.
      */
     public void recibirDanio(int danio) {
         this.vida -= danio;
@@ -132,8 +132,14 @@ public abstract class Entidad {
     public void setVida(int vida) { this.vida = vida; }
 
     /**
+     * pre: fuerza >= 0.
+     * post: establece la fuerza de la entidad al valor indicado.
+     */
+    public void setFuerza(int fuerza) { this.fuerza = fuerza; } // <-- NUEVO MÉTODO
+
+    /**
      * post: devuelve una representación textual de la entidad
-     *       con su nombre, vida y posición actual.
+     * con su nombre, vida y posición actual.
      */
     @Override
     public String toString() {

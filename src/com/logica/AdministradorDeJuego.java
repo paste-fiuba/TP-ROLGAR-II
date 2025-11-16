@@ -15,7 +15,7 @@ import java.util.Random;
 
 public class AdministradorDeJuego {
 
-    private ControladorJuego controlador; // <-- REFERENCIA AL CEREBRO
+    private ControladorJuego controlador; 
     private Tablero tablero;
     private List<Personaje> jugadores;
     private int indiceJugadorActual = 0;
@@ -27,9 +27,8 @@ public class AdministradorDeJuego {
     private static final double PROB_RUPTURA_ALIANZA = 0.15;
     private List<String> jugadoresEliminados;
 
-    // --- CONSTRUCTOR MODIFICADO ---
     public AdministradorDeJuego(ControladorJuego controlador, Tablero tablero, List<Personaje> jugadores, List<Enemigo> enemigos, PanelJuego panel) {
-        this.controlador = controlador; // <-- Guardamos el controlador
+        this.controlador = controlador; 
         this.tablero = tablero;
         this.jugadores = jugadores;
         this.enemigos = enemigos;
@@ -38,6 +37,31 @@ public class AdministradorDeJuego {
         this.alianzas = new ArrayList<>();
         this.propuestas = new HashMap<>();
         this.jugadoresEliminados = new ArrayList<>();
+    }
+    
+    // --- MÉTODO NUEVO ---
+    /**
+     * pre: -
+     * post: Marca como "visitados" todos los casilleros alrededor del jugador
+     * actual, según su rango de visión.
+     */
+    public void actualizarVisibilidad() {
+        Personaje jugador = getJugadorActual();
+        if (jugador == null) return;
+        
+        int pX = jugador.getPosX();
+        int pY = jugador.getPosY();
+        int pZ = jugador.getPosZ();
+        int vision = jugador.getVision(); // Asumimos 1 por defecto
+
+        for (int x = pX - vision; x <= pX + vision; x++) {
+            for (int y = pY - vision; y <= pY + vision; y++) {
+                // Chequea que la coordenada esté dentro del tablero
+                if (tablero.esCoordenadaValida(x, y, pZ)) {
+                    tablero.getCasillero(x, y, pZ).marcarVisitado();
+                }
+            }
+        }
     }
     
     public boolean isJugadorMuerto() {
@@ -61,6 +85,11 @@ public class AdministradorDeJuego {
     public List<Personaje> getJugadores() {
         return this.jugadores;
     }
+    
+    // --- NUEVO GETTER PARA EL RENDERIZADOR ---
+    public Tablero getTablero() {
+        return this.tablero;
+    }
 
     public Personaje getJugadorActual() {
         if (jugadores == null || jugadores.isEmpty()) return null;
@@ -76,15 +105,6 @@ public class AdministradorDeJuego {
         return null;
     }
     
-    public void finalizarTurnoSiCorresponde() {
-        Personaje jugador = getJugadorActual();
-        if (jugador != null && jugador.getMovimientosExtra() > 0) {
-            jugador.setMovimientosExtra(jugador.getMovimientosExtra() - 1);
-            logBatalla(jugador.getNombre() + " usó un movimiento extra.");
-        } 
-        // Ya no llama a finalizarTurno()
-    }
-
     public boolean procesarMovimiento(int dx, int dy) {
         Personaje jugador = getJugadorActual();
         if (jugador == null) return false;
@@ -143,8 +163,6 @@ public class AdministradorDeJuego {
         
         Enemigo enemigoEnCasilla = enemigoEnPosicion(x, y, z);
         if (enemigoEnCasilla != null && enemigoEnCasilla.estaVivo()) {
-            // --- MODIFICADO ---
-            // Inicia la pantalla de combate en lugar de resolverlo
             controlador.iniciarCombate(jugador, enemigoEnCasilla);
             return;
         }
@@ -179,8 +197,6 @@ public class AdministradorDeJuego {
             }
         }
     }
-
-    // --- El método ejecutarCombate() FUE ELIMINADO ---
 
     public boolean sonAdyacentes(Personaje a, Personaje b) {
         if (a == null || b == null) return false;
@@ -251,11 +267,11 @@ public class AdministradorDeJuego {
             return;
         }
         
-        // --- MODIFICADO ---
         controlador.iniciarCombate(atacante, objetivo);
     }
 
     public void finalizarTurno() {
+        actualizarVisibilidad(); // <-- ACTUALIZA VISIBILIDAD ANTES DE MOVER ENEMIGOS
         procesarTurnoEnemigos();
         procesarRupturaAlianzas();
 
@@ -286,9 +302,8 @@ public class AdministradorDeJuego {
 
             int dist = Math.abs(enemigo.getPosX() - objetivo.getPosX()) + Math.abs(enemigo.getPosY() - objetivo.getPosY());
             if (dist <= 1) {
-                // --- MODIFICADO ---
                 controlador.iniciarCombate(objetivo, enemigo);
-                break; // Un solo enemigo ataca por turno
+                break; 
             }
         }
         
@@ -372,6 +387,28 @@ public class AdministradorDeJuego {
         return null;
     }
 
+    private Enemigo encontrarEnemigoMasCercano() {
+        Enemigo masCercano = null;
+        int menorDistancia = Integer.MAX_VALUE;
+        Personaje jugadorRef = getJugadorActual();
+        if (jugadorRef == null) return null;
+        int pX = jugadorRef.getPosX();
+        int pY = jugadorRef.getPosY();
+        int pZ = jugadorRef.getPosZ();
+
+        if (enemigos == null) return null;
+        for (Enemigo enemigo : enemigos) {
+            if (enemigo.estaVivo() && enemigo.getPosZ() == pZ) {
+                int dist = Math.abs(enemigo.getPosX() - pX) + Math.abs(enemigo.getPosY() - pY);
+                if (dist < menorDistancia) {
+                    menorDistancia = dist;
+                    masCercano = enemigo;
+                }
+            }
+        }
+        return masCercano;
+    }
+
     private void procesarRupturaAlianzas() {
         if (alianzas == null || alianzas.isEmpty()) return;
 
@@ -400,26 +437,5 @@ public class AdministradorDeJuego {
                 }
             }
         }
-    }
-    public static Enemigo encontrarEnemigoMasCercano(Personaje jugador, List<Enemigo> enemigos) {
-        Enemigo masCercano = null;
-        int menorDistancia = Integer.MAX_VALUE;
-
-        if (jugador == null || enemigos == null) return null;
-
-        int pX = jugador.getPosX();
-        int pY = jugador.getPosY();
-        int pZ = jugador.getPosZ();
-
-        for (Enemigo enemigo : enemigos) {
-            if (enemigo.estaVivo() && enemigo.getPosZ() == pZ) {
-                int dist = Math.abs(enemigo.getPosX() - pX) + Math.abs(enemigo.getPosY() - pY);
-                if (dist < menorDistancia) {
-                    menorDistancia = dist;
-                    masCercano = enemigo;
-                }
-            }
-        }
-        return masCercano;
     }
 }

@@ -4,7 +4,9 @@ import com.entidades.Entidad;
 import com.entidades.Personaje;
 import com.entidades.Enemigo;
 import com.items.Carta;
-import java.awt.event.KeyEvent; // <-- IMPORTANTE
+import com.items.CartaAtaqueDoble; // <-- IMPORTANTE
+import com.items.CartaEscudo;     // <-- IMPORTANTE
+import java.awt.event.KeyEvent; 
 import java.util.Random;
 
 /**
@@ -29,18 +31,21 @@ public class AdministradorDeCombate {
     private EstadoCombate estado;
     private Random random = new Random();
     private String mensajeAccion = ""; // Mensaje para mostrar en la UI
+    // private PartidaDeRolgar.Dificultad dificultad; // <-- ELIMINADO
 
     /**
      * pre: controlador, adminJuego, jugador y oponente no son null.
      * post: Crea una nueva instancia de combate. El turno siempre empieza por el jugador.
      */
+    // --- CONSTRUCTOR MODIFICADO ---
     public AdministradorDeCombate(ControladorJuego controlador, AdministradorDeJuego adminJuego, Personaje jugador, Entidad oponente) {
         this.controlador = controlador;
         this.adminJuego = adminJuego;
         this.jugador = jugador;
         this.oponente = oponente;
-        this.estado = EstadoCombate.ELIGE_ACCION; // Inicia en la elección de acción
-        this.adminJuego.limpiarLogCombate(); // Limpia el log al iniciar
+        // this.dificultad = dificultad; // <-- ELIMINADO
+        this.estado = EstadoCombate.ELIGE_ACCION; 
+        this.adminJuego.limpiarLogCombate(); 
         this.adminJuego.logBatalla("¡" + oponente.getNombre() + " te desafía!");
         this.mensajeAccion = "Elige tu acción...";
     }
@@ -71,17 +76,16 @@ public class AdministradorDeCombate {
     private void manejarInputAccion(int keyCode) {
         if (keyCode == KeyEvent.VK_1) { // [1] LUCHAR
             jugadorAtaca();
-            if (estado == EstadoCombate.ELIGE_ACCION) { // Si el combate no terminó
+            if (estado == EstadoCombate.ELIGE_ACCION) { 
                 cambiarTurno();
             }
         } else if (keyCode == KeyEvent.VK_2) { // [2] CARTA
-            // Cambiar al sub-menú de cartas
             this.estado = EstadoCombate.ELIGE_CARTA;
             this.mensajeAccion = "Elige una carta (1-0) o [ESC] para cancelar.";
             adminJuego.limpiarLogCombate(); 
         } else if (keyCode == KeyEvent.VK_3) { // [3] HUIR
             jugadorIntentaHuir();
-            if (estado == EstadoCombate.ELIGE_ACCION) { // Si falló la huida
+            if (estado == EstadoCombate.ELIGE_ACCION) { 
                 cambiarTurno();
             }
         }
@@ -96,22 +100,19 @@ public class AdministradorDeCombate {
             this.estado = EstadoCombate.ELIGE_ACCION;
             this.mensajeAccion = "Elige tu acción...";
             adminJuego.limpiarLogCombate();
-            adminJuego.logBatalla("¡" + oponente.getNombre() + " te desafía!"); // Restaurar mensaje
+            adminJuego.logBatalla("¡" + oponente.getNombre() + " te desafía!"); 
             return;
         }
         
         if (keyCode >= KeyEvent.VK_0 && keyCode <= KeyEvent.VK_9) {
-            int slotIndex = (keyCode == KeyEvent.VK_0) ? 9 : keyCode - KeyEvent.VK_1; // 0 es el slot 10
+            int slotIndex = (keyCode == KeyEvent.VK_0) ? 9 : keyCode - KeyEvent.VK_1; 
             
             boolean exito = jugadorUsaCarta(slotIndex);
             
-            if (exito && estado == EstadoCombate.ELIGE_CARTA) { // Si usó la carta y el combate no terminó
-                // El estado vuelve a ELIGE_ACCION antes de cambiar de turno
+            if (exito && estado == EstadoCombate.ELIGE_CARTA) { 
                 this.estado = EstadoCombate.ELIGE_ACCION;
                 cambiarTurno();
             }
-            // Si 'exito' es false (ej. slot vacío), no cambia de turno,
-            // el jugador puede elegir otra carta.
         }
     }
 
@@ -131,7 +132,6 @@ public class AdministradorDeCombate {
             dmgJugador = (jugador.getFuerza() / 2) + random.nextInt(Math.max(1, jugador.getFuerza()));
         }
 
-        // Aliados cercanos ayudan
         if (jugador.getAlianza() != null) {
             for (Personaje aliado : jugador.getAlianza().getMiembros()) {
                 if (aliado == jugador || aliado.getVida() <= 0) continue;
@@ -159,13 +159,16 @@ public class AdministradorDeCombate {
     private boolean jugadorUsaCarta(int slotIndex) {
         if (jugador.getInventario().cantidadDeCartas() > slotIndex) {
             Carta carta = jugador.getInventario().getCarta(slotIndex);
-            adminJuego.logBatalla(jugador.getNombre() + " usó '" + carta.getNombre() + "'!");
             
-            if (carta instanceof com.items.CartaRoboDeCarta || carta instanceof com.items.CartaCuracionAliado) {
-                 adminJuego.logBatalla("¡No puedes usar esa carta en combate!");
-                 return false; // No gasta el turno si la carta es inválida
+            // --- NUEVA REGLA GLOBAL ---
+            // Solo permite usar cartas de AtaqueDoble o Escudo en combate
+            if (!(carta instanceof CartaAtaqueDoble) && !(carta instanceof CartaEscudo)) {
+                adminJuego.logBatalla("¡Solo puedes usar cartas de Ataque o Escudo en combate!");
+                return false; // No se usó la carta, no se gasta el turno
             }
+            // --- FIN DE LA REGLA ---
 
+            adminJuego.logBatalla(jugador.getNombre() + " usó '" + carta.getNombre() + "'!");
             jugador.usarCarta(slotIndex, oponente); // Aplicar efecto
             jugador.eliminarCarta(slotIndex); // Consumir carta
             
@@ -182,7 +185,6 @@ public class AdministradorDeCombate {
      * post: El jugador intenta huir. Si tiene éxito, finaliza el combate.
      */
     private void jugadorIntentaHuir() {
-        // Un 30% de chance de huir
         if (random.nextDouble() < 0.30) {
             adminJuego.logBatalla("¡Lograste escapar!");
             this.estado = EstadoCombate.FINALIZADO;
@@ -210,14 +212,12 @@ public class AdministradorDeCombate {
     private void procesarTurnoOponente() {
         if (estado != EstadoCombate.TURNO_OPONENTE) return;
 
-        // Lógica de IA del oponente (simple: siempre ataca)
         int dmgEnemigo = (oponente.getFuerza() / 2) + random.nextInt(Math.max(1, oponente.getFuerza()));
         jugador.recibirDanio(dmgEnemigo);
         adminJuego.logBatalla(oponente.getNombre() + " golpea por " + dmgEnemigo + "!");
 
         verificarFinDeCombate();
 
-        // Si el combate no terminó, devolver el turno al jugador
         if (estado == EstadoCombate.TURNO_OPONENTE) {
             this.estado = EstadoCombate.ELIGE_ACCION;
             this.mensajeAccion = "Elige tu acción...";

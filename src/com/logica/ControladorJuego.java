@@ -32,6 +32,7 @@ public class ControladorJuego {
     
     private PartidaDeRolgar partida; 
     private int pendingTransferSlot = -1;
+    
     private PartidaDeRolgar.Dificultad dificultadSeleccionada;
     private int jugadoresSeleccionados;
 
@@ -40,6 +41,7 @@ public class ControladorJuego {
         this.partida = partida;
         this.panelJuego = panel;
         this.estadoJuego = GameState.MENU_PRINCIPAL;
+        this.dificultadSeleccionada = PartidaDeRolgar.Dificultad.NORMAL; // Default
     }
 
     public void manejarInput(int keyCode) {
@@ -111,7 +113,8 @@ public class ControladorJuego {
             }
             
             if (seMovio) {
-                adminJuego.finalizarTurnoSiCorresponde();
+                adminJuego.actualizarVisibilidad(); // <-- ACTUALIZA VISIBILIDAD
+                adminJuego.finalizarTurno(); 
             }
             
             // Lógica de Acciones (no movimiento)
@@ -137,8 +140,7 @@ public class ControladorJuego {
                 if (panelJuego != null && panelJuego.getRenderUI() != null) {
                     panelJuego.getRenderUI().agregarMensajeLog("Transferencia: presioná 1..0 para elegir el slot a transferir.");
                 }
-            } else if (keyCode == KeyEvent.VK_ENTER) {
-                adminJuego.finalizarTurno();
+            
             } else if (keyCode == KeyEvent.VK_L) {
                 Personaje actual = adminJuego.getJugadorActual();
                 if (actual != null) {
@@ -268,7 +270,6 @@ public class ControladorJuego {
 
     private void manejarInputCombate(int keyCode) {
         if (adminCombate == null) return;
-        // Simplemente pasamos la tecla al TDA de combate
         adminCombate.manejarInput(keyCode);
     }
     
@@ -288,6 +289,8 @@ public class ControladorJuego {
 
     public void iniciarPartida() {
         partida.cargarPartida(dificultadSeleccionada, jugadoresSeleccionados);
+        
+        this.dificultadSeleccionada = partida.getDificultad(); 
 
         Tablero tablero = partida.getTablero();
         List<Personaje> jugadores = partida.getJugadores();
@@ -297,6 +300,9 @@ public class ControladorJuego {
 
         this.adminJuego = new AdministradorDeJuego(this, tablero, jugadores, enemigos, panelJuego);
         panelJuego.setAdministrador(adminJuego);
+        
+        // --- NUEVO: Actualiza la visibilidad al iniciar ---
+        this.adminJuego.actualizarVisibilidad(); 
         
         Personaje primer = this.adminJuego.getJugadorActual();
         if (primer != null) panelJuego.setNivelZActual(primer.getPosZ());
@@ -314,6 +320,11 @@ public class ControladorJuego {
         this.adminCombate = null;
         this.estadoJuego = GameState.RUNNING;
         
+        // --- NUEVO: Actualiza la visibilidad al salir del combate ---
+        if(this.adminJuego != null) {
+            this.adminJuego.actualizarVisibilidad();
+        }
+
         // Chequear estado general post-combate
         if (adminJuego.isJugadorMuerto()) {
             estadoJuego = GameState.GAME_OVER;
