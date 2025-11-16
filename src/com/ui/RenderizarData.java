@@ -86,7 +86,7 @@ public class RenderizarData {
         g.setColor(Color.WHITE);
         String enemigosTxt = "Criaturas enemigas restantes: " + enemigosVivos;
         g.drawString(enemigosTxt, 20, 60);
-        String pisoTxt = p.getNombre() + " se encuentra en el piso: " + p.getPosZ()+1;
+        String pisoTxt = p.getNombre() + " se encuentra en el piso: " + p.getPosZ();
         g.drawString(pisoTxt, 20, 75);
 
         g.setColor(Color.GREEN);
