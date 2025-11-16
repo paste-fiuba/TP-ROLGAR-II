@@ -5,7 +5,6 @@ import com.entidades.Personaje;
 import com.items.Carta;
 import com.items.Inventario;
 import com.logica.AdministradorDeCombate;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -55,7 +54,7 @@ public class RenderizadorCombate {
      * pre: adminCombate no es null, battleLog no es null.
      * post: Dibuja la pantalla de combate estilo Pokémon.
      */
-    public void dibujarPantallaCombate(Graphics g, AdministradorDeCombate adminCombate, int anchoVentana, int altoVentana, List<String> battleLog) {
+    public void dibujarPantallaCombate(Graphics g, AdministradorDeCombate adminCombate, int anchoVentana, int altoVentana, List<String> battleLog, BufferedImage spriteJugador, BufferedImage spriteOponente) {
         if (adminCombate == null) return;
         
         Personaje jugador = adminCombate.getJugador();
@@ -83,18 +82,21 @@ public class RenderizadorCombate {
         // 3. Dibujar Sprites (escalados 96x96)
         int spriteSize = 96; 
         
-        if (spriteEnemigoBatalla != null) {
-             g.drawImage(spriteEnemigoBatalla, 
-                (int)(anchoVentana * 0.65), 
-                (int)(altoVentana * 0.2), 
-                spriteSize, spriteSize, null);
+        BufferedImage enemyToDraw = (spriteOponente != null) ? spriteOponente : this.spriteEnemigoBatalla;
+        BufferedImage playerToDraw = (spriteJugador != null) ? spriteJugador : this.spritePersonajeBatalla;
+
+        if (enemyToDraw != null) {
+             g.drawImage(enemyToDraw, 
+            (int)(anchoVentana * 0.65), 
+            (int)(altoVentana * 0.2), 
+            spriteSize, spriteSize, null);
         }
         
-        if (spritePersonajeBatalla != null) {
-            g.drawImage(spritePersonajeBatalla, 
-                (int)(anchoVentana * 0.15) + (spriteSize / 2), 
-                (int)(altoVentana * 0.4), 
-                spriteSize, spriteSize, null);
+        if (playerToDraw != null) {
+            g.drawImage(playerToDraw, 
+            (int)(anchoVentana * 0.15) + (spriteSize / 2), 
+            (int)(altoVentana * 0.4), 
+            spriteSize, spriteSize, null);
         }
         
         // 4. Caja de Acciones (Abajo)

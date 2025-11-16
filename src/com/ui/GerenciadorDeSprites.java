@@ -46,8 +46,9 @@ public class GerenciadorDeSprites {
 
     private void cargarSpritesDeUI() {
         this.spriteSlot = cargarImagen("src/sprites/slot.png");
-        this.spritePersonajeBatalla = cargarImagen("src/sprites/personaje_batalla.png");
-        this.spriteEnemigoBatalla = cargarImagen("src/sprites/enemigo_batalla.png");
+        // Try optional large variants silently (no WARN if absent)
+        this.spritePersonajeBatalla = cargarImagenSilenciosa("src/sprites/personaje_batalla.png");
+        this.spriteEnemigoBatalla = cargarImagenSilenciosa("src/sprites/enemigo_batalla.png");
         if (this.spritePersonajeBatalla == null) {
             this.spritePersonajeBatalla = cargarImagen("src/sprites/personaje.png");
         }
@@ -86,6 +87,23 @@ public class GerenciadorDeSprites {
             }
         } catch (IOException e) {
             System.err.println("ERROR: No se pudo cargar el sprite: " + ruta);
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Like cargarImagen but do not print a WARN if the file is missing.
+     * Useful for optional UI variants where absence is expected and fallbacks exist.
+     */
+    private BufferedImage cargarImagenSilenciosa(String ruta) {
+        try {
+            File f = new File(ruta);
+            if (f.exists()) {
+                return ImageIO.read(f);
+            }
+        } catch (IOException e) {
+            System.err.println("ERROR: No se pudo cargar el sprite (silencioso): " + ruta);
             e.printStackTrace();
         }
         return null;
