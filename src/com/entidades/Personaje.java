@@ -8,23 +8,20 @@ public class Personaje extends Entidad {
 
     private Inventario inventario;
 
-    // --- Lógica de Escudo (Modificada) ---
-    private int vidaEscudo; // HP temporal del escudo
+    private int vidaEscudo; 
     
-    // (Variables de otros buffs)
     private boolean invisible;
     private boolean evasionActiva;
     private double probabilidadEsquivaProximoAtaque;
     private int movimientosExtra;
     private boolean ataqueDobleActivo; 
-    // Alianza actual (si pertenece a una)
     private Alianza alianza;
 
     public Personaje(String nombre, int vida, int posX, int posY, int posZ,
                      int fuerza, int vision, double salud) {
         super(nombre, vida, posX, posY, posZ, fuerza, vision, salud);
         this.inventario = new Inventario();
-        this.vidaEscudo = 0; // Inicia con 0 de escudo
+        this.vidaEscudo = 0; 
         this.invisible = false;
         this.evasionActiva = false;
         this.probabilidadEsquivaProximoAtaque = 0.0;
@@ -44,19 +41,17 @@ public class Personaje extends Entidad {
         return inventario;
     }
 
-    // --- Getters y Setters para Estados ---
+    // --- Getters y Setters ---
 
-    // Este método ahora AÑADE vida al escudo
+    
     public void agregarVidaEscudo(int cantidad) {
         this.vidaEscudo += cantidad;
     }
     
-    // ¡ESTE ES EL MÉTODO QUE FALTABA!
     public int getVidaEscudo() {
         return this.vidaEscudo;
     }
     
-    // (Otros buffs)
     public void setInvisible(boolean estado) { this.invisible = estado; }
     public boolean isInvisible() { return this.invisible; }
     public void setEvasionActiva(boolean estado) { this.evasionActiva = estado; }
@@ -81,28 +76,23 @@ public class Personaje extends Entidad {
     @Override
     public void recibirDanio(int danio) {
         if (invisible) {
-            // Invisibilidad evita el daño garantizado y se consume
             invisible = false;
             return;
         }
 
-        // Si hay una probabilidad de esquivar el próximo ataque, evaluar y consumirla
         if (probabilidadEsquivaProximoAtaque > 0.0) {
             double roll = Math.random();
             boolean esquivo = roll < probabilidadEsquivaProximoAtaque;
-            // consumir la probabilidad en cualquier caso
             probabilidadEsquivaProximoAtaque = 0.0;
             if (esquivo) {
                 return;
             }
-            // si falla la esquiva, continuar al cálculo de daño
         }
         if (evasionActiva) {
             evasionActiva = false;
             return;
         }
         
-        // --- Nueva Lógica de Escudo ---
         if (this.vidaEscudo > 0) {
             int danioAbsorbido = Math.min(danio, this.vidaEscudo);
             this.vidaEscudo -= danioAbsorbido;

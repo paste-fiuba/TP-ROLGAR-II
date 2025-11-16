@@ -8,7 +8,6 @@ public class CartaTeletransportacion extends Carta {
         this.nuevaX = x;
         this.nuevaY = y;
         this.nuevaZ = z;
-        // --- LÍNEA ELIMINADA ---
     }
     @Override
     public void aplicarEfecto(Personaje usuario, Entidad objetivo) {

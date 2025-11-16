@@ -5,12 +5,10 @@ package com.logica;
  * durante el combate.
  */
 public enum AccionCombate {
-    // Acciones principales
     ATACAR,
     ABRIR_MENU_CARTA,
     HUIR,
 
-    // Selección de carta
     USAR_CARTA_1,
     USAR_CARTA_2,
     USAR_CARTA_3,
@@ -22,7 +20,6 @@ public enum AccionCombate {
     USAR_CARTA_9,
     USAR_CARTA_0,
 
-    // UI de combate
-    CANCELAR_CARTA, // (Corresponde a 'Escape')
+    CANCELAR_CARTA, 
     NINGUNA
 }

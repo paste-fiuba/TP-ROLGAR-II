@@ -9,7 +9,6 @@ public class CartaEsquivarDanio extends Carta {
         super("Evasión", "Otorga un " + (int)(probabilidad * 100) +
               "% de probabilidad de esquivar el próximo ataque.");
         this.probabilidad = probabilidad;
-        // --- LÍNEA ELIMINADA ---
     }
     @Override
     public void aplicarEfecto(Personaje usuario, Entidad objetivo) {

@@ -45,7 +45,7 @@ public class RenderizadorMundo {
         
         int TAMAÑO_TILE = PanelJuego.TAMAÑO_TILE;
 
-        // 1. Dibujar Terreno y Cartas
+        // Dibujar Terreno y Cartas
         for (int y = 0; y < tablero.getDimensionY(); y++) {
             for (int x = 0; x < tablero.getDimensionX(); x++) {
                 
@@ -54,7 +54,6 @@ public class RenderizadorMundo {
                     int pixelX = x * TAMAÑO_TILE;
                     int pixelY = y * TAMAÑO_TILE;
     
-                    // --- USA EL GERENCIADOR DE SPRITES ---
                     if (casillero.getTipo() == TipoCasillero.ROCA) {
                         g.drawImage(sprites.getSpriteRoca(), pixelX, pixelY, null);
                     } else if (casillero.getTipo() == TipoCasillero.AGUA) { 
@@ -67,7 +66,6 @@ public class RenderizadorMundo {
                     
                     Carta carta = casillero.getCarta();
                     if (carta != null) {
-                        // --- USA EL GERENCIADOR DE SPRITES ---
                         BufferedImage imgCarta = sprites.getSpriteCarta(carta.getNombre());
                         
                         if (imgCarta != null) {
@@ -78,7 +76,7 @@ public class RenderizadorMundo {
             }
         }
         
-        // 2. Dibujar Enemigos
+        // Dibujar Enemigos
         for (Enemigo enemigo : enemigos) {
             if (!enemigo.estaVivo() || enemigo.getPosZ() != zActual) continue;
 
@@ -95,7 +93,7 @@ public class RenderizadorMundo {
             }
         }
         
-        // 3. Dibujar todos los jugadores
+        // Dibujar todos los jugadores
         if (jugadores != null) {
             for (Personaje jugador : jugadores) {
                 if (jugador == null) continue;
@@ -132,7 +130,6 @@ public class RenderizadorMundo {
                             g.setFont(oldFont);
                         }
                     } catch (Exception ex) {
-                        // No interrumpir el render
                     }
                 }
             }

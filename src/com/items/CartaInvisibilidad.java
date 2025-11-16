@@ -4,7 +4,6 @@ import com.entidades.Personaje;
 public class CartaInvisibilidad extends Carta {
     public CartaInvisibilidad() {
         super("Invisibilidad", "Hace invisible al jugador por un turno, evitando ataques.");
-        // --- LÍNEA ELIMINADA ---
     }
     @Override
     public void aplicarEfecto(Personaje usuario, Entidad objetivo) {

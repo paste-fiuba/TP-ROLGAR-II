@@ -10,17 +10,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.function.Consumer; // Para poder "loguear"
+import java.util.function.Consumer; 
 
 /**
- * TDA para gestionar la lógica de alianzas, propuestas y rupturas.
+ * TDA para gestionar la lógica de alianzas.
  */
 public class AdministradorDeAlianzas {
 
     private List<Alianza> alianzas;
     private Map<Personaje, Personaje> propuestas;
     private Random random;
-    private Consumer<String> logger; // Una referencia al método logBatalla
+    private Consumer<String> logger; 
 
     private static final double PROB_RUPTURA_ALIANZA = 0.15;
 
@@ -38,9 +38,7 @@ public class AdministradorDeAlianzas {
         return propuestas.get(target);
     }
 
-    /**
-     * Un jugador 'proponente' le ofrece una alianza a 'objetivo'.
-     */
+
     public void proponerAlianza(Personaje proponente, Personaje objetivo, Tablero tablero) {
         if (proponente == null || objetivo == null) return;
         if (!sonAdyacentes(proponente, objetivo, tablero)) {
@@ -55,9 +53,7 @@ public class AdministradorDeAlianzas {
         logger.accept(proponente.getNombre() + " propone alianza a " + objetivo.getNombre());
     }
 
-    /**
-     * El 'target' acepta la propuesta pendiente.
-     */
+
     public void aceptarPropuesta(Personaje target) {
         if (target == null) return;
         Personaje proponente = propuestas.remove(target);
@@ -71,32 +67,31 @@ public class AdministradorDeAlianzas {
         Alianza alianzaTarget = target.getAlianza();
 
         if (alianzaProponente == null && alianzaTarget == null) {
-            // Ninguno tiene alianza: crear una nueva
             Alianza nueva = new Alianza("Alianza " + proponente.getNombre() + "-" + target.getNombre());
             nueva.agregarMiembro(proponente);
             nueva.agregarMiembro(target);
             alianzas.add(nueva);
-        } else if (alianzaProponente != null && alianzaTarget == null) {
-            // El proponente ya tiene alianza: unir al target
+            
+        } 
+        else if (alianzaProponente != null && alianzaTarget == null) {
+
             alianzaProponente.agregarMiembro(target);
-        } else if (alianzaProponente == null && alianzaTarget != null) {
-            // El target ya tiene alianza: unir al proponente
+        } 
+        else if (alianzaProponente == null && alianzaTarget != null) {
+
             alianzaTarget.agregarMiembro(proponente);
-        } else if (alianzaProponente != alianzaTarget) {
-            // Ambos tienen alianzas distintas: fusionarlas
+        } 
+        else if (alianzaProponente != alianzaTarget) {
             for (Personaje p : alianzaTarget.getMiembros()) {
                 alianzaProponente.agregarMiembro(p);
             }
-            // Eliminar la alianza vacía
             alianzas.remove(alianzaTarget);
         }
         
         logger.accept(target.getNombre() + " aceptó la alianza con " + proponente.getNombre());
     }
 
-    /**
-     * El 'target' rechaza la propuesta pendiente.
-     */
+
     public void rechazarPropuesta(Personaje target) {
         if (target == null) return;
         Personaje proponente = propuestas.remove(target);
@@ -107,9 +102,7 @@ public class AdministradorDeAlianzas {
         }
     }
 
-    /**
-     * Transfiere una carta de 'from' a 'to'.
-     */
+
     public boolean transferirCarta(Personaje from, Personaje to, int slotIndex, Tablero tablero) {
         if (from == null || to == null) return false;
         if (!sonAdyacentes(from, to, tablero)) return false;
@@ -123,9 +116,7 @@ public class AdministradorDeAlianzas {
         return true;
     }
 
-    /**
-     * Procesa la probabilidad de que las alianzas se rompan.
-     */
+
     public void procesarRupturaAlianzas() {
         if (alianzas == null || alianzas.isEmpty()) return;
 
@@ -156,13 +147,10 @@ public class AdministradorDeAlianzas {
         }
     }
 
-    /**
-     * Verifica si dos personajes son adyacentes (no diagonal).
-     */
+
     public boolean sonAdyacentes(Personaje a, Personaje b, Tablero tablero) {
         if (a == null || b == null || tablero == null) return false;
         if (a.getPosZ() != b.getPosZ()) return false;
-        // Chequeo de distancia Manhattan
         int dist = Math.abs(a.getPosX() - b.getPosX()) + Math.abs(a.getPosY() - b.getPosY());
         return dist == 1;
     }

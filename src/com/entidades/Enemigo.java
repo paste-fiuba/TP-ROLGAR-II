@@ -4,7 +4,7 @@ import java.util.Random;
 
 /**
  * Clase que representa a un enemigo dentro del tablero.
- * Hereda de Entidad e incluye comportamiento automático (movimiento aleatorio y ataque).
+ * Hereda de Entidad e incluye comportamiento automático.
  */
 public class Enemigo extends Entidad {
 
@@ -33,7 +33,7 @@ public class Enemigo extends Entidad {
     public void moverAleatorio(int maxX, int maxY, int maxZ) {
         if (!vivo) return;
 
-        int dx = random.nextInt(3) - 1; // valores entre -1 y 1
+        int dx = random.nextInt(3) - 1;
         int dy = random.nextInt(3) - 1;
         int dz = random.nextInt(3) - 1;
 

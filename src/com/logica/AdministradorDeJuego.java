@@ -22,8 +22,6 @@ public class AdministradorDeJuego {
     private PanelJuego panelJuego;
     private Random random;
     private List<String> jugadoresEliminados;
-
-    // Delegados
     private AdministradorDeAlianzas adminAlianzas;
     private AdministradorDeEnemigos adminEnemigos;
     private AdministradorDePersonaje adminPersonaje;

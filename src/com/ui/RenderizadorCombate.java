@@ -13,11 +13,10 @@ import java.util.List;
 
 /**
  * TDA responsable de dibujar la pantalla de combate.
- * (Extraído de RenderizadorUI)
  */
 public class RenderizadorCombate {
 
-    // --- Dependencias (Fuentes, Sprites, Colores) ---
+    // --- Dependencias  ---
     private BufferedImage spritePersonajeBatalla;
     private BufferedImage spriteEnemigoBatalla;
 
@@ -61,13 +60,13 @@ public class RenderizadorCombate {
         Entidad oponente = adminCombate.getOponente();
         AdministradorDeCombate.EstadoCombate estado = adminCombate.getEstado();
 
-        // 1. Fondo (Estilo Cueva)
+        // 1. Fondo 
         g.setColor(colorFondoBatallaCielo); 
         g.fillRect(0, 0, anchoVentana, (int)(altoVentana * 0.65)); 
         g.setColor(colorFondoBatallaPasto); 
         g.fillRect(0, (int)(altoVentana * 0.65), anchoVentana, (int)(altoVentana * 0.35));
 
-        // 2. Plataformas (Color cueva)
+        // 2. Plataformas 
         int plataformaAncho = 240;
         int plataformaAlto = 40;
         int plataformaOponenteX = (int)(anchoVentana * 0.65) - (plataformaAncho / 2);
@@ -79,7 +78,7 @@ public class RenderizadorCombate {
         g.fillOval(plataformaOponenteX, plataformaOponenteY, plataformaAncho, plataformaAlto);
         g.fillOval(plataformaJugadorX, plataformaJugadorY, plataformaAncho, plataformaAlto);
 
-        // 3. Dibujar Sprites (escalados 96x96)
+        // 3. Dibujar Sprites 
         int spriteSize = 96; 
         
         BufferedImage enemyToDraw = (spriteOponente != null) ? spriteOponente : this.spriteEnemigoBatalla;
@@ -99,7 +98,7 @@ public class RenderizadorCombate {
             spriteSize, spriteSize, null);
         }
         
-        // 4. Caja de Acciones (Abajo)
+        // 4. Caja de Acciones 
         int altoCajaAccion = (int)(altoVentana * 0.35); 
         int yCajaAccion = altoVentana - altoCajaAccion;
         
@@ -112,7 +111,7 @@ public class RenderizadorCombate {
         int xDivision = anchoVentana / 2;
         g.fillRect(xDivision, yCajaAccion, 4, altoCajaAccion); 
 
-        // Lado Izquierdo: Log de Batalla
+        // Log de Batalla
         g.setFont(fontMenuOpcion);
         int logX = 40; 
         int logY = yCajaAccion + 60;
@@ -121,14 +120,12 @@ public class RenderizadorCombate {
         g.drawString(adminCombate.getMensajeAccion(), logX, logY);
         
         int logMsgY = logY + 40;
-        // Muestra los últimos 2 mensajes del log de batalla
         int logCountBatalla = 0;
         for (int i = battleLog.size() - 1; i >= 0 && logCountBatalla < 2; i--) {
             g.drawString(battleLog.get(i), logX, logMsgY + (logCountBatalla * 25));
             logCountBatalla++;
         }
-
-        // Lado Derecho: Opciones (Depende del estado)
+        
         if (estado == AdministradorDeCombate.EstadoCombate.ELIGE_ACCION) {
             g.setFont(fontCombate);
             g.drawString("[1] LUCHAR", xDivision + 50, yCajaAccion + 80);
@@ -136,11 +133,10 @@ public class RenderizadorCombate {
             g.drawString("[3] HUIR", xDivision + 270, yCajaAccion + 140);
         
         } else if (estado == AdministradorDeCombate.EstadoCombate.ELIGE_CARTA) {
-            // Dibujar el inventario para seleccionar
-            g.setFont(fontInfo); // Fuente más chica
+            g.setFont(fontInfo); 
             Inventario inv = jugador.getInventario();
             for (int i = 0; i < 10; i++) {
-                int slot = (i + 1) % 10; // 1, 2, ... 9, 0
+                int slot = (i + 1) % 10; 
                 String textoCarta = "[" + slot + "] ";
                 Carta c = inv.getCarta(i);
                 if (c != null) {
@@ -149,8 +145,8 @@ public class RenderizadorCombate {
                     textoCarta += "- Vacío -";
                 }
                 
-                int col = i / 5; // Columna 0 o 1
-                int fila = i % 5; // Fila 0 a 4
+                int col = i / 5; 
+                int fila = i % 5; 
                 
                 int x = xDivision + 40 + (col * 220);
                 int y = yCajaAccion + 60 + (fila * 20);
@@ -161,7 +157,6 @@ public class RenderizadorCombate {
             g.drawString("[ESC] Cancelar", xDivision + 50, yCajaAccion + 170);
         }
         
-        // 5. Cajas de Info (HP)
         g.setFont(fontCombateInfo);
         
         int cajaAncho = 350;
@@ -177,8 +172,7 @@ public class RenderizadorCombate {
     
     /**
      * pre: g no es null, x e y son posiciones válidas.
-     * post: Dibuja la caja de info de un combatiente (nombre y HP).
-     * (Movido de RenderizadorUI)
+     * post: Dibuja la caja de info de un combatiente.
      */
     private void dibujarCajaInfo(Graphics g, String nombre, int vida, int x, int y, int ancho, int alto) {
         g.setColor(colorCajaUI);
@@ -196,7 +190,6 @@ public class RenderizadorCombate {
     /**
      * pre: g no es null, x e y son posiciones válidas.
      * post: Dibuja una barra de HP estilo Pokémon.
-     * (Movido de RenderizadorUI)
      */
     private void dibujarBarraHP(Graphics g, int x, int y, int vida) {
         int anchoBarra = 200;
@@ -210,7 +203,7 @@ public class RenderizadorCombate {
         g.fillRect(x + 40, y - 12, anchoBarra, altoBarra);
         
         int vidaActual = Math.max(0, vida); 
-        int anchoVida = (int) (anchoBarra * (vidaActual / 100.0)); // Asumimos 100 de vida máx
+        int anchoVida = (int) (anchoBarra * (vidaActual / 100.0));
         
         if (vidaActual > 50) {
             g.setColor(Color.GREEN);

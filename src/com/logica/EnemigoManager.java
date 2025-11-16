@@ -40,7 +40,6 @@ public class EnemigoManager {
 
     public void markDead(Enemigo e) {
         if (e == null) return;
-        // ensure the enemy's vida/vivo reflect death
         e.setVida(0);
         e.recibirDanio(0);
     }

@@ -3,13 +3,10 @@ package com.items;
 import com.entidades.Entidad;
 import com.entidades.Personaje;
 import java.util.ArrayList;
-import java.util.Collections; // <-- IMPORTANTE
+import java.util.Collections; 
 
 /**
- * Representa el conjunto de cartas que posee un personaje.
  * TDA encargado de administrar la colección de cartas (inventario del jugador).
- * ---
- * MODIFICADO: Ahora usa 10 slots fijos (con nulls) en lugar de una lista dinámica.
  */
 public class Inventario {
 
@@ -17,12 +14,10 @@ public class Inventario {
     private static final int MAX_CARTAS = 10;
 
     /**
-     * pre: -
+     * pre: 
      * post: crea un inventario vacío con 10 slots (llenos de null).
      */
     public Inventario() {
-        // --- CAMBIO ---
-        // Inicializa la lista con 10 slots vacíos (null)
         this.cartas = new ArrayList<>(Collections.nCopies(MAX_CARTAS, null));
     }
 
@@ -33,17 +28,14 @@ public class Inventario {
     public void agregarCarta(Carta carta) {
         if (carta == null) return;
 
-        // --- CAMBIO ---
-        // Busca el primer slot (índice) que esté vacío (null)
         for (int i = 0; i < MAX_CARTAS; i++) {
             if (cartas.get(i) == null) {
-                cartas.set(i, carta); // Coloca la carta en ese slot
+                cartas.set(i, carta);
                 System.out.println("Carta agregada: " + carta.getNombre() + " en slot " + (i + 1));
-                return; // Termina el método
+                return;
             }
         }
         
-        // Si el loop termina, no había slots vacíos
         System.out.println("No se puede agregar más cartas. Inventario lleno.");
     }
 
@@ -52,13 +44,10 @@ public class Inventario {
      * post: vacía el slot en la posición indicada (lo pone en null).
      */
     public void eliminarCarta(int indice) {
-        // --- CAMBIO ---
-        // Ya no usa .remove(), que "desplaza" la lista.
-        // Usa .set(null) para "vaciar" el slot.
-        if (indice >= 0 && indice < MAX_CARTAS) { // Compara con MAX_CARTAS
-            Carta eliminada = cartas.get(indice); // Obtiene la carta para mostrar el nombre
+        if (indice >= 0 && indice < MAX_CARTAS) { 
+            Carta eliminada = cartas.get(indice); 
             if (eliminada != null) {
-                cartas.set(indice, null); // Vaciamos el slot
+                cartas.set(indice, null); 
                 System.out.println("Carta eliminada: " + eliminada.getNombre());
             }
         }
@@ -69,11 +58,9 @@ public class Inventario {
      * post: aplica el efecto de la carta si existe una en ese slot.
      */
     public void usarCarta(int indice, Personaje usuario, Entidad objetivo) {
-        // --- CAMBIO ---
-        // Se asegura de que la carta exista (no sea null) antes de usarla
         if (indice >= 0 && indice < MAX_CARTAS && usuario != null) {
             Carta carta = cartas.get(indice);
-            if (carta != null) { // <-- CHEQUEO IMPORTANTE
+            if (carta != null) { 
                 carta.aplicarEfecto(usuario, objetivo);
             }
         }
@@ -83,9 +70,7 @@ public class Inventario {
      * post: devuelve la cantidad de cartas reales (no-null) en el inventario.
      */
     public int cantidadDeCartas() {
-        // --- CAMBIO ---
-        // Ya no devuelve .size() (que siempre es 10)
-        // Devuelve la cantidad de items que NO son null
+
         int count = 0;
         for (Carta c : cartas) {
             if (c != null) {
@@ -96,11 +81,9 @@ public class Inventario {
     }
 
     /**
-     * post: devuelve una copia de la lista de cartas (solo las no-null).
+     * post: devuelve una copia de la lista de cartas (solo las no null).
      */
     public ArrayList<Carta> getCartas() {
-        // --- CAMBIO ---
-        // Devuelve una lista solo con las cartas reales (sin los nulls)
         ArrayList<Carta> soloCartas = new ArrayList<>();
         for (Carta c : cartas) {
             if (c != null) {
@@ -110,11 +93,7 @@ public class Inventario {
         return soloCartas;
     }
 
-    /**
-     * Devuelve la carta en un slot específico (0 a 9).
-     * @param indice El slot del inventario (0 a 9).
-     * @return La Carta en ese slot, o null si está vacío.
-     */
+
     public Carta getCarta(int indice) {
         // --- CAMBIO ---
         // Ahora .get(indice) puede devolver null, lo cual es correcto.
@@ -131,8 +110,7 @@ public class Inventario {
      */
     @Override
     public String toString() {
-        // --- CAMBIO ---
-        // Muestra los 10 slots, incluyendo los vacíos
+
         StringBuilder sb = new StringBuilder("Inventario:\n");
         for (int i = 0; i < MAX_CARTAS; i++) {
             sb.append("[").append(i + 1).append("] "); // Slots 1-10

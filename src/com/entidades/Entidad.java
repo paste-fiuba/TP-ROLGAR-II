@@ -6,7 +6,6 @@ package com.entidades;
  */
 public abstract class Entidad {
 
-    // Atributos comunes 
     protected String nombre;
     protected int vida;
     protected int posX;
@@ -14,7 +13,7 @@ public abstract class Entidad {
     protected int posZ;
     protected int fuerza;
     protected int vision;
-    protected double salud; // Porcentaje de recuperación por turno
+    protected double salud; 
 
     /**
      * pre: nombre no es null, vida > 0, fuerza >= 0, vision >= 0, salud >= 0.

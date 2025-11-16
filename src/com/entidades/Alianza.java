@@ -89,7 +89,7 @@ public class Alianza {
      */
     public void recibirDanioGrupal(int danio) {
         for (Personaje p : miembros) {
-            int danioReducido = danio / 2; // daño reducido a la mitad
+            int danioReducido = danio / 2; 
             p.recibirDanio(danioReducido);
             System.out.println(p.getNombre() + " recibió daño reducido por estar en alianza.");
         }

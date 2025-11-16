@@ -6,7 +6,6 @@ public class CartaAumentoVida extends Carta {
     public CartaAumentoVida(int incremento) {
         super("Aumento de Vida", "Aumenta la vida del personaje en " + incremento + " puntos.");
         this.incremento = incremento;
-        // --- LÍNEA ELIMINADA ---
     }
     @Override
     public void aplicarEfecto(Personaje usuario, Entidad objetivo) {

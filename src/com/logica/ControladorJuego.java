@@ -75,7 +75,7 @@ public class ControladorJuego {
                 break;
         }
 
-        // --- Flujo del Juego (RUNNING, PAUSED, etc.) ---
+        // --- Flujo del Juego  ---
         
         AccionJuego accion = lectorTeclado.traducirInput(keyCode);
 
@@ -198,7 +198,7 @@ public class ControladorJuego {
                                 pendingTransferSlot = -1;
                             }
                         } else {
-                            adminJuego.activarCarta(slotIndex); // <-- Esta es la llamada clave
+                            adminJuego.activarCarta(slotIndex); 
                             adminJuego.finalizarTurno(); 
                         }
                         break;
@@ -234,7 +234,7 @@ public class ControladorJuego {
         this.panelJuego.repaint();
     }
     
-    // --- Métodos de Menú (sin cambios) ---
+    // --- Métodos de Menú  ---
     
     private void manejarMenuPrincipal(int keyCode) {
         if (keyCode == KeyEvent.VK_1) { 
@@ -283,7 +283,7 @@ public class ControladorJuego {
     }
 
     /**
-     * MÉTODO CORREGIDO: Traduce el input basándose en el estado del combate.
+     Traduce el input basándose en el estado del combate.
      */
     private void manejarInputCombate(int keyCode) {
         if (adminCombate == null) return;
@@ -318,7 +318,7 @@ public class ControladorJuego {
         }
     }
     
-    // --- Métodos de Control de Partida (sin cambios) ---
+    // --- Métodos de Control de Partida ---
 
     public GameState getEstadoJuego() {
         return this.estadoJuego;

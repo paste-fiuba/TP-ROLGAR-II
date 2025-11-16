@@ -21,7 +21,6 @@ public class Turno {
 
     /**
      * Establece forzosamente el índice del jugador.
-     * (Necesario si un jugador es eliminado)
      */
 	public void setIndiceJugadorActual(int idx) { this.indiceJugadorActual = idx; }
 }

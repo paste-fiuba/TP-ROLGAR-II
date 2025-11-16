@@ -26,26 +26,23 @@ public class PanelJuego extends JPanel implements KeyListener {
     private List<Enemigo> enemigos;
     private com.logica.AdministradorDeJuego administrador;
     private ControladorJuego controlador;
-    
-    // --- MÓDULOS DE UI MODIFICADOS ---
-    private GerenciadorDeSprites gerenciadorSprites; // <-- NUEVO
+    private GerenciadorDeSprites gerenciadorSprites; 
     private RenderizadorMundo renderMundo;
     private RenderizadorUI renderUI;
-    private RenderizarMusica musica; // <-- NUEVO
-
-    // Dimensiones lógicas por defecto
-    private int ANCHO_LOGICO = 800;
-    private int ALTO_LOGICO = 600;
-    private int ALTO_JUEGO_LOGICO = 536;
+    private RenderizarMusica musica; 
+    private int ANCHO_LOGICO;
+    private int ALTO_LOGICO;
+    private int ALTO_JUEGO_LOGICO;
 
     public PanelJuego() {
         this.setBackground(Color.BLACK); 
         
-        // --- INICIALIZACIÓN CENTRALIZADA ---
-        this.gerenciadorSprites = new GerenciadorDeSprites(); // <-- 1. CREA EL GERENCIADOR
-        this.renderMundo = new RenderizadorMundo(this.gerenciadorSprites); // <-- 2. INYECTA EN MUNDO
-        this.renderUI = new RenderizadorUI(this.gerenciadorSprites); // <-- 3. INYECTA EN UI
-        
+        this.gerenciadorSprites = new GerenciadorDeSprites(); 
+        this.renderMundo = new RenderizadorMundo(this.gerenciadorSprites); 
+        this.renderUI = new RenderizadorUI(this.gerenciadorSprites); 
+        this.ANCHO_LOGICO = 800;
+        this.ALTO_LOGICO = 600;
+        this.ALTO_JUEGO_LOGICO = 536;
         this.musica = new RenderizarMusica();
         this.musica.reproducir("src/Musica/musicaJuego.wav");
         

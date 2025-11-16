@@ -6,8 +6,8 @@ public class CartaRoboDeCarta extends Carta {
     private Random random = new Random();
     public CartaRoboDeCarta() {
         super("Robo de Carta", "Roba una carta aleatoria del inventario de otro jugador.");
-        // --- LÍNEA ELIMINADA ---
     }
+    
     @Override
     public void aplicarEfecto(Personaje usuario, Entidad objetivo) {
         if (usuario == null || objetivo == null) return;

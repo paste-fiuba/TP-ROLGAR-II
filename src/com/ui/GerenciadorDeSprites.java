@@ -9,7 +9,6 @@ import javax.imageio.ImageIO;
 
 public class GerenciadorDeSprites {
 
-    // (Campos sin cambios)
     private BufferedImage spriteRoca, spriteVacio, spriteRampa, spriteAgua;
     private BufferedImage spritePersonaje;
     private BufferedImage spriteEnemigoPorDefecto;
@@ -25,10 +24,10 @@ public class GerenciadorDeSprites {
         
         cargarSpritesDelMundo();
         cargarSpritesDeUI();
-        cargarSpritesDeCartas(); // <-- ESTE MÉTODO SE CORRIGIÓ
+        cargarSpritesDeCartas(); 
     }
 
-    // (cargarSpritesDelMundo y cargarSpritesDeUI sin cambios)
+
     private void cargarSpritesDelMundo() {
         this.spriteRoca = cargarImagen("src/sprites/roca.png");
         this.spriteVacio = cargarImagen("src/sprites/vacio.png");
@@ -46,7 +45,7 @@ public class GerenciadorDeSprites {
 
     private void cargarSpritesDeUI() {
         this.spriteSlot = cargarImagen("src/sprites/slot.png");
-        // Try optional large variants silently (no WARN if absent)
+
         this.spritePersonajeBatalla = cargarImagenSilenciosa("src/sprites/personaje_batalla.png");
         this.spriteEnemigoBatalla = cargarImagenSilenciosa("src/sprites/enemigo_batalla.png");
         if (this.spritePersonajeBatalla == null) {
@@ -57,13 +56,8 @@ public class GerenciadorDeSprites {
         }
     }
 
-    /**
-     * MÉTODO CORREGIDO:
-     * Las claves de carga ahora coinciden con el 'normalizarClave'
-     * (sin espacios ni acentos).
-     */
+
     private void cargarSpritesDeCartas() {
-        // --- CAMBIO --- (Claves sin espacios)
         cargarSpriteCarta("ataquedoble", "src/sprites/dobleAtaque.png");
         cargarSpriteCarta("escudo", "src/sprites/escudo.png");
         cargarSpriteCarta("aumentodevida", "src/sprites/curacion-parcial.png");
@@ -76,7 +70,6 @@ public class GerenciadorDeSprites {
         cargarSpriteCarta("teletransportacion", "src/sprites/teletransportarse.png");
     }
 
-    // (cargarImagen y cargarSpriteEnemigo sin cambios)
     private BufferedImage cargarImagen(String ruta) {
         try {
             File f = new File(ruta);
@@ -92,10 +85,7 @@ public class GerenciadorDeSprites {
         return null;
     }
 
-    /**
-     * Like cargarImagen but do not print a WARN if the file is missing.
-     * Useful for optional UI variants where absence is expected and fallbacks exist.
-     */
+
     private BufferedImage cargarImagenSilenciosa(String ruta) {
         try {
             File f = new File(ruta);
@@ -123,9 +113,8 @@ public class GerenciadorDeSprites {
         }
     }
 
-    // --- Métodos de Acceso (Públicos) ---
+    // --- Métodos de Acceso  ---
 
-    // (Getters de tiles y entidades sin cambios)
     public BufferedImage getSpriteRoca() { return spriteRoca; }
     public BufferedImage getSpriteVacio() { return spriteVacio; }
     public BufferedImage getSpriteRampa() { return spriteRampa; }
@@ -147,16 +136,11 @@ public class GerenciadorDeSprites {
     public BufferedImage getSpritePersonajeBatalla() { return spritePersonajeBatalla; }
     public BufferedImage getSpriteEnemigoBatalla() { return spriteEnemigoBatalla; }
 
-    /**
-     * MÉTODO CORREGIDO:
-     * La lógica de fallback (con contains) era incorrecta.
-     * Ahora solo busca la clave normalizada exacta.
-     */
+    
     public BufferedImage getSpriteCarta(String nombreCarta) {
-        String clave = normalizarClave(nombreCarta); // ej: "Ataque Doble" -> "ataquedoble"
+        String clave = normalizarClave(nombreCarta); 
         
-        // --- CAMBIO ---
-        // Busca la clave normalizada directamente.
+
         BufferedImage img = spritesCartas.get(clave); 
         
         if (img == null) {
@@ -165,9 +149,7 @@ public class GerenciadorDeSprites {
         return img;
     }
 
-    /**
-     * Convierte un nombre "Aumento de Vida" en "aumentodevida".
-     */
+
     private String normalizarClave(String s) {
         if (s == null) return "";
         String key = s.toLowerCase();
@@ -176,7 +158,7 @@ public class GerenciadorDeSprites {
         key = key.replaceAll("[íìïî]", "i");
         key = key.replaceAll("[óòöô]", "o");
         key = key.replaceAll("[úùüû]", "u");
-        key = key.replaceAll("[^a-z0-9]", ""); // Quita espacios, guiones, etc.
+        key = key.replaceAll("[^a-z0-9]", ""); 
         return key;
     }
 }

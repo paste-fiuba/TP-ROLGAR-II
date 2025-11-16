@@ -8,18 +8,17 @@ import com.tablero.Tablero;
 import com.tablero.TipoCasillero;
 import com.ui.PanelJuego;
 import java.util.List;
-import java.util.function.Consumer; // Para el logger
+import java.util.function.Consumer; 
 
 /**
- * TDA para gestionar las acciones específicas de un jugador (movimiento, uso de
- * items, etc.)
+ * TDA para gestionar las acciones específicas de un jugador 
  */
 public class AdministradorDePersonaje {
 
     private Tablero tablero;
     private List<Enemigo> enemigos;
     private PanelJuego panelJuego;
-    private Consumer<String> logger; // Referencia a logBatalla
+    private Consumer<String> logger;
 
     public AdministradorDePersonaje(Tablero tablero, List<Enemigo> enemigos, PanelJuego panelJuego,
             Consumer<String> logger) {
@@ -52,21 +51,16 @@ public class AdministradorDePersonaje {
 
     /**
      * Procesa el intento de un jugador de activar una carta.
-     * ---
-     * ¡BUG CORREGIDO AQUÍ!
-     * ---
      */
     public void activarCarta(Personaje jugador, int slotIndex, List<Personaje> todosLosJugadores) {
         if (jugador == null)
             return;
         
-        // --- LÓGICA CORREGIDA ---
-        // 1. Obtiene la carta del slot específico (puede ser null)
+
         Carta carta = jugador.getInventario().getCarta(slotIndex);
 
-        // 2. Comprueba si la carta existe (no es null)
+
         if (carta != null) {
-            // ¡Sí hay una carta!
             logger.accept("¡Has activado '" + carta.getNombre() + "'!");
 
             if (carta instanceof com.items.CartaRoboDeCarta) {
@@ -74,7 +68,7 @@ public class AdministradorDePersonaje {
                 for (Personaje p : todosLosJugadores) {
                     if (p == null || p == jugador || p.getVida() <= 0)
                         continue;
-                    if (sonAdyacentes(jugador, p)) { // Usa el sonAdyacentes local
+                    if (sonAdyacentes(jugador, p)) { 
                         objetivo = p;
                         break;
                     }
@@ -88,11 +82,9 @@ public class AdministradorDePersonaje {
                 jugador.usarCarta(slotIndex, null);
             }
             
-            // 3. Elimina la carta (la pone en null) DESPUÉS de usarla
             jugador.eliminarCarta(slotIndex);
             
         } else {
-            // No había carta en ese slot
             logger.accept("Slot " + (slotIndex + 1) + " está vacío.");
         }
     }
@@ -129,18 +121,18 @@ public class AdministradorDePersonaje {
         if (jugador == null || tablero == null)
             return;
 
-        // 1. Comprobar si hay un enemigo
+
         Enemigo enemigoEnCasilla = enemigoEnPosicion(x, y, z);
         if (enemigoEnCasilla != null && enemigoEnCasilla.estaVivo()) {
             controlador.iniciarCombate(jugador, enemigoEnCasilla);
             return;
         }
 
-        // 2. Comprobar si hay una carta
+
         Casillero casilleroActual = tablero.getCasillero(x, y, z);
         if (casilleroActual.getCarta() != null) {
-            if (jugador.getInventario().cantidadDeCartas() < 10) { // <-- Usa cantidadDeCartas() para SABER SI ESTÁ LLENO
-                jugador.agregarCarta(casilleroActual.getCarta()); // <-- Usa agregarCarta() que busca slot vacío
+            if (jugador.getInventario().cantidadDeCartas() < 10) { 
+                jugador.agregarCarta(casilleroActual.getCarta()); 
                 casilleroActual.setCarta(null);
                 logger.accept("¡Recogiste una carta!");
             } else {
@@ -149,7 +141,7 @@ public class AdministradorDePersonaje {
             return;
         }
 
-        // 3. Comprobar si es una rampa
+
         if (casilleroActual.getTipo() == TipoCasillero.RAMPA) {
             int zArriba = z + 1;
             if (tablero.esCoordenadaValida(x, y, zArriba) &&

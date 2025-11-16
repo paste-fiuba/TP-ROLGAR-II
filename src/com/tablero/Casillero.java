@@ -6,7 +6,7 @@ public class Casillero {
 
     private TipoCasillero tipo;
     private Carta carta;
-    private boolean visitado; // <-- NUEVO
+    private boolean visitado;
 
     /**
      * post: inicializa el casillero como VACIO y sin carta.
@@ -14,7 +14,7 @@ public class Casillero {
     public Casillero() {
         this.tipo = TipoCasillero.VACIO;
         this.carta = null;
-        this.visitado = false; // <-- NUEVO
+        this.visitado = false; 
     }
 
     /**
@@ -47,7 +47,6 @@ public class Casillero {
         this.carta = carta;
     }
     
-    // --- MÉTODOS NUEVOS ---
     
     /**
      * post: devuelve true si el casillero ha sido visitado/descubierto.
