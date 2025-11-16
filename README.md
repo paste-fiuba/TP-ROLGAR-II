@@ -257,3 +257,27 @@ El proyecto es una aplicación Java estándar. Desde la raíz del directorio `sr
   * Nombre Apellido (Padrón)
   * Nombre Apellido (Padrón)
   * Nombre Apellido (Padrón)
+
+## Cuestionario
+
+### 1. ¿Qué es un svn?
+
+**SVN** (Apache Subversion) es un **sistema de control de versiones centralizado**. En este modelo, un único servidor (repositorio) almacena todo el historial de cambios del proyecto. Los desarrolladores "hacen check-out" de una copia de trabajo desde este servidor, realizan cambios en sus computadoras locales y luego "hacen check-in" (commit) de esos cambios de vuelta al servidor central. Todo el historial principal reside en un solo lugar.
+
+### 2. ¿Qué es una "Ruta absoluta" o una "Ruta relativa"?
+
+Son dos maneras de especificar la ubicación de un archivo o directorio en un sistema:
+
+* **Ruta Absoluta:** Es la dirección completa y única de un recurso, comenzando desde el **directorio raíz** del sistema de archivos. No depende de dónde te encuentres actualmente.
+    * Ejemplo en Windows: `C:\Usuarios\MiPC\Documentos\Rolgar\src\com\Main.java`
+    * Ejemplo en Linux/Mac: `/home/usuario/proyectos/Rolgar/src/com/Main.java`
+
+* **Ruta Relativa:** Es la dirección de un recurso *en relación* a tu ubicación actual (el directorio de trabajo). Es un atajo.
+    * Ejemplo: Si estás parado en la carpeta `Rolgar/`, la ruta relativa al mismo archivo sería `src/com/Main.java`.
+    * El trabajo práctico pide usar siempre rutas relativas (como `src/sprites/roca.png`) para que el proyecto pueda ser compilado y ejecutado desde cualquier computadora, sin importar en qué carpeta lo haya guardado el usuario.
+
+### 3. ¿Qué es git?
+
+**Git** es un **sistema de control de versiones distribuido** (DVCS). Es el estándar de la industria moderna para el desarrollo de software.
+
+A diferencia de SVN (que es centralizado), en un sistema distribuido como Git, cada desarrollador tiene una copia *completa* del repositorio (un "clon") en su máquina local, incluyendo todo el historial de cambios. Esto permite a los desarrolladores trabajar de forma totalmente offline, crear "ramas" (branches) para experimentar con nuevas funciones sin afectar el código principal, y "fusionar" (merge) cambios de manera mucho más eficiente.
