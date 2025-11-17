@@ -21,26 +21,45 @@ public class Alianza {
     }
 
     /**
-     * pre: personaje != null.
+     * pre: p != null.
      * post: agrega el personaje a la alianza si no pertenece ya.
      */
     public void agregarMiembro(Personaje p) {
-        if (p == null) return;
-        if (!miembros.contains(p)) {
+        boolean puedeAgregar;
+        boolean yaPertenece;
+
+        puedeAgregar = (p != null);
+        yaPertenece = false;
+
+        if (puedeAgregar) {
+            yaPertenece = miembros.contains(p);
+        }
+
+        if (puedeAgregar && !yaPertenece) {
             miembros.add(p);
             p.setAlianza(this);
             System.out.println(p.getNombre() + " se unió a la alianza " + nombre);
-        } else {
+        } else if (puedeAgregar) {
             System.out.println(p.getNombre() + " ya pertenece a la alianza " + nombre);
         }
     }
 
     /**
-     * pre: personaje != null.
+     * pre: p != null.
      * post: elimina el personaje si pertenece a la alianza.
      */
     public void eliminarMiembro(Personaje p) {
-        if (p != null && miembros.contains(p)) {
+        boolean puedeEliminar;
+        boolean pertenece;
+
+        puedeEliminar = (p != null);
+        pertenece = false;
+
+        if (puedeEliminar) {
+            pertenece = miembros.contains(p);
+        }
+
+        if (puedeEliminar && pertenece) {
             miembros.remove(p);
             p.setAlianza(null);
             System.out.println(p.getNombre() + " salió de la alianza " + nombre);
@@ -53,54 +72,97 @@ public class Alianza {
      * post: devuelve true si el personaje pertenece a la alianza.
      */
     public boolean pertenece(Personaje p) {
-        return miembros.contains(p);
+        boolean pertenece;
+        pertenece = miembros.contains(p);
+        return pertenece;
     }
 
     /**
      * post: devuelve la cantidad actual de miembros.
      */
     public int cantidadMiembros() {
-        return miembros.size();
+        int cantidad;
+        cantidad = miembros.size();
+        return cantidad;
     }
 
     /**
      * post: devuelve la lista de miembros (lectura).
      */
     public ArrayList<Personaje> getMiembros() {
-        return new ArrayList<>(miembros);
+        ArrayList<Personaje> copia;
+        copia = new ArrayList<>(miembros);
+        return copia;
     }
 
     /**
      * pre: cantidad > 0.
-     * post: todos los miembros de la alianza recuperan vida en la cantidad indicada.
-     *       Si un miembro supera 100, se limita a 100.
+     * post: todos los miembros recuperan vida en la cantidad indicada (máx 100).
      */
     public void curarAliados(int cantidad) {
-        for (Personaje p : miembros) {
-            int nuevaVida = Math.min(p.getVida() + cantidad, 100);
-            p.setVida(nuevaVida);
-            System.out.println(p.getNombre() + " fue curado por la alianza +" + cantidad + " vida.");
+        Personaje actual;
+        int vidaActual;
+        int nuevaVida;
+        int i;
+        int tope;
+
+        i = 0;
+        tope = miembros.size();
+
+        while (i < tope) {
+            actual = miembros.get(i);
+            vidaActual = actual.getVida();
+            nuevaVida = vidaActual + cantidad;
+
+            if (nuevaVida > 100) {
+                nuevaVida = 100;
+            }
+
+            actual.setVida(nuevaVida);
+            System.out.println(actual.getNombre() + " fue curado por la alianza +" + cantidad + " vida.");
+            i++;
         }
     }
 
     /**
-     * pre: daño >= 0.
-     * post: todos los miembros de la alianza reciben daño reducido (trabajo en equipo).
+     * pre: danio >= 0.
+     * post: todos reciben daño reducido.
      */
     public void recibirDanioGrupal(int danio) {
-        for (Personaje p : miembros) {
-            int danioReducido = danio / 2; 
-            p.recibirDanio(danioReducido);
-            System.out.println(p.getNombre() + " recibió daño reducido por estar en alianza.");
+        Personaje actual;
+        int danioReducido;
+        int i;
+        int tope;
+
+        danioReducido = danio / 2;
+        i = 0;
+        tope = miembros.size();
+
+        while (i < tope) {
+            actual = miembros.get(i);
+            actual.recibirDanio(danioReducido);
+            System.out.println(actual.getNombre() + " recibió daño reducido por estar en alianza.");
+            i++;
         }
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("Alianza " + nombre + " [Miembros: ");
-        for (Personaje p : miembros) {
-            sb.append(p.getNombre()).append(", ");
+        StringBuilder sb;
+        Personaje actual;
+        int i;
+        int tope;
+
+        sb = new StringBuilder("Alianza " + nombre + " [Miembros: ");
+        i = 0;
+        tope = miembros.size();
+
+        while (i < tope) {
+            actual = miembros.get(i);
+            sb.append(actual.getNombre()).append(", ");
+            i++;
         }
+
         sb.append("]");
         return sb.toString();
     }

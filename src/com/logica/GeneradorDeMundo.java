@@ -177,7 +177,7 @@ public class GeneradorDeMundo {
         tallarPasilloHorizontal(tablero, 25, 30, 5, 4);
         tallarPasilloHorizontal(tablero, 8, 10, 20, 4);
         tallarPasilloHorizontal(tablero, 25, 30, 20, 4);
-        tablero.getCasillero(32, 20, 4).setTipo(TipoCasillero.RAMPA); // Rampa 4->5
+        tablero.getCasillero(32, 20, 4).setTipo(TipoCasillero.RAMPA); 
 
         // --- Nivel 5 ---
         tallarHabitacion(tablero, 30, 18, 33, 21, 5);

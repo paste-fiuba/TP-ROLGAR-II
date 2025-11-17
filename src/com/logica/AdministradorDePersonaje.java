@@ -32,21 +32,53 @@ public class AdministradorDePersonaje {
      * Procesa el intento de movimiento de un jugador.
      * Devuelve true si el movimiento fue exitoso.
      */
+    /**
+     * pre: jugador != null.
+     * post: procesa el movimiento y devuelve true si fue válido.
+     */
     public boolean procesarMovimiento(Personaje jugador, int dx, int dy, ControladorJuego controlador) {
-        if (jugador == null)
-            return false;
-        int x = jugador.getPosX();
-        int y = jugador.getPosY();
-        int z = jugador.getPosZ();
-        int newX = x + dx;
-        int newY = y + dy;
 
-        if (esMovimientoValido(newX, newY, z)) {
-            jugador.setPosicion(newX, newY, z);
-            revisarCasilleroActual(jugador, newX, newY, z, controlador);
-            return true;
+        boolean resultado;
+        boolean jugadorValido;
+        int x;
+        int y;
+        int z;
+        int newX;
+        int newY;
+        boolean movimientoValido;
+
+        resultado = false;
+        jugadorValido = (jugador != null);
+        x = 0;
+        y = 0;
+        z = 0;
+        newX = 0;
+        newY = 0;
+        movimientoValido = false;
+
+        if (jugadorValido) {
+
+            x = jugador.getPosX();
+            y = jugador.getPosY();
+            z = jugador.getPosZ();
+            newX = x + dx;
+            newY = y + dy;
+
+            movimientoValido = esMovimientoValido(newX, newY, z);
+
+            if (movimientoValido) {
+                jugador.setPosicion(newX, newY, z);
+                revisarCasilleroActual(jugador, newX, newY, z, controlador);
+                resultado = true;
+            } else {
+                resultado = false;
+            }
+
+        } else {
+            resultado = false;
         }
-        return false;
+
+        return resultado;
     }
 
     /**
@@ -162,31 +194,77 @@ public class AdministradorDePersonaje {
     }
 
     /**
-     * Devuelve un enemigo en la posición (x, y, z) o null si no hay ninguno.
+     * pre: enemigos != null.
+     * post: devuelve el enemigo vivo en la posición indicada o null.
      */
     private Enemigo enemigoEnPosicion(int x, int y, int z) {
-        if (enemigos == null)
-            return null;
-        for (Enemigo enemigo : enemigos) {
-            if (enemigo.estaVivo() &&
-                    enemigo.getPosX() == x &&
-                    enemigo.getPosY() == y &&
-                    enemigo.getPosZ() == z) {
-                return enemigo;
+
+        Enemigo resultado;
+        int i;
+        int n;
+        Enemigo e;
+        boolean encontrado;
+        boolean vivo;
+
+        resultado = null;
+        i = 0;
+        n = 0;
+        e = null;
+        encontrado = false;
+        vivo = false;
+
+        if (enemigos != null) {
+
+            n = enemigos.size();
+
+            while (i < n && !encontrado) {
+
+                e = enemigos.get(i);
+
+                if (e != null) {
+                    vivo = e.estaVivo();
+                    if (vivo) {
+                        if (e.getPosX() == x && e.getPosY() == y && e.getPosZ() == z) {
+                            resultado = e;
+                            encontrado = true;
+                        }
+                    }
+                }
+
+                i++;
             }
         }
-        return null;
+
+        return resultado;
     }
 
     /**
      * Verifica adyacencia (para robar cartas o atacar).
      */
+    /**
+     * pre: a != null y b != null.
+     * post: devuelve true si están a distancia 1 en el mismo nivel.
+     */
     private boolean sonAdyacentes(Personaje a, Personaje b) {
-        if (a == null || b == null)
-            return false;
-        if (a.getPosZ() != b.getPosZ())
-            return false;
-        int dist = Math.abs(a.getPosX() - b.getPosX()) + Math.abs(a.getPosY() - b.getPosY());
-        return dist == 1;
+
+        boolean resultado;
+        boolean datosValidos;
+        boolean mismoZ;
+        int dist;
+
+        resultado = false;
+        datosValidos = (a != null && b != null);
+        mismoZ = false;
+        dist = 0;
+
+        if (datosValidos) {
+            mismoZ = (a.getPosZ() == b.getPosZ());
+            if (mismoZ) {
+                dist = Math.abs(a.getPosX() - b.getPosX()) + Math.abs(a.getPosY() - b.getPosY());
+                resultado = (dist == 1);
+            }
+        }
+
+        return resultado;
     }
 }
