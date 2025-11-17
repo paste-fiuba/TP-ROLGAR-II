@@ -40,7 +40,7 @@ public class GerenciadorDeSprites {
         cargarSpriteEnemigo("murcielago", "src/sprites/murcielago.png");
         cargarSpriteEnemigo("golem", "src/sprites/golem.png");
         cargarSpriteEnemigo("serpiente", "src/sprites/serpiente.png");
-        cargarSpriteEnemigo("mago", "src/sprites/mago.png");
+        cargarSpriteEnemigo("jefe", "src/sprites/jefe.png");
     }
 
     private void cargarSpritesDeUI() {
@@ -120,6 +120,7 @@ public class GerenciadorDeSprites {
     public BufferedImage getSpriteRampa() { return spriteRampa; }
     public BufferedImage getSpriteAgua() { return spriteAgua; }
     public BufferedImage getSpritePersonaje() { return spritePersonaje; }
+    
     public BufferedImage getSpriteEnemigo(String nombre, String tipo) {
         String claveNombre = normalizarClave(nombre);
         String claveTipo = normalizarClave(tipo);
@@ -131,11 +132,12 @@ public class GerenciadorDeSprites {
         if (img != null) return img;
         img = spritesEnemigos.get(claveTipo);
         if (img != null) return img;
-        if (claveNombre.contains("mago")) return spritesEnemigos.get("mago"); 
+        if (claveNombre.contains("jefe")) return spritesEnemigos.get("jefe"); 
         if (claveNombre.contains("orco")) return spritesEnemigos.get("orco");
         if (claveNombre.contains("esqueleto")) return spritesEnemigos.get("esqueleto");
         return spriteEnemigoPorDefecto;
     }
+    
     public BufferedImage getSpriteSlot() { return spriteSlot; }
     public BufferedImage getSpritePersonajeBatalla() { return spritePersonajeBatalla; }
     public BufferedImage getSpriteEnemigoBatalla() { return spriteEnemigoBatalla; }
