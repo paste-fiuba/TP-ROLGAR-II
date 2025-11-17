@@ -58,9 +58,7 @@ public class RenderizarData {
     }
 	
 	/**
-	 * MÉTODO CORREGIDO:
 	 * Reescrito para usar un layout dinámico con espaciado de línea constante,
-	 * evitando que el texto se "amontone".
 	 */
 	public void dibujarInfoJuego(Graphics g, Personaje p, List<Enemigo> e, java.util.List<Personaje> jugadores, com.logica.AdministradorDeJuego admin, int pendingTransfer, Font fontInfo, List<String> battleLog, Enemigo enemigoMasCercano) {
 
@@ -68,26 +66,22 @@ public class RenderizarData {
 
         g.setFont(fontInfo);
 
-        // --- INICIO DE LA CORRECCIÓN DE LAYOUT ---
         
-        // 1. Definir un layout claro para el HUD
-        int hudX = 20;
-        int hudY = 30; // Posición Y inicial
-        int lineHeight = 20; // Espacio entre líneas
 
-        // 2. Dibujar la Vida
+        int hudX = 20;
+        int hudY = 30; 
+        int lineHeight = 20; 
+
         g.setColor(Color.RED);
         g.drawString("JUGADOR HP: " + p.getVida(), hudX, hudY);
-        hudY += lineHeight; // Mover Y para la siguiente línea
+        hudY += lineHeight; 
 
-        // 3. Dibujar el Escudo (si existe)
         if (p.getVidaEscudo() > 0) {
             g.setColor(Color.CYAN);
             g.drawString("ESCUDO: " + p.getVidaEscudo(), hudX, hudY);
-            hudY += lineHeight; // Mover Y para la siguiente línea
+            hudY += lineHeight; 
         }
 
-        // 4. Dibujar Enemigos restantes
         g.setColor(Color.WHITE);
         int enemigosVivos = 0;
         if (e != null) {
@@ -97,16 +91,14 @@ public class RenderizarData {
         }
         String enemigosTxt = "Criaturas enemigas restantes: " + enemigosVivos;
         g.drawString(enemigosTxt, hudX, hudY);
-        hudY += lineHeight; // Mover Y para la siguiente línea
+        hudY += lineHeight; 
 
         // 5. Dibujar el Piso actual
         String pisoTxt = p.getNombre() + " se encuentra en el piso: " + p.getPosZ();
         g.drawString(pisoTxt, hudX, hudY);
-        hudY += lineHeight; // Mover Y para la siguiente línea
+        hudY += lineHeight; 
 
-        // --- FIN DE LA CORRECCIÓN DEL HUD ---
 
-        // 6. Dibujar el HUD del Enemigo (Top-Right) - (Sin cambios)
         if (enemigoMasCercano != null) {
             g.setColor(Color.ORANGE);
             String textoEnemigo = enemigoMasCercano.getNombre() + " HP: " + enemigoMasCercano.getVida();
@@ -114,18 +106,16 @@ public class RenderizarData {
             g.drawString(textoEnemigo, g.getClipBounds().width - anchoTexto - 20, 30);
         }
 
-        // 7. Dibujar el Battle Log (Ahora empieza DESPUÉS del HUD)
-        hudY += 10; // Añadir un pequeño padding extra antes del log
+        hudY += 10; 
         g.setColor(Color.GREEN);
         for (String mensaje : battleLog) {
-            g.drawString(mensaje, hudX, hudY); // Usa la nueva 'hudY'
-            hudY += 20; // Incrementa para la siguiente línea del log
+            g.drawString(mensaje, hudX, hudY); 
+            hudY += 20; 
         }
 
-        // 8. Dibujar prompts de Alianza/Ataque (Usan la 'hudY' final)
+
         if (admin != null) {
             
-            // (Jugadores eliminados - Sin cambios, está en la otra esquina)
             java.util.List<String> eliminados = admin.getJugadoresEliminados();
             if (eliminados != null && !eliminados.isEmpty()) {
                 g.setColor(Color.RED);
@@ -139,8 +129,8 @@ public class RenderizarData {
                 }
             }
 
-            // (Prompts de acción)
-            int promptY = hudY + 10; // Posición Y para los prompts de acción
+
+            int promptY = hudY + 10; 
 
             Personaje proponente = admin.getPropuestaPara(p);
             if (proponente != null) {

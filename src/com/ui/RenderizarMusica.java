@@ -11,7 +11,7 @@ public class RenderizarMusica {
             AudioInputStream audio = AudioSystem.getAudioInputStream(new File(ruta));
             clip = AudioSystem.getClip();
             clip.open(audio);
-            clip.loop(Clip.LOOP_CONTINUOUSLY); // Reproducir en loop
+            clip.loop(Clip.LOOP_CONTINUOUSLY); 
             clip.start();
         } catch (Exception e) {
             e.printStackTrace();

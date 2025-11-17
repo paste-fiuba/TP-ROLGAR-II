@@ -41,7 +41,6 @@ public class SpriteManager {
                 String key = normalizeKey(f.getName().replaceAll("\\.png$|\\.jpg$|\\.jpeg$", ""));
                 spritesByKey.put(key, img);
             } catch (IOException ex) {
-                // Ignorar archivo si no se pudo leer
             }
         }
 
@@ -63,7 +62,6 @@ public class SpriteManager {
 
     public BufferedImage getEnemyBattleSprite(Enemigo e) {
         if (e == null) return defaultEnemyBattle;
-        // Prefer lookup by nombre, then by tipo
         String nombreKey = normalizeKey(e.getNombre());
         BufferedImage img = spritesByKey.get(nombreKey);
         if (img != null) return img;
@@ -75,7 +73,6 @@ public class SpriteManager {
 
     public BufferedImage getPlayerBattleSprite(Personaje p) {
         if (p == null) return null;
-        // Try by player name, fallback to personaje_batalla or personaje
         BufferedImage img = spritesByKey.get(normalizeKey(p.getNombre()));
         if (img != null) return img;
         img = spritesByKey.get("personaje_batalla");
