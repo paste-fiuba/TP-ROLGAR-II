@@ -81,7 +81,7 @@ public class GeneradorDeMundo {
         // Nivel 8
         enemigos.add(new Enemigo("Golem", "Magma", 100, 20, 7, 8, 12, 1, 0)); 
         // Nivel 9 (Jefe)
-        enemigos.add(new Enemigo("rey mago", "jefe", 300, 20, 19, 9, 20, 1, 0));
+        enemigos.add(new Enemigo("REY MAGO", "JEFE", 300, 20, 19, 9, 20, 1, 0));
 
         if (dificultad == PartidaDeRolgar.Dificultad.FACIL) {
             enemigos.removeIf(e -> !e.getNombre().equals("REY MAGO") && random.nextBoolean());
