@@ -22,7 +22,7 @@ public class GeneradorDeMundo {
     private static final int ANCHO_TABLERO = 40;
     private static final int ALTO_TABLERO = 25;
     private static final int NIVELES_TABLERO = 10;
-    private static final int NIVEL_INICIAL = 7;
+    private static final int NIVEL_INICIAL = 0;
 
     private Random random = new Random();
 
@@ -37,7 +37,7 @@ public class GeneradorDeMundo {
             int startX = 5 + (i * 3); 
             int startY = 5;
             
-            Personaje p = new Personaje(nombres[i], 100, startX, startY, NIVEL_INICIAL, 10, 5, 2);
+            Personaje p = new Personaje(nombres[i], 100, startX, startY, NIVEL_INICIAL, 10, 2, 2);
             try {
                 p.agregarCarta(new CartaAtaqueDoble());
                 p.agregarCarta(new CartaEscudo());
