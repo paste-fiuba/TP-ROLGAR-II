@@ -2,7 +2,7 @@ package com.entidades;
 
 /**
  * Clase abstracta que representa una entidad dentro del tablero.
- * Define los atributos y comportamientos comunes de personajes y enemigos.
+ * Define atributos y comportamientos comunes de personajes y enemigos.
  */
 public abstract class Entidad {
 
@@ -16,9 +16,8 @@ public abstract class Entidad {
     protected double salud; 
 
     /**
-     * pre: nombre no es null, vida > 0, fuerza >= 0, vision >= 0, salud >= 0.
-     * Las coordenadas (posX, posY, posZ) son válidas dentro del tablero.
-     * post: crea una entidad inicializando todos los atributos con los valores indicados.
+     * pre: nombre != null, vida > 0, fuerza >= 0, vision >= 0, salud >= 0.
+     * post: inicializa la entidad con los valores indicados.
      */
     public Entidad(String nombre, int vida, int posX, int posY, int posZ,
                    int fuerza, int vision, double salud) {
@@ -33,116 +32,179 @@ public abstract class Entidad {
     }
 
     /**
-     * pre: dx, dy y dz representan desplazamientos válidos (por ejemplo, -1, 0 o 1)
-     * y el movimiento resultante debe mantenerse dentro del tablero.
-     * post: actualiza la posición de la entidad sumando (dx, dy, dz) a su posición actual.
+     * pre: dx, dy, dz son desplazamientos válidos.
+     * post: actualiza la posición sumando los valores recibidos.
      */
     public void mover(int dx, int dy, int dz) {
-        this.posX += dx;
-        this.posY += dy;
-        this.posZ += dz;
+        int nuevoX;
+        int nuevoY;
+        int nuevoZ;
+
+        nuevoX = posX + dx;
+        nuevoY = posY + dy;
+        nuevoZ = posZ + dz;
+
+        posX = nuevoX;
+        posY = nuevoY;
+        posZ = nuevoZ;
     }
 
     /**
      * pre: danio >= 0.
-     * post: disminuye la vida de la entidad en "danio" unidades.
-     * si la vida es menor a 0, se ajusta a 0.
+     * post: disminuye la vida en la cantidad indicada (no menor a 0).
      */
     public void recibirDanio(int danio) {
-        this.vida -= danio;
-        if (vida < 0) vida = 0;
+        int nuevaVida;
+
+        nuevaVida = vida - danio;
+
+        if (nuevaVida < 0) {
+            nuevaVida = 0;
+        }
+
+        vida = nuevaVida;
     }
 
     /**
-     * pre: objetivo no es null y se encuentra vivo.
-     * post: el objetivo pierde una cantidad de vida igual a la fuerza de esta entidad.
+     * pre: objetivo != null.
+     * post: el objetivo recibe daño igual a la fuerza de esta entidad.
      */
     public void atacar(Entidad objetivo) {
-        if (objetivo != null) {
+        boolean puedeAtacar;
+
+        puedeAtacar = (objetivo != null);
+
+        if (puedeAtacar) {
             objetivo.recibirDanio(fuerza);
         }
     }
 
     /**
-     * pre: salud > 0.
-     * post: aumenta la vida de la entidad en el porcentaje indicado por "salud".
+     * pre: salud >= 0.
+     * post: aumenta la vida de la entidad según el porcentaje "salud".
      */
     public void recuperarEnergia() {
-        int recupero = (int) (vida * (salud / 100));
-        this.vida += recupero;
+        int recupero;
+        double porcentaje;
+
+        porcentaje = salud / 100.0;
+        recupero = (int) (vida * porcentaje);
+
+        vida = vida + recupero;
     }
 
-    // ==== Getters y Setters ====
+    // ================== GETTERS ===================
 
     /**
-     * post: devuelve el nombre de la entidad.
+     * post: devuelve el nombre.
      */
-    public String getNombre() { return nombre; }
+    public String getNombre() {
+        String resultado;
+        resultado = nombre;
+        return resultado;
+    }
 
     /**
-     * post: devuelve la vida actual de la entidad.
+     * post: devuelve la vida actual.
      */
-    public int getVida() { return vida; }
+    public int getVida() {
+        int resultado;
+        resultado = vida;
+        return resultado;
+    }
 
     /**
-     * post: devuelve la coordenada X actual.
+     * post: devuelve X.
      */
-    public int getPosX() { return posX; }
+    public int getPosX() {
+        int resultado;
+        resultado = posX;
+        return resultado;
+    }
 
     /**
-     * post: devuelve la coordenada Y actual.
+     * post: devuelve Y.
      */
-    public int getPosY() { return posY; }
+    public int getPosY() {
+        int resultado;
+        resultado = posY;
+        return resultado;
+    }
 
     /**
-     * post: devuelve la coordenada Z actual.
+     * post: devuelve Z.
      */
-    public int getPosZ() { return posZ; }
+    public int getPosZ() {
+        int resultado;
+        resultado = posZ;
+        return resultado;
+    }
 
     /**
-     * post: devuelve la fuerza de ataque de la entidad.
+     * post: devuelve la fuerza.
      */
-    public int getFuerza() { return fuerza; }
+    public int getFuerza() {
+        int resultado;
+        resultado = fuerza;
+        return resultado;
+    }
 
     /**
-     * post: devuelve el rango de visión de la entidad.
+     * post: devuelve la visión.
      */
-    public int getVision() { return vision; }
+    public int getVision() {
+        int resultado;
+        resultado = vision;
+        return resultado;
+    }
 
     /**
-     * post: devuelve el porcentaje de regeneración de vida por turno.
+     * post: devuelve el porcentaje de salud.
      */
-    public double getSalud() { return salud; }
+    public double getSalud() {
+        double resultado;
+        resultado = salud;
+        return resultado;
+    }
+
+    // ================== SETTERS ===================
 
     /**
-     * pre: las coordenadas (x, y, z) son válidas dentro del tablero.
-     * post: actualiza la posición de la entidad con las coordenadas indicadas.
+     * pre: (x,y,z) válidos.
+     * post: actualiza posición.
      */
     public void setPosicion(int x, int y, int z) {
-        this.posX = x;
-        this.posY = y;
-        this.posZ = z;
+        posX = x;
+        posY = y;
+        posZ = z;
     }
 
     /**
      * pre: vida >= 0.
-     * post: establece la vida actual de la entidad al valor indicado.
+     * post: establece vida.
      */
-    public void setVida(int vida) { this.vida = vida; }
+    public void setVida(int vida) {
+        this.vida = vida;
+    }
 
     /**
      * pre: fuerza >= 0.
-     * post: establece la fuerza de la entidad al valor indicado.
+     * post: actualiza la fuerza.
      */
-    public void setFuerza(int fuerza) { this.fuerza = fuerza; } // <-- NUEVO MÉTODO
+    public void setFuerza(int fuerza) {
+        this.fuerza = fuerza;
+    }
 
     /**
-     * post: devuelve una representación textual de la entidad
-     * con su nombre, vida y posición actual.
+     * post: devuelve la descripción textual.
      */
     @Override
     public String toString() {
-        return nombre + " [vida=" + vida +
-               ", pos=(" + posX + "," + posY + "," + posZ + ")]";
+        String texto;
+
+        texto = nombre + " [vida=" + vida +
+                ", pos=(" + posX + "," + posY + "," + posZ + ")]";
+
+        return texto;
     }
 }
