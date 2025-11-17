@@ -123,11 +123,15 @@ public class GerenciadorDeSprites {
     public BufferedImage getSpriteEnemigo(String nombre, String tipo) {
         String claveNombre = normalizarClave(nombre);
         String claveTipo = normalizarClave(tipo);
+        if (claveTipo.equals("jefe")) {
+            return spritesEnemigos.get("jefe");
+        }
+
         BufferedImage img = spritesEnemigos.get(claveNombre);
         if (img != null) return img;
         img = spritesEnemigos.get(claveTipo);
         if (img != null) return img;
-        if (claveNombre.contains("mago")) return spritesEnemigos.get("mago");
+        if (claveNombre.contains("mago")) return spritesEnemigos.get("mago"); 
         if (claveNombre.contains("orco")) return spritesEnemigos.get("orco");
         if (claveNombre.contains("esqueleto")) return spritesEnemigos.get("esqueleto");
         return spriteEnemigoPorDefecto;

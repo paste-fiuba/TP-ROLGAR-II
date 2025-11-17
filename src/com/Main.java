@@ -24,5 +24,6 @@ public class Main {
         miPanel.setControlador(miControlador);
 
         new VentanaJuego(miPanel);
+        
     }
 }

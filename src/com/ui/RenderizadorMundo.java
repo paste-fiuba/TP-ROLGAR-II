@@ -31,9 +31,14 @@ public class RenderizadorMundo {
     private boolean personajeCercano(List<Personaje> jugadores, int x, int y, int z) {
         for(Personaje jugador : jugadores) {
             if (jugador.getPosZ() == z) {
+                
+
+                int vision = jugador.getVision(); 
+                
                 int distAbsX = Math.abs(jugador.getPosX() - x);
                 int distAbsY = Math.abs(jugador.getPosY() - y);
-                if (distAbsX <= 1 && distAbsY <= 1) {
+                
+                if (distAbsX <= vision && distAbsY <= vision) { 
                     return true;
                 }
             }

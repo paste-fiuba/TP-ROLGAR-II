@@ -22,7 +22,7 @@ public class GeneradorDeMundo {
     private static final int ANCHO_TABLERO = 40;
     private static final int ALTO_TABLERO = 25;
     private static final int NIVELES_TABLERO = 10;
-    private static final int NIVEL_INICIAL = 0;
+    private static final int NIVEL_INICIAL = 7;
 
     private Random random = new Random();
 
@@ -37,7 +37,7 @@ public class GeneradorDeMundo {
             int startX = 5 + (i * 3); 
             int startY = 5;
             
-            Personaje p = new Personaje(nombres[i], 100, startX, startY, NIVEL_INICIAL, 10, 1, 5.0);
+            Personaje p = new Personaje(nombres[i], 100, startX, startY, NIVEL_INICIAL, 10, 5, 2);
             try {
                 p.agregarCarta(new CartaAtaqueDoble());
                 p.agregarCarta(new CartaEscudo());
@@ -71,9 +71,6 @@ public class GeneradorDeMundo {
         // Nivel 4
         enemigos.add(new Enemigo("Esqueleto", "Elite", 50, 32, 20, 4, 10, 1, 0));
         enemigos.add(new Enemigo("Esqueleto", "Elite", 50, 7, 5, 4, 10, 1, 0));
-        // Nivel 5
-        enemigos.add(new Enemigo("Serpiente Acuática", "Rápida", 40, 12, 10, 5, 10, 1, 0));
-        enemigos.add(new Enemigo("Serpiente Acuática", "Rápida", 40, 28, 15, 5, 10, 1, 0));
         // Nivel 6
         enemigos.add(new Enemigo("Golem", "Tanque", 80, 10, 12, 6, 10, 1, 0)); 
         enemigos.add(new Enemigo("Golem", "Tanque", 80, 30, 12, 6, 10, 1, 0)); 
@@ -84,7 +81,7 @@ public class GeneradorDeMundo {
         // Nivel 8
         enemigos.add(new Enemigo("Golem", "Magma", 100, 20, 7, 8, 12, 1, 0)); 
         // Nivel 9 (Jefe)
-        enemigos.add(new Enemigo("REY MAGO", "JEFE", 300, 20, 19, 9, 20, 1, 0));
+        enemigos.add(new Enemigo("rey mago", "jefe", 300, 20, 19, 9, 20, 1, 0));
 
         if (dificultad == PartidaDeRolgar.Dificultad.FACIL) {
             enemigos.removeIf(e -> !e.getNombre().equals("REY MAGO") && random.nextBoolean());
@@ -122,103 +119,164 @@ public class GeneradorDeMundo {
      * post: Modifica el tablero, tallando el mundo, pasillos, rampas.
      */
     private void crearMundo(Tablero tablero, PartidaDeRolgar.Dificultad dificultad) {
-        
+
         // 1. Rellenar todo de roca
         for (int z = 0; z < NIVELES_TABLERO; z++) {
             for (int y = 0; y < ALTO_TABLERO; y++) {
                 for (int x = 0; x < ANCHO_TABLERO; x++) {
                     if (tablero.esCoordenadaValida(x, y, z)) {
-                         tablero.getCasillero(x, y, z).setTipo(TipoCasillero.ROCA);
+                        tablero.getCasillero(x, y, z).setTipo(TipoCasillero.ROCA);
                     }
                 }
             }
         }
 
         // --- Nivel 0 ---
-        tallarHabitacion(tablero, 3, 3, 10, 10, 0); 
+        tallarHabitacion(tablero, 3, 3, 10, 10, 0);
         tallarHabitacion(tablero, 5, 15, 10, 20, 0, TipoCasillero.AGUA);
-        tallarHabitacion(tablero, 15, 10, 25, 15, 0); 
+        tallarHabitacion(tablero, 15, 10, 25, 15, 0);
         tallarPasilloHorizontal(tablero, 10, 15, 7, 0);
         tallarPasilloVertical(tablero, 15, 7, 10, 0);
-        tablero.getCasillero(20, 12, 0).setTipo(TipoCasillero.RAMPA); // Rampa 0->1
-        
+
+        tablero.getCasillero(20, 12, 0).setTipo(TipoCasillero.RAMPA); 
+
         // --- Nivel 1 ---
         tallarHabitacion(tablero, 18, 10, 22, 14, 1);
-        tablero.getCasillero(20, 12, 1).setTipo(TipoCasillero.RAMPA); // Rampa 1->0
+        tablero.getCasillero(20, 12, 1).setTipo(TipoCasillero.RAMPA); 
+
         tallarHabitacion(tablero, 3, 3, 10, 10, 1);
-        tablero.getCasillero(5, 5, 1).setTipo(TipoCasillero.RAMPA); // Rampa 1->2
+        tablero.getCasillero(5, 5, 1).setTipo(TipoCasillero.RAMPA); 
+
         tallarPasilloHorizontal(tablero, 10, 18, 10, 1);
         tallarPasilloVertical(tablero, 10, 5, 10, 1);
-        
+
         // --- Nivel 2 ---
         tallarHabitacion(tablero, 3, 3, 10, 10, 2);
-        tablero.getCasillero(5, 5, 2).setTipo(TipoCasillero.RAMPA); // Rampa 2->1
+        tablero.getCasillero(5, 5, 2).setTipo(TipoCasillero.RAMPA); 
+
         tallarHabitacion(tablero, 33, 18, 38, 23, 2);
-        tablero.getCasillero(35, 20, 2).setTipo(TipoCasillero.RAMPA); // Rampa 2->3
+        tablero.getCasillero(35, 20, 2).setTipo(TipoCasillero.RAMPA); 
+
         tallarPasilloHorizontal(tablero, 10, 30, 5, 2);
         tallarPasilloVertical(tablero, 30, 5, 20, 2);
         tallarPasilloHorizontal(tablero, 33, 30, 20, 2);
 
         // --- Nivel 3 ---
         tallarHabitacion(tablero, 33, 18, 38, 23, 3);
-        tablero.getCasillero(35, 20, 3).setTipo(TipoCasillero.RAMPA); // Rampa 3->2
+        tablero.getCasillero(35, 20, 3).setTipo(TipoCasillero.RAMPA); 
+
         tallarHabitacion(tablero, 10, 5, 30, 20, 3);
         tallarPasilloHorizontal(tablero, 30, 35, 18, 3);
-        tablero.getCasillero(15, 12, 3).setTipo(TipoCasillero.RAMPA); // Rampa 3->4
-        
-        // --- Nivel 4---
+
+        tablero.getCasillero(15, 12, 3).setTipo(TipoCasillero.RAMPA); 
+
+        // --- Nivel 4 ---
         tallarHabitacion(tablero, 10, 5, 25, 20, 4);
-        tablero.getCasillero(15, 12, 4).setTipo(TipoCasillero.RAMPA); // Rampa 4->3
+        tablero.getCasillero(15, 12, 4).setTipo(TipoCasillero.RAMPA);
+
         tallarHabitacion(tablero, 5, 3, 8, 6, 4);
         tallarHabitacion(tablero, 30, 3, 33, 6, 4);
         tallarHabitacion(tablero, 5, 18, 8, 21, 4);
         tallarHabitacion(tablero, 30, 18, 33, 21, 4);
+
         tallarPasilloHorizontal(tablero, 8, 10, 5, 4);
         tallarPasilloHorizontal(tablero, 25, 30, 5, 4);
         tallarPasilloHorizontal(tablero, 8, 10, 20, 4);
         tallarPasilloHorizontal(tablero, 25, 30, 20, 4);
-        tablero.getCasillero(32, 20, 4).setTipo(TipoCasillero.RAMPA); 
+
+        tablero.getCasillero(32, 20, 4).setTipo(TipoCasillero.RAMPA);
 
         // --- Nivel 5 ---
         tallarHabitacion(tablero, 30, 18, 33, 21, 5);
-        tablero.getCasillero(32, 20, 5).setTipo(TipoCasillero.RAMPA); // Rampa 5->4
+        
+        tablero.getCasillero(32, 20, 5).setTipo(TipoCasillero.RAMPA);
+
         tallarHabitacion(tablero, 5, 5, 35, 20, 5);
         tallarHabitacion(tablero, 10, 8, 30, 17, 5, TipoCasillero.AGUA);
         tallarPasilloHorizontal(tablero, 25, 30, 19, 5);
-        tablero.getCasillero(7, 7, 5).setTipo(TipoCasillero.RAMPA); // Rampa 5->6
+
+
+        tablero.getCasillero(7, 7, 5).setTipo(TipoCasillero.RAMPA);
 
         // --- Nivel 6 ---
         tallarHabitacion(tablero, 5, 5, 35, 20, 6);
-        tablero.getCasillero(7, 7, 6).setTipo(TipoCasillero.RAMPA); // Rampa 6->5
-        tallarHabitacion(tablero, 10, 8, 30, 17, 6, TipoCasillero.ROCA); // Pilar de roca
-        tallarHabitacion(tablero, 15, 11, 25, 14, 6); // Túnel a través del pilar
-        tablero.getCasillero(33, 12, 6).setTipo(TipoCasillero.RAMPA); // Rampa 6->7
-        
-        // --- Nivel 7---
-        tallarHabitacion(tablero, 31, 10, 35, 14, 7);
-        tablero.getCasillero(33, 12, 7).setTipo(TipoCasillero.RAMPA); // Rampa 7->6
-        tallarHabitacion(tablero, 5, 5, 10, 10, 7);
-        tallarHabitacion(tablero, 5, 15, 10, 20, 7);
-        tallarHabitacion(tablero, 15, 10, 20, 15, 7);
-        tallarPasilloVertical(tablero, 7, 10, 15, 7);
+
+
+        tablero.getCasillero(7, 7, 6).setTipo(TipoCasillero.RAMPA);
+
+        tallarHabitacion(tablero, 10, 8, 30, 17, 6, TipoCasillero.ROCA);
+        tallarHabitacion(tablero, 15, 11, 25, 14, 6);
+        tablero.getCasillero(33, 12, 6).setTipo(TipoCasillero.RAMPA); // 6 -> 7
+
+     // --- Nivel 7 ---
+        tallarHabitacion(tablero, 30, 10, 36, 14, 7);
+        tablero.getCasillero(33, 12, 7).setTipo(TipoCasillero.RAMPA);
+
+        tallarHabitacion(tablero, 5, 5, 12, 10, 7);
+
+        tallarHabitacion(tablero, 5, 16, 12, 22, 7);
+        tablero.getCasillero(7, 18, 7).setTipo(TipoCasillero.RAMPA);
+
+        tallarHabitacion(tablero, 15, 10, 25, 17, 7);
+
+        tallarPasilloVertical(tablero, 10, 10, 12, 7);
         tallarPasilloHorizontal(tablero, 10, 15, 12, 7);
-        tallarPasilloVertical(tablero, 17, 15, 22, 7);
-        tallarPasilloHorizontal(tablero, 17, 31, 22, 7);
-        tallarPasilloVertical(tablero, 31, 14, 22, 7);
-        tablero.getCasillero(7, 18, 7).setTipo(TipoCasillero.RAMPA); // Rampa 7->8
-        
+
+        tallarPasilloHorizontal(tablero, 25, 30, 12, 7);
+
+        tallarPasilloVertical(tablero, 20, 17, 22, 7);
+
+        tallarPasilloHorizontal(tablero, 12, 20, 18, 7);
+
+        tallarPasilloHorizontal(tablero, 25, 30, 22, 7);
+        tallarPasilloVertical(tablero, 30, 14, 22, 7);
+
+        tallarPasilloVertical(tablero, 8, 10, 16, 7);
+
+
         // --- Nivel 8 ---
-        tallarHabitacion(tablero, 5, 15, 10, 20, 8);
-        tablero.getCasillero(7, 18, 8).setTipo(TipoCasillero.RAMPA); // Rampa 8->7
+        tallarHabitacion(tablero, 8, 15, 13, 20, 8);
+
+        tablero.getCasillero(7, 18, 8).setTipo(TipoCasillero.RAMPA);
+
         tallarHabitacion(tablero, 15, 5, 25, 20, 8);
         tallarPasilloHorizontal(tablero, 10, 15, 18, 8);
-        tablero.getCasillero(20, 7, 8).setTipo(TipoCasillero.RAMPA); // Rampa 8->9
-        
+
+        tablero.getCasillero(20, 7, 8).setTipo(TipoCasillero.RAMPA);
+
+        tallarPasilloVertical(tablero, 7, 12, 18, 8);
+
+
         // --- Nivel 9 ---
         tallarHabitacion(tablero, 15, 5, 25, 10, 9);
-        tablero.getCasillero(20, 7, 9).setTipo(TipoCasillero.RAMPA); // Rampa 9->8
+        tablero.getCasillero(20, 7, 9).setTipo(TipoCasillero.RAMPA);
+
         tallarHabitacion(tablero, 10, 15, 30, 23, 9);
         tallarPasilloVertical(tablero, 20, 10, 15, 9);
+        
+        tablero.getCasillero(7, 18, 7).setTipo(TipoCasillero.RAMPA);
+        tablero.getCasillero(7, 18, 8).setTipo(TipoCasillero.RAMPA);
+        repararRampas(tablero);
+    }
+    
+    private void repararRampas(Tablero tablero) {
+
+        // Rampa nivel 4 -> 5
+        tablero.getCasillero(32, 20, 4).setTipo(TipoCasillero.RAMPA);
+        tablero.getCasillero(32, 20, 5).setTipo(TipoCasillero.RAMPA);
+
+        // Limpiar alrededor (para asegurar acceso)
+        int[][] offs = {{1,0},{-1,0},{0,1},{0,-1}};
+        for (int[] o : offs) {
+            int nx = 32 + o[0];
+            int ny = 20 + o[1];
+
+            if (tablero.esCoordenadaValida(nx, ny, 4))
+                tablero.getCasillero(nx, ny, 4).setTipo(TipoCasillero.VACIO);
+
+            if (tablero.esCoordenadaValida(nx, ny, 5))
+                tablero.getCasillero(nx, ny, 5).setTipo(TipoCasillero.VACIO);
+        }
     }
 
     /**

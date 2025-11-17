@@ -204,7 +204,7 @@ public class AdministradorDeJuego {
     public void marcarEnemigoDerrotado(Enemigo e) {
         if (e == null) return;
         e.setVida(0);
-        e.recibirDanio(0); // asegurarse que estado 'vivo' se actualice
+        e.recibirDanio(0); 
         logBatalla("El enemigo " + e.getNombre() + " fue derrotado.");
     }
 }
