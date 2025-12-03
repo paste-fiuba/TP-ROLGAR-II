@@ -1,8 +1,8 @@
 package com.ui;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Font;
+import java.awt.Graphics;
 
 public class RenderizarMenu {
 
@@ -110,10 +110,10 @@ public class RenderizarMenu {
         String titulo = "Instrucciones";
         int anchoTitulo = g.getFontMetrics().stringWidth(titulo);
         g.drawString(titulo, (anchoVentana - anchoTitulo) / 2, altoVentana / 4); 
-
-        Font fontInstrucciones = null;
+        // Usar una fuente legible y dimensión fija para el texto de instrucciones
+        Font fontInstrucciones = new Font("Arial", Font.PLAIN, 20);
         g.setFont(fontInstrucciones);
-        
+
         String[] lineas = {
             "Muevete con W, A, S, D (Ortogonal) y Q, E, Z, C (Diagonal).",
             "Presiona [ENTER] para finalizar tu turno.",
@@ -132,11 +132,45 @@ public class RenderizarMenu {
             "[ESC] Volver al Menú Principal"
         };
 
-        int y = altoVentana / 2 - 100;
+        // Parámetros de layout
+        int maxTextWidth = (int)(anchoVentana * 0.85); // 85% del ancho de ventana
+        int startY = altoVentana / 2 - 120;
+        int y = startY;
+        java.awt.FontMetrics fm = g.getFontMetrics(fontInstrucciones);
+        int lineHeight = fm.getHeight() + 6;
+
+        // Función sencilla de envolver texto por palabras al ancho máximo
         for (String linea : lineas) {
-            int anchoLinea = g.getFontMetrics().stringWidth(linea);
-            g.drawString(linea, (anchoVentana - anchoLinea) / 2, y);
-            y += 25;
+            if (linea == null || linea.isEmpty()) {
+                y += lineHeight; // espacio en blanco
+                continue;
+            }
+
+            String[] palabras = linea.split("\\s+");
+            StringBuilder current = new StringBuilder();
+            for (int i = 0; i < palabras.length; i++) {
+                String palabra = palabras[i];
+                String tentativa = current.length() == 0 ? palabra : current + " " + palabra;
+                int w = fm.stringWidth(tentativa);
+                if (w <= maxTextWidth) {
+                    if (current.length() > 0) current.append(' ');
+                    current.append(palabra);
+                } else {
+                    // dibujar línea actual centrada
+                    String lineaADibujar = current.toString();
+                    int anchoLinea = fm.stringWidth(lineaADibujar);
+                    g.drawString(lineaADibujar, (anchoVentana - anchoLinea) / 2, y);
+                    y += lineHeight;
+                    current = new StringBuilder(palabra);
+                }
+            }
+
+            if (current.length() > 0) {
+                String lineaADibujar = current.toString();
+                int anchoLinea = fm.stringWidth(lineaADibujar);
+                g.drawString(lineaADibujar, (anchoVentana - anchoLinea) / 2, y);
+                y += lineHeight;
+            }
         }
     }
 }
